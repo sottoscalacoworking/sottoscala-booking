@@ -13,52 +13,59 @@
   --ss-text:#1A1A1A;--ss-muted:#6B6B6B;--ss-border:#E0E0DC;
 }
 body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
-.wrap{background:var(--ss-bg);border-radius:12px;overflow:hidden;max-width:900px;margin:0 auto;box-shadow:0 2px 20px rgba(0,0,0,0.08)}
+.wrap{background:var(--ss-bg);border-radius:12px;overflow:hidden;max-width:960px;margin:0 auto;box-shadow:0 2px 20px rgba(0,0,0,0.08)}
 .topbar{background:var(--ss-navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .topbar-title{font-size:15px;font-weight:700;color:#fff}
 .topbar-sub{font-size:12px;color:rgba(255,255,255,0.55);margin-top:1px}
 .topbar-badge{background:var(--ss-orange);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
-.app{display:grid;grid-template-columns:1fr 300px;min-height:620px}
+.app{display:grid;grid-template-columns:1fr 340px;min-height:640px}
 .left{padding:1.25rem;background:var(--ss-white);border-right:1px solid var(--ss-border)}
-.right{padding:1.25rem;background:var(--ss-bg);display:flex;flex-direction:column;gap:0.7rem}
+.right{padding:1.25rem;background:var(--ss-bg);display:flex;flex-direction:column;gap:0.6rem;overflow-y:auto}
 .legend{display:flex;gap:12px;margin-bottom:0.75rem;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted);font-weight:500}
 .ld{width:16px;height:22px;border-radius:3px;flex-shrink:0}
-.panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:10px;padding:0.875rem}
-.panel-label{font-size:10px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+.panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:10px;padding:0.8rem}
+.panel-label{font-size:10px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:7px}
 .sel-name{font-size:14px;font-weight:600;color:var(--ss-text)}
 .sel-sub{font-size:12px;color:var(--ss-muted);margin-top:3px}
-.sel-empty{font-size:13px;color:var(--ss-muted);font-weight:400}
-.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
-.pb{padding:8px 6px;border:1.5px solid var(--ss-border);border-radius:8px;background:var(--ss-white);cursor:pointer;font-size:10px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;line-height:1.4;font-family:'Inter',sans-serif}
+.sel-empty{font-size:12px;color:var(--ss-muted);font-weight:400}
+.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.pb{padding:7px 4px;border:1.5px solid var(--ss-border);border-radius:8px;background:var(--ss-white);cursor:pointer;font-size:10px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;line-height:1.4;font-family:'Inter',sans-serif}
 .pb:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
 .pb.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
-.pb span{display:block;font-size:12px;font-weight:600;margin-top:2px}
-.pb .badge{display:inline-block;font-size:9px;font-weight:600;background:rgba(245,196,0,0.25);color:#7a5e00;border-radius:4px;padding:1px 5px;margin-top:3px}
+.pb span{display:block;font-size:11px;font-weight:600;margin-top:2px}
+.pb .badge{display:inline-block;font-size:9px;font-weight:600;background:rgba(245,196,0,0.25);color:#7a5e00;border-radius:4px;padding:1px 4px;margin-top:2px}
 .pb.active .badge{background:rgba(255,255,255,0.25);color:#fff}
-.restrict-note{font-size:11px;color:var(--ss-orange);font-weight:500;margin-top:6px;padding:6px 8px;background:#FEF0EC;border-radius:6px;border-left:3px solid var(--ss-orange);display:none}
+.restrict-note{font-size:11px;color:var(--ss-orange);font-weight:500;margin-top:5px;padding:5px 8px;background:#FEF0EC;border-radius:6px;border-left:3px solid var(--ss-orange);display:none}
 .restrict-note.visible{display:block}
-.crow{display:flex;gap:6px}
-.crow input{flex:1;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none}
-.crow input:focus{border-color:var(--ss-navy)}
-.capply{padding:7px 12px;background:var(--ss-yellow);color:#1a1200;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.field-row{display:flex;gap:6px}
+.field-row .field{flex:1}
+.field{margin-bottom:0}
+.field label{display:block;font-size:10px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.field input,.field textarea,.field select{width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none;transition:border-color 0.12s}
+.field input:focus,.field textarea:focus{border-color:var(--ss-navy)}
+.field textarea{resize:vertical;min-height:56px}
+.carnet-row{display:flex;gap:6px;align-items:flex-end}
+.carnet-row .field{flex:1}
+.capply{padding:7px 12px;background:var(--ss-yellow);color:#1a1200;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;height:34px}
 .capply:hover{background:#e0b400}
-.cst{font-size:11px;margin-top:5px;min-height:15px;font-weight:500}
+.cst{font-size:11px;margin-top:4px;min-height:14px;font-weight:500}
 .cok{color:#0F6E56}.cerr{color:#B53C1D}
-input[type=date]{width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none}
-input[type=date]:focus{border-color:var(--ss-navy)}
-.avail-status{font-size:12px;font-weight:500;margin-top:6px;min-height:18px;padding:5px 8px;border-radius:6px;display:none}
+.avail-status{font-size:12px;font-weight:500;margin-top:5px;min-height:16px;padding:5px 8px;border-radius:6px;display:none}
 .avail-status.visible{display:block}
 .avail-ok{background:#E6F4EE;color:#0F6E56}
 .avail-busy{background:#FDEEEA;color:#B53C1D}
 .avail-loading{background:#F0F0EE;color:var(--ss-muted)}
-.sum-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--ss-muted)}
+.sum-row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;color:var(--ss-muted)}
 .sum-row span:last-child{font-weight:500;color:var(--ss-text)}
-.sum-div{height:1px;background:var(--ss-border);margin:6px 0}
+.sum-div{height:1px;background:var(--ss-border);margin:5px 0}
 .sum-tot{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--ss-text)}
 .cta{width:100%;padding:12px;background:var(--ss-orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.12s;margin-top:auto}
 .cta:hover{background:var(--ss-orange-dark)}
 .cta:disabled{background:#D4D4D0;color:#999;cursor:not-allowed}
+.cta.loading{background:var(--ss-navy);cursor:wait}
+.success-msg{display:none;background:#E6F4EE;border:1px solid #0F6E56;border-radius:8px;padding:1rem;text-align:center;color:#0F6E56;font-weight:600;font-size:13px}
+.success-msg.visible{display:block}
 .note{font-size:11px;color:var(--ss-muted);text-align:center}
 .desk-avail{fill:#E84A1A;cursor:pointer}
 .desk-avail:hover{opacity:0.72}
@@ -66,7 +73,7 @@ input[type=date]:focus{border-color:var(--ss-navy)}
 .desk-sel{fill:#E84A1A;stroke:#F5C400;stroke-width:3.5}
 .desk-busy{fill:#9E97C8;cursor:not-allowed}
 .desk-loading{fill:#ccaa88;cursor:wait}
-.desk-locked{fill:#4a4a4a;opacity:0.35;cursor:not-allowed}
+.desk-reserved{fill:#4a4a4a;opacity:0.35;cursor:not-allowed}
 .space-avail{fill:rgba(255,255,255,0.1);stroke:rgba(255,255,255,0.3);stroke-width:1.5;cursor:pointer}
 .space-avail:hover{fill:rgba(245,196,0,0.22);stroke:#F5C400;stroke-width:2}
 .space-sel{fill:rgba(245,196,0,0.28);stroke:#F5C400;stroke-width:2.5}
@@ -90,7 +97,6 @@ input[type=date]:focus{border-color:var(--ss-navy)}
         <div class="li"><div class="ld" style="background:#E84A1A"></div>Disponibile</div>
         <div class="li"><div class="ld" style="background:#9E97C8"></div>Occupato</div>
         <div class="li"><div class="ld" style="background:#E84A1A;outline:2.5px solid #F5C400;outline-offset:1px"></div>Selezionato</div>
-        <div class="li"><div class="ld" style="background:#ccaa88"></div>Verifica in corso...</div>
       </div>
 
       <svg viewBox="0 0 340 520" width="100%" style="border-radius:10px;display:block">
@@ -124,12 +130,12 @@ input[type=date]:focus{border-color:var(--ss-navy)}
         <rect id="post-A4" class="desk-avail" x="228" y="122" width="60" height="80" rx="3" onclick="selectDesk('A4')"/>
         <text x="258" y="208" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">A4</text>
         <!-- ISOLA B -->
-        <rect id="post-B1" class="desk-occ" x="160" y="222" width="60" height="80" rx="3"/>
-        <text x="190" y="308" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B1</text>
+        <rect id="post-B1" class="desk-reserved" x="160" y="222" width="60" height="80" rx="3"/>
+        <text x="190" y="308" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.45)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B1</text>
         <rect id="post-B2" class="desk-avail" x="228" y="222" width="60" height="80" rx="3" onclick="selectDesk('B2')"/>
         <text x="258" y="308" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B2</text>
-        <rect id="post-B3" class="desk-occ" x="160" y="309" width="60" height="80" rx="3"/>
-        <text x="190" y="395" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B3</text>
+        <rect id="post-B3" class="desk-reserved" x="160" y="309" width="60" height="80" rx="3"/>
+        <text x="190" y="395" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.45)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B3</text>
         <rect id="post-B4" class="desk-avail" x="228" y="309" width="60" height="80" rx="3" onclick="selectDesk('B4')"/>
         <text x="258" y="395" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B4</text>
         <!-- WORKSHOP -->
@@ -139,209 +145,223 @@ input[type=date]:focus{border-color:var(--ss-navy)}
     </div>
 
     <div class="right">
+
+      <!-- spazio selezionato -->
       <div class="panel" id="sel-card">
         <div class="panel-label">Spazio selezionato</div>
         <div class="sel-empty" id="sel-name">Clicca una postazione o uno spazio</div>
       </div>
 
+      <!-- piano -->
       <div class="panel">
         <div class="panel-label">Piano</div>
         <div class="plan-grid" id="pgrid">
-          <button class="pb active" data-plan="giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
-          <button class="pb" data-plan="trimestrale" data-price="249" data-desk-only="true" onclick="setPlan(this)">Trimestrale<span>€249</span><span class="badge">3 mesi</span></button>
-          <button class="pb" data-plan="mensile" data-price="299" data-desk-only="true" onclick="setPlan(this)">Mensile<span>€299</span></button>
-          <button class="pb" data-plan="annuale" data-price="199" data-desk-only="true" onclick="setPlan(this)">Annuale<span>€199/m</span><span class="badge">miglior prezzo</span></button>
+          <button class="pb active" data-plan="Giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
+          <button class="pb" data-plan="Trimestrale" data-price="249" data-desk-only="true" onclick="setPlan(this)">Trimestrale<span>€249</span><span class="badge">3 mesi</span></button>
+          <button class="pb" data-plan="Mensile" data-price="299" data-desk-only="true" onclick="setPlan(this)">Mensile<span>€299</span></button>
+          <button class="pb" data-plan="Annuale" data-price="199" data-desk-only="true" onclick="setPlan(this)">Annuale<span>€199/m</span><span class="badge">miglior prezzo</span></button>
         </div>
         <div class="restrict-note" id="restrict-note">Solo postazioni disponibili per questo piano</div>
       </div>
 
+      <!-- data -->
       <div class="panel">
-        <div class="panel-label">Carnet ingressi</div>
-        <div style="font-size:11px;color:var(--ss-muted);margin-bottom:7px">Hai un carnet da 5 o 10 ingressi?</div>
-        <div class="crow">
-          <input type="text" id="cin" placeholder="Es. SS-10-2847" oninput="this.value=this.value.toUpperCase()"/>
-          <button class="capply" onclick="applyCarnet()">Verifica</button>
-        </div>
-        <div class="cst" id="cst"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-label">Data</div>
-        <input type="date" id="din" onchange="onDateChange()"/>
+        <div class="panel-label">Data di inizio</div>
+        <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
         <div class="avail-status" id="avail-status"></div>
       </div>
 
+      <!-- dati personali -->
+      <div class="panel">
+        <div class="panel-label">I tuoi dati</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="field-row">
+            <div class="field">
+              <label>Nome e cognome *</label>
+              <input type="text" id="f-nome" placeholder="Mario Rossi"/>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Email *</label>
+              <input type="email" id="f-email" placeholder="mario@email.com"/>
+            </div>
+            <div class="field">
+              <label>Telefono</label>
+              <input type="tel" id="f-telefono" placeholder="3331234567"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Codice carnet <span style="font-weight:400;text-transform:none">(se hai un carnet)</span></label>
+            <div class="carnet-row">
+              <div class="field" style="margin:0">
+                <input type="text" id="f-carnet" placeholder="Es. SS-10-2847" oninput="this.value=this.value.toUpperCase()"/>
+              </div>
+              <button class="capply" onclick="applyCarnet()">Verifica</button>
+            </div>
+            <div class="cst" id="cst"></div>
+          </div>
+          <div class="field">
+            <label>Note <span style="font-weight:400;text-transform:none">(opzionale)</span></label>
+            <textarea id="f-note" placeholder="Es. Ho bisogno di un monitor esterno, porto il cane..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- riepilogo -->
       <div class="panel">
         <div class="panel-label">Riepilogo</div>
         <div class="sum-row"><span>Spazio</span><span id="ss">—</span></div>
         <div class="sum-row"><span>Piano</span><span id="sp">—</span></div>
-        <div class="sum-row"><span>Data</span><span id="sd">—</span></div>
+        <div class="sum-row"><span>Data inizio</span><span id="sd">—</span></div>
         <div class="sum-row"><span>IVA 22%</span><span id="si">—</span></div>
         <div class="sum-div"></div>
         <div class="sum-tot"><span>Totale</span><span id="st">—</span></div>
       </div>
 
+      <div class="success-msg" id="success-msg">
+        ✅ Prenotazione inviata!<br>
+        <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Ti contatteremo a breve per confermare. Controlla la tua email.</span>
+      </div>
+
       <button class="cta" id="cta" disabled onclick="doBook()">Seleziona uno spazio →</button>
-      <div class="note">Conferma via email · info@sottoscalacoworking.com</div>
+      <div class="note">Confermato via email · info@sottoscalacoworking.com</div>
+
     </div>
   </div>
 </div>
 
 <script>
+// ── Configurazione ───────────────────────────────────────────
 const API_KEY = 'AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
+const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
+
+// entry ID dai campi del form (estratti dal link precompilato)
+const ENTRY = {
+  nome:     'entry.895383222',
+  email:    'entry.2051139569',
+  telefono: 'entry.1557765686',
+  spazio:   'entry.354362357',
+  piano:    'entry.1602908207',
+  data:     'entry.1684990418',
+  carnet:   'entry.201482006',
+  note:     'entry.571263674',
+};
 
 const CAL_IDS = {
-  'A1': 'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com',
-  'A2': 'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com',
-  'A3': 'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com',
-  'A4': 'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com',
-  'B1': 'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com',
-  'B2': 'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com',
-  'B3': 'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com',
-  'B4': 'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com',
-  'meeting': 'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com',
-  'kitchen': 'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com',
-  'workshop': 'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com',
+  'Postazione A1': 'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com',
+  'Postazione A2': 'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com',
+  'Postazione A3': 'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com',
+  'Postazione A4': 'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com',
+  'Postazione B1': 'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com',
+  'Postazione B2': 'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com',
+  'Postazione B3': 'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com',
+  'Postazione B4': 'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com',
+  'Sala meeting':  'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com',
+  'Bancone cucina':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com',
+  'Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com',
 };
 
 const SPACES = {
-  meeting:  {name:'Sala meeting',  price:35,  unit:'/ ora',  deskOnly:false},
-  kitchen:  {name:'Bancone cucina',price:19,  unit:'/ giorno',deskOnly:true},
-  workshop: {name:'Tavolo workshop',price:19, unit:'/ giorno',deskOnly:true},
+  meeting:  {name:'Sala meeting',   calName:'Sala meeting',   price:35,  unit:'/ ora',   deskOnly:false},
+  kitchen:  {name:'Bancone cucina', calName:'Bancone cucina', price:19,  unit:'/ giorno',deskOnly:true},
+  workshop: {name:'Tavolo workshop',calName:'Tavolo workshop',price:19,  unit:'/ giorno',deskOnly:true},
 };
 
 const DEMO_C = {'SS-10-2847':{type:10,used:3},'SS-05-1234':{type:5,used:1}};
 const ALL_DESKS = ['A1','A2','A3','A4','B1','B2','B3','B4'];
-const RESERVED = ['B1','B3']; // postazioni riservate (Lisa & Andrea)
+const RESERVED  = ['B1','B3']; // postazioni Lisa & Andrea
 const ZONES_LOCKABLE = ['kitchen','workshop'];
 
 let sel=null, isPost=false, planPrice=19, planLabel='Giornaliero', carnetActive=null, deskOnly=false;
 
-// ── Google Calendar availability check ──────────────────────
+// ── Google Calendar check ────────────────────────────────────
 async function checkAvailability(resourceId, dateStr) {
-  const calId = CAL_IDS[resourceId];
+  const calId = isPost ? CAL_IDS['Postazione '+resourceId] : CAL_IDS[SPACES[resourceId].calName];
   if (!calId) return true;
-  const dateObj = new Date(dateStr + 'T00:00:00');
-  const timeMin = dateObj.toISOString();
-  const end = new Date(dateObj); end.setDate(end.getDate()+1);
-  const timeMax = end.toISOString();
-  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&fields=items(summary,start,end)`;
+  const d = new Date(dateStr+'T00:00:00');
+  const end = new Date(d); end.setDate(end.getDate()+1);
+  const url = 'https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events?key='+API_KEY+'&timeMin='+d.toISOString()+'&timeMax='+end.toISOString()+'&singleEvents=true&fields=items(summary)';
   try {
     const res = await fetch(url);
     const data = await res.json();
     return !(data.items && data.items.length > 0);
-  } catch(e) {
-    return true; // se errore assumiamo disponibile
-  }
+  } catch(e) { return true; }
 }
 
-// controlla tutte le postazioni per una data e aggiorna colori
 async function refreshAllForDate(dateStr) {
   if (!dateStr) return;
   ALL_DESKS.forEach(id => {
+    if (RESERVED.includes(id)) return;
     const el = document.getElementById('post-'+id);
     if (el) el.setAttribute('class','desk-loading');
   });
-  ['meeting','kitchen','workshop'].forEach(id => {
-    const el = document.getElementById('zone-'+id);
-    if (!el) return;
-    if (deskOnly && ZONES_LOCKABLE.includes(id)) return;
-    el.setAttribute('class','space-avail'); // reset, poi verrà aggiornato
-  });
-
   const promises = ALL_DESKS.map(async id => {
-    if (RESERVED.includes(id)) { const el2 = document.getElementById("post-"+id); if(el2) el2.setAttribute("class","desk-occ"); return; }
-    const avail = await checkAvailability(id, dateStr);
+    if (RESERVED.includes(id)) return;
     const el = document.getElementById('post-'+id);
     if (!el) return;
-    if (deskOnly) {
-      // postazioni sempre cliccabili se disponibili
-    }
+    const avail = await checkAvailability(id, dateStr);
     if (sel && isPost && sel.id === id) {
       el.setAttribute('class', avail ? 'desk-sel' : 'desk-busy');
+    } else if (avail) {
+      el.setAttribute('class','desk-avail');
+      el.setAttribute('onclick',"selectDesk('"+id+"')");
     } else {
-      el.setAttribute('class', avail ? 'desk-avail' : 'desk-busy');
-      if (avail) el.setAttribute('onclick', `selectDesk('${id}')`);
-      else el.removeAttribute('onclick');
+      el.setAttribute('class','desk-busy');
+      el.removeAttribute('onclick');
     }
   });
-
-  // controlla anche zone non lockate
   const zonePromises = Object.keys(SPACES).map(async id => {
     if (deskOnly && ZONES_LOCKABLE.includes(id)) return;
-    if (RESERVED.includes(id)) { const el2 = document.getElementById("post-"+id); if(el2) el2.setAttribute("class","desk-occ"); return; }
     const avail = await checkAvailability(id, dateStr);
     const el = document.getElementById('zone-'+id);
     if (!el) return;
-    if (sel && !isPost && sel.id === id) {
-      el.setAttribute('class', avail ? 'space-sel' : 'space-busy');
-    } else {
-      el.setAttribute('class', avail ? 'space-avail' : 'space-busy');
-    }
+    el.setAttribute('class', sel && !isPost && sel.id===id ? (avail?'space-sel':'space-busy') : (avail?'space-avail':'space-busy'));
   });
-
   await Promise.all([...promises, ...zonePromises]);
 }
 
-// ── UI logic ────────────────────────────────────────────────
+// ── UI ───────────────────────────────────────────────────────
 async function onDateChange() {
   const d = document.getElementById('din').value;
   if (!d) return;
-  const dt = new Date(d+'T00:00:00');
-  document.getElementById('sd').textContent = dt.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
-
+  document.getElementById('sd').textContent = new Date(d+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
   if (sel) {
-    const statusEl = document.getElementById('avail-status');
-    statusEl.className = 'avail-status visible avail-loading';
-    statusEl.textContent = 'Verifica disponibilità...';
-
-    const resourceId = isPost ? sel.id : sel.id;
-    const avail = await checkAvailability(resourceId, d);
-
-    if (avail) {
-      statusEl.className = 'avail-status visible avail-ok';
-      statusEl.textContent = '✓ Disponibile in questa data';
-    } else {
-      statusEl.className = 'avail-status visible avail-busy';
-      statusEl.textContent = '✗ Già prenotato in questa data';
-    }
+    const st = document.getElementById('avail-status');
+    st.className='avail-status visible avail-loading'; st.textContent='Verifica disponibilità...';
+    const avail = await checkAvailability(isPost?sel.id:sel.id, d);
+    st.className='avail-status visible '+(avail?'avail-ok':'avail-busy');
+    st.textContent = avail ? '✓ Disponibile in questa data' : '✗ Già prenotato in questa data';
   }
-
   await refreshAllForDate(d);
   updateSummary();
 }
 
 function selectDesk(id) {
   if (RESERVED.includes(id)) return;
-  clearAll();
-  sel={id}; isPost=true;
+  clearAll(); sel={id}; isPost=true;
   document.getElementById('post-'+id).setAttribute('class','desk-sel');
   setCard('Postazione '+id,'Scegli piano e data');
   document.getElementById('ss').textContent='Postazione '+id;
-  const d = document.getElementById('din').value;
-  if (d) onDateChange();
-  else updateSummary();
+  const d=document.getElementById('din').value;
+  if(d) onDateChange(); else updateSummary();
 }
 
 function selectSpace(id) {
-  clearAll();
-  const sp=SPACES[id]; sel={id,...sp}; isPost=false;
+  clearAll(); const sp=SPACES[id]; sel={id,...sp}; isPost=false;
   document.getElementById('zone-'+id).setAttribute('class','space-sel');
   setCard(sp.name,'Da €'+sp.price+sp.unit);
   document.getElementById('ss').textContent=sp.name;
-  const d = document.getElementById('din').value;
-  if (d) onDateChange();
-  else updateSummary();
+  if(!sp.deskOnly){ planPrice=sp.price; }
+  const d=document.getElementById('din').value;
+  if(d) onDateChange(); else updateSummary();
 }
 
-function handleZoneClick(id) {
-  if (deskOnly) return;
-  selectSpace(id);
-}
+function handleZoneClick(id) { if(deskOnly) return; selectSpace(id); }
 
 function setCard(name,sub) {
-  const nm=document.getElementById('sel-name');
-  nm.className='sel-name'; nm.textContent=name;
+  const el=document.getElementById('sel-name');
+  el.className='sel-name'; el.textContent=name;
   let s=document.getElementById('sel-sub');
   if(!s){s=document.createElement('div');s.id='sel-sub';s.className='sel-sub';document.getElementById('sel-card').appendChild(s);}
   s.textContent=sub;
@@ -349,38 +369,26 @@ function setCard(name,sub) {
 
 function setPlan(btn) {
   planPrice=parseInt(btn.dataset.price);
-  const pmap={giornaliero:'Giornaliero',trimestrale:'Trimestrale',mensile:'Mensile',annuale:'Annuale'};
-  planLabel=pmap[btn.dataset.plan];
+  planLabel=btn.dataset.plan;
   deskOnly=btn.dataset.deskOnly==='true';
   document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('sp').textContent=planLabel;
   document.getElementById('restrict-note').classList.toggle('visible',deskOnly);
-  carnetActive=null;
-  document.getElementById('cst').textContent='';
-  document.getElementById('cin').value='';
-  if(deskOnly && sel && !isPost){
-    clearAll(); sel=null;
-    document.getElementById('sel-name').className='sel-empty';
-    document.getElementById('sel-name').textContent='Clicca una postazione';
-    document.getElementById('ss').textContent='—';
-    const sub=document.getElementById('sel-sub');
-    if(sub)sub.remove();
-  }
-  updateZoneLocks();
-  updateSummary();
+  carnetActive=null; document.getElementById('cst').textContent=''; document.getElementById('f-carnet').value='';
+  if(deskOnly && sel && !isPost){ clearAll(); sel=null; resetSelCard(); }
+  updateZoneLocks(); updateSummary();
 }
 
 function updateZoneLocks() {
   ZONES_LOCKABLE.forEach(id=>{
     const el=document.getElementById('zone-'+id);
-    if(!el)return;
-    el.setAttribute('class', deskOnly ? 'space-locked' : (sel&&sel.id===id ? 'space-sel' : 'space-avail'));
+    if(el) el.setAttribute('class',deskOnly?'space-locked':(sel&&sel.id===id?'space-sel':'space-avail'));
   });
 }
 
 function applyCarnet() {
-  const v=document.getElementById('cin').value.trim();
+  const v=document.getElementById('f-carnet').value.trim();
   const st=document.getElementById('cst');
   if(DEMO_C[v]){
     const c=DEMO_C[v]; const rem=c.type-c.used;
@@ -397,15 +405,22 @@ function applyCarnet() {
 
 function clearAll() {
   ALL_DESKS.forEach(id=>{
+    if(RESERVED.includes(id)) return;
     const el=document.getElementById('post-'+id);
-    if(el){el.setAttribute('class','desk-avail');el.setAttribute('onclick',`selectDesk('${id}')`);}
+    if(el){el.setAttribute('class','desk-avail');el.setAttribute('onclick',"selectDesk('"+id+"')");}
   });
   Object.keys(SPACES).forEach(id=>{
     const el=document.getElementById('zone-'+id);
-    if(!el)return;
-    el.setAttribute('class', deskOnly&&ZONES_LOCKABLE.includes(id) ? 'space-locked' : 'space-avail');
+    if(el) el.setAttribute('class',deskOnly&&ZONES_LOCKABLE.includes(id)?'space-locked':'space-avail');
   });
   document.getElementById('avail-status').className='avail-status';
+}
+
+function resetSelCard() {
+  document.getElementById('sel-name').className='sel-empty';
+  document.getElementById('sel-name').textContent='Clicca una postazione o uno spazio';
+  const s=document.getElementById('sel-sub'); if(s) s.remove();
+  document.getElementById('ss').textContent='—';
 }
 
 function updateSummary() {
@@ -415,24 +430,59 @@ function updateSummary() {
     const p=carnetActive?0:planPrice; const iva=Math.round(p*0.22);
     document.getElementById('si').textContent=carnetActive?'—':'€'+iva;
     document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva);
-    cta.disabled=false; cta.textContent='Richiedi prenotazione →';
+    cta.disabled=false; cta.textContent='Conferma prenotazione →';
   } else {
     document.getElementById('si').textContent='—'; document.getElementById('st').textContent='—';
     cta.disabled=true; cta.textContent=sel?'Scegli una data →':'Seleziona uno spazio →';
   }
 }
 
-function doBook() {
-  const d=document.getElementById('din').value;
-  const nm=isPost?'Postazione '+sel.id:sel.name;
-  const extra=carnetActive?' con carnet '+carnetActive.code:'';
-  const p=carnetActive?0:planPrice; const iva=Math.round(p*0.22); const tot=p+iva;
-  const subject=encodeURIComponent('Prenotazione SottoScala – '+nm+' – '+d);
-  const body=encodeURIComponent(`Ciao,\n\nVorrei prenotare:\n\nSpazio: ${nm}\nPiano: ${planLabel}\nData: ${d}${extra}\nTotale: €${tot} (IVA inclusa)\n\nGrazie!`);
-  window.open(`mailto:info@sottoscalacoworking.com?subject=${subject}&body=${body}`);
+// ── Submit invisibile al Google Form ────────────────────────
+async function doBook() {
+  const nome    = document.getElementById('f-nome').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const telefono= document.getElementById('f-telefono').value.trim();
+  const carnet  = document.getElementById('f-carnet').value.trim();
+  const note    = document.getElementById('f-note').value.trim();
+  const data    = document.getElementById('din').value;
+
+  if (!nome || !email) { alert('Inserisci nome e email per procedere.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Inserisci un indirizzo email valido.'); return; }
+
+  const spazioLabel = isPost ? 'Postazione '+sel.id : sel.name;
+
+  const cta = document.getElementById('cta');
+  cta.disabled=true; cta.className='cta loading'; cta.textContent='Invio in corso...';
+
+  // costruisce il form data
+  const body = new URLSearchParams();
+  body.append(ENTRY.nome,     nome);
+  body.append(ENTRY.email,    email);
+  body.append(ENTRY.telefono, telefono);
+  body.append(ENTRY.spazio,   spazioLabel);
+  body.append(ENTRY.piano,    planLabel);
+  body.append(ENTRY.data,     data);
+  if(carnet) body.append(ENTRY.carnet, carnet);
+  if(note)   body.append(ENTRY.note,   note);
+
+  try {
+    // submit invisibile tramite no-cors (Google Forms lo accetta)
+    await fetch(FORM_ACTION, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    });
+    // mostra successo
+    cta.style.display='none';
+    document.getElementById('success-msg').classList.add('visible');
+  } catch(err) {
+    cta.disabled=false; cta.className='cta'; cta.textContent='Conferma prenotazione →';
+    alert('Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com');
+  }
 }
 
-document.getElementById('din').min=new Date().toISOString().split('T')[0];
+document.getElementById('din').min = new Date().toISOString().split('T')[0];
 </script>
 </body>
 </html>
