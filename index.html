@@ -247,4 +247,135 @@ function selectDesk(id){
   clearAllSel();sel={id};isPost=true;isMeeting=false;
   document.getElementById('post-'+id).setAttribute('class','desk-sel');
   setCard('Postazione '+id,'Scegli piano e data');
-  document.g
+  document.getElementById('ss').textContent='Postazione '+id;
+  enablePlan(true);
+  document.getElementById('meeting-note').classList.remove('visible');
+  const d=document.getElementById('din').value;
+  if(d)onDateChange();else updateSummary();
+}
+
+function selectSpace(id){
+  clearAllSel();const sp=SPACES[id];sel={id,...sp};isPost=false;isMeeting=(id==='meeting');
+  document.getElementById('zone-'+id).setAttribute('class','space-sel');
+  setCard(sp.name,isMeeting?'Prenota a ore — contattaci':'Da €'+sp.price+sp.unit);
+  document.getElementById('ss').textContent=sp.name;
+  if(isMeeting){
+    enablePlan(false);
+    document.getElementById('meeting-note').classList.add('visible');
+    planPrice=sp.price;planLabel='Orario';
+    document.getElementById('sp').textContent='Orario (€25-35/ora)';
+  }else{
+    enablePlan(true);
+    document.getElementById('meeting-note').classList.remove('visible');
+    planPrice=sp.price;
+  }
+  const d=document.getElementById('din').value;
+  if(d)onDateChange();else updateSummary();
+}
+
+function handleZoneClick(id){if(deskOnly)return;selectSpace(id);}
+
+function enablePlan(on){
+  const g=document.getElementById('pgrid');
+  g.style.opacity=on?'1':'0.4';g.style.pointerEvents=on?'auto':'none';
+}
+
+function setCard(name,sub){
+  const el=document.getElementById('sel-name');el.className='sel-name';el.textContent=name;
+  let s=document.getElementById('sel-sub');
+  if(!s){s=document.createElement('div');s.id='sel-sub';s.className='sel-sub';document.getElementById('sel-card').appendChild(s);}
+  s.textContent=sub;
+}
+
+function setPlan(btn){
+  if(isMeeting)return;
+  planPrice=parseInt(btn.dataset.price);planLabel=btn.dataset.plan;deskOnly=btn.dataset.deskOnly==='true';
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('sp').textContent=planLabel;
+  document.getElementById('restrict-note').classList.toggle('visible',deskOnly);
+  carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';
+  if(deskOnly&&sel&&!isPost){clearAllSel();sel=null;resetSelCard();}
+  updateZoneLocks();updateSummary();
+}
+
+function updateZoneLocks(){
+  ZONES_LOCKABLE.forEach(id=>{const el=document.getElementById('zone-'+id);if(el)el.setAttribute('class',deskOnly?'space-locked':(sel&&sel.id===id?'space-sel':'space-avail'));});
+}
+
+function applyCarnet(){
+  const v=document.getElementById('f-carnet').value.trim();const st=document.getElementById('cst');
+  if(DEMO_C[v]){const c=DEMO_C[v];const rem=c.type-c.used;carnetActive={code:v,remaining:rem};
+    st.className='cst cok';st.textContent='✓ Carnet valido · '+rem+'/'+c.type+' ingressi rimanenti';
+    planPrice=0;planLabel='Carnet ('+rem+' rimasti)';
+    document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
+    document.getElementById('sp').textContent=planLabel;updateSummary();
+  }else{carnetActive=null;st.className='cst cerr';st.textContent='Codice non trovato.';}
+}
+
+function clearAllSel(){
+  ALL_DESKS.forEach(id=>{if(RESERVED.includes(id))return;const el=document.getElementById('post-'+id);if(el){el.setAttribute('class','desk-avail');el.setAttribute('onclick',"selectDesk('"+id+"')");}});
+  Object.keys(SPACES).forEach(id=>{const el=document.getElementById('zone-'+id);if(el)el.setAttribute('class',deskOnly&&ZONES_LOCKABLE.includes(id)?'space-locked':'space-avail');});
+  document.getElementById('avail-status').className='avail-status';
+}
+
+function resetSelCard(){
+  document.getElementById('sel-name').className='sel-empty';document.getElementById('sel-name').textContent='Clicca una postazione o uno spazio';
+  const s=document.getElementById('sel-sub');if(s)s.remove();document.getElementById('ss').textContent='—';
+}
+
+async function onDateChange(){
+  const d=document.getElementById('din').value;if(!d)return;
+  document.getElementById('sd').textContent=new Date(d+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
+  if(sel&&!isMeeting){
+    const st=document.getElementById('avail-status');
+    st.className='avail-status visible avail-loading';st.textContent='Verifica disponibilità...';
+    const calName=isPost?'Postazione '+sel.id:SPACES[sel.id].calName;
+    const avail=await checkAvailability(calName,d);
+    st.className='avail-status visible '+(avail?'avail-ok':'avail-busy');
+    st.textContent=avail?'✓ Disponibile in questa data':'✗ Già prenotato in questa data';
+  }
+  await refreshAllForDate(d);
+  updateSummary();
+}
+
+function updateSummary(){
+  const d=document.getElementById('din').value;const cta=document.getElementById('cta');
+  if(sel&&d){
+    const p=carnetActive?0:planPrice;const iva=Math.round(p*0.22);
+    document.getElementById('si').textContent=carnetActive?'—':'€'+iva;
+    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva);
+    cta.disabled=false;cta.textContent='Conferma prenotazione →';
+  }else{
+    document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
+    cta.disabled=true;cta.textContent=sel?'Scegli una data →':'Seleziona uno spazio →';
+  }
+}
+
+async function doBook(){
+  const nome=document.getElementById('f-nome').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const telefono=document.getElementById('f-telefono').value.trim();
+  const carnet=document.getElementById('f-carnet').value.trim();
+  const note=document.getElementById('f-note').value.trim();
+  const data=document.getElementById('din').value;
+  if(!nome||!email){alert('Inserisci nome e email per procedere.');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Inserisci un indirizzo email valido.');return;}
+  const spazioLabel=isPost?'Postazione '+sel.id:sel.name;
+  const cta=document.getElementById('cta');
+  cta.disabled=true;cta.className='cta loading';cta.textContent='Invio in corso...';
+  const body=new URLSearchParams();
+  body.append(ENTRY.nome,nome);body.append(ENTRY.email,email);body.append(ENTRY.telefono,telefono);
+  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel);body.append(ENTRY.data,data);
+  if(carnet)body.append(ENTRY.carnet,carnet);if(note)body.append(ENTRY.note,note);
+  try{
+    await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+    cta.style.display='none';document.getElementById('success-msg').classList.add('visible');
+  }catch(err){
+    cta.disabled=false;cta.className='cta';cta.textContent='Conferma prenotazione →';
+    alert('Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com');
+  }
+}
+document.getElementById('din').min=new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
