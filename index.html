@@ -36,22 +36,43 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .pb span{display:block;font-size:11px;font-weight:600;margin-top:2px}
 .pb .badge{display:inline-block;font-size:9px;font-weight:600;background:rgba(245,196,0,0.25);color:#7a5e00;border-radius:4px;padding:1px 4px;margin-top:2px}
 .pb.active .badge{background:rgba(255,255,255,0.25);color:#fff}
-.restrict-note{font-size:11px;color:var(--ss-orange);font-weight:500;margin-top:5px;padding:5px 8px;background:#FEF0EC;border-radius:6px;border-left:3px solid var(--ss-orange);display:none}
+.restrict-note{font-size:11px;font-weight:500;margin-top:5px;padding:5px 8px;border-radius:6px;border-left:3px solid var(--ss-orange);background:#FEF0EC;color:var(--ss-orange);display:none}
 .restrict-note.visible{display:block}
-.field-row{display:flex;gap:6px}
-.field-row .field{flex:1}
+.meeting-note{font-size:11px;font-weight:500;margin-top:5px;padding:5px 8px;border-radius:6px;border-left:3px solid var(--ss-navy);background:#EEF1FA;color:var(--ss-navy);display:none}
+.meeting-note.visible{display:block}
+/* meeting orario */
+.meeting-panel{display:none}
+.meeting-panel.visible{display:block}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+.tb{padding:6px 2px;border:1.5px solid var(--ss-border);border-radius:7px;background:var(--ss-white);cursor:pointer;font-size:11px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;font-family:'Inter',sans-serif}
+.tb:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
+.tb.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
+.tb.busy{background:#F0EEF8;color:#9E97C8;cursor:not-allowed;border-color:var(--ss-border)}
+.dur-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.db{padding:7px 4px;border:1.5px solid var(--ss-border);border-radius:7px;background:var(--ss-white);cursor:pointer;font-size:10px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;font-family:'Inter',sans-serif;line-height:1.4}
+.db:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
+.db.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
+.db span{display:block;font-size:11px;font-weight:600;margin-top:2px}
+.pax-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.paxb{padding:7px 4px;border:1.5px solid var(--ss-border);border-radius:7px;background:var(--ss-white);cursor:pointer;font-size:10px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;font-family:'Inter',sans-serif;line-height:1.4}
+.paxb:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
+.paxb.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
+.paxb span{display:block;font-size:11px;font-weight:600;margin-top:2px}
+/* campi form */
 .field{margin-bottom:0}
 .field label{display:block;font-size:10px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
-.field input,.field textarea,.field select{width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none;transition:border-color 0.12s}
+.field input,.field textarea{width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none;transition:border-color 0.12s}
 .field input:focus,.field textarea:focus{border-color:var(--ss-navy)}
-.field textarea{resize:vertical;min-height:56px}
+.field textarea{resize:vertical;min-height:52px}
+.field-row{display:flex;gap:6px}
+.field-row .field{flex:1}
 .carnet-row{display:flex;gap:6px;align-items:flex-end}
-.carnet-row .field{flex:1}
+.carnet-row .field{flex:1;margin:0}
 .capply{padding:7px 12px;background:var(--ss-yellow);color:#1a1200;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;height:34px}
 .capply:hover{background:#e0b400}
 .cst{font-size:11px;margin-top:4px;min-height:14px;font-weight:500}
 .cok{color:#0F6E56}.cerr{color:#B53C1D}
-.avail-status{font-size:12px;font-weight:500;margin-top:5px;min-height:16px;padding:5px 8px;border-radius:6px;display:none}
+.avail-status{font-size:12px;font-weight:500;margin-top:5px;padding:5px 8px;border-radius:6px;display:none}
 .avail-status.visible{display:block}
 .avail-ok{background:#E6F4EE;color:#0F6E56}
 .avail-busy{background:#FDEEEA;color:#B53C1D}
@@ -67,35 +88,28 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .success-msg{display:none;background:#E6F4EE;border:1px solid #0F6E56;border-radius:8px;padding:1rem;text-align:center;color:#0F6E56;font-weight:600;font-size:13px}
 .success-msg.visible{display:block}
 .note{font-size:11px;color:var(--ss-muted);text-align:center}
+/* SVG */
 .desk-avail{fill:#E84A1A;cursor:pointer}
-.desk-avail:hover{opacity:0.72}
+.desk-avail:hover{opacity:0.75}
 .desk-occ{fill:#9E97C8;cursor:not-allowed}
-.desk-sel{fill:#E84A1A;stroke:#F5C400;stroke-width:3.5}
+.desk-sel{fill:#E84A1A;stroke:#F5C400;stroke-width:3.5;cursor:pointer}
 .desk-busy{fill:#9E97C8;cursor:not-allowed}
-.desk-loading{fill:#ccaa88;cursor:wait}
 .desk-reserved{fill:#4a4a4a;opacity:0.35;cursor:not-allowed}
 .space-avail{fill:rgba(255,255,255,0.1);stroke:rgba(255,255,255,0.3);stroke-width:1.5;cursor:pointer}
 .space-avail:hover{fill:rgba(245,196,0,0.22);stroke:#F5C400;stroke-width:2}
 .space-sel{fill:rgba(245,196,0,0.28);stroke:#F5C400;stroke-width:2.5}
 .space-locked{fill:rgba(0,0,0,0.25);stroke:rgba(255,255,255,0.08);stroke-width:1;cursor:not-allowed}
 .space-busy{fill:rgba(158,151,200,0.35);stroke:#9E97C8;stroke-width:1.5;cursor:not-allowed}
-
-/* ── Mobile responsive ─────────────────────────────── */
-@media (max-width: 700px) {
-  .app { grid-template-columns: 1fr; min-height:unset; }
-  .left { border-right: none; border-bottom: 1px solid var(--ss-border); padding: 1rem; }
-  .right { padding: 1rem; }
-  .topbar { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .topbar-badge { align-self: flex-start; }
-  .plan-grid { grid-template-columns: repeat(2,1fr); }
-  .field-row { flex-direction: column; gap: 8px; }
-  svg { max-height: 420px; }
+/* mobile */
+@media(max-width:700px){
+  .app{grid-template-columns:1fr;min-height:unset}
+  .left{border-right:none;border-bottom:1px solid var(--ss-border);padding:1rem}
+  .right{padding:1rem}
+  .topbar{flex-direction:column;align-items:flex-start;gap:6px}
+  .topbar-badge{align-self:flex-start}
+  .field-row{flex-direction:column;gap:8px}
+  svg{max-height:420px}
 }
-@media (max-width: 400px) {
-  .plan-grid { grid-template-columns: 1fr 1fr; }
-  .legend { gap: 8px; }
-}
-
 </style>
 </head>
 <body>
@@ -115,7 +129,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <div class="li"><div class="ld" style="background:#9E97C8"></div>Occupato</div>
         <div class="li"><div class="ld" style="background:#E84A1A;outline:2.5px solid #F5C400;outline-offset:1px"></div>Selezionato</div>
       </div>
-
       <svg viewBox="0 0 340 520" width="100%" style="border-radius:10px;display:block">
         <rect width="340" height="520" fill="#2E1F8A" rx="10"/>
         <rect x="10" y="10" width="320" height="500" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" rx="3"/>
@@ -127,7 +140,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <rect x="10" y="145" width="80" height="175" fill="#251880" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
         <text x="20" y="163" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,Arial" font-weight="500">ANTI</text>
         <rect x="15" y="175" width="70" height="138" fill="rgba(0,0,0,0.18)" rx="3"/>
-        <text x="50" y="248" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial" font-weight="500">W.C.</text>
+        <text x="50" y="248" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial">W.C.</text>
         <rect id="zone-meeting" class="space-avail" x="12" y="14" width="78" height="28" rx="4" onclick="selectSpace('meeting')"/>
         <text x="51" y="32" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Sala meeting</text>
         <rect id="zone-kitchen" class="space-avail" x="12" y="358" width="78" height="36" rx="4" onclick="handleZoneClick('kitchen')"/>
@@ -169,8 +182,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <div class="sel-empty" id="sel-name">Clicca una postazione o uno spazio</div>
       </div>
 
-      <!-- piano -->
-      <div class="panel">
+      <!-- piano (postazioni) -->
+      <div class="panel" id="plan-panel">
         <div class="panel-label">Piano</div>
         <div class="plan-grid" id="pgrid">
           <button class="pb active" data-plan="Giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
@@ -179,11 +192,32 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
           <button class="pb" data-plan="Annuale" data-price="199" data-desk-only="true" onclick="setPlan(this)">Annuale<span>€199/m</span><span class="badge">miglior prezzo</span></button>
         </div>
         <div class="restrict-note" id="restrict-note">Solo postazioni disponibili per questo piano</div>
+        <div class="meeting-note" id="meeting-note">La sala si prenota a ore — scegli data, orario e durata qui sotto</div>
+      </div>
+
+      <!-- MEETING: orario e durata (visibile solo per sala meeting) -->
+      <div class="panel meeting-panel" id="meeting-panel">
+        <div class="panel-label">Numero di persone</div>
+        <div class="pax-grid" style="margin-bottom:12px">
+          <button class="paxb active" data-pax="small" onclick="setPax(this)">Fino a 3 persone<span>€25/ora</span></button>
+          <button class="paxb" data-pax="large" onclick="setPax(this)">Da 4 a 6 persone<span>€35/ora</span></button>
+        </div>
+        <div class="panel-label">Orario di inizio</div>
+        <div class="time-grid" id="time-grid">
+          <!-- generato da JS -->
+        </div>
+        <div class="panel-label" style="margin-top:8px">Durata</div>
+        <div class="dur-grid">
+          <button class="db active" data-dur="1" data-label="1 ora" onclick="setDur(this)">1 ora<span id="dur-price-1"></span></button>
+          <button class="db" data-dur="2" data-label="2 ore" onclick="setDur(this)">2 ore<span id="dur-price-2"></span></button>
+          <button class="db" data-dur="4" data-label="Mezza giornata" onclick="setDur(this)">Mezza giornata<span id="dur-price-4"></span></button>
+          <button class="db" data-dur="8" data-label="Giornata intera" onclick="setDur(this)">Giornata intera<span id="dur-price-8"></span></button>
+        </div>
       </div>
 
       <!-- data -->
       <div class="panel">
-        <div class="panel-label">Data di inizio</div>
+        <div class="panel-label" id="date-label">Data di inizio</div>
         <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
         <div class="avail-status" id="avail-status"></div>
       </div>
@@ -192,36 +226,20 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
       <div class="panel">
         <div class="panel-label">I tuoi dati</div>
         <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="field"><label>Nome e cognome *</label><input type="text" id="f-nome" placeholder="Mario Rossi"/></div>
           <div class="field-row">
-            <div class="field">
-              <label>Nome e cognome *</label>
-              <input type="text" id="f-nome" placeholder="Mario Rossi"/>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label>Email *</label>
-              <input type="email" id="f-email" placeholder="mario@email.com"/>
-            </div>
-            <div class="field">
-              <label>Telefono</label>
-              <input type="tel" id="f-telefono" placeholder="3331234567"/>
-            </div>
+            <div class="field"><label>Email *</label><input type="email" id="f-email" placeholder="mario@email.com"/></div>
+            <div class="field"><label>Telefono</label><input type="tel" id="f-telefono" placeholder="3331234567"/></div>
           </div>
           <div class="field">
-            <label>Codice carnet <span style="font-weight:400;text-transform:none">(se hai un carnet)</span></label>
+            <label>Codice carnet <span style="font-weight:400;text-transform:none">(opzionale)</span></label>
             <div class="carnet-row">
-              <div class="field" style="margin:0">
-                <input type="text" id="f-carnet" placeholder="Es. SS-10-2847" oninput="this.value=this.value.toUpperCase()"/>
-              </div>
+              <div class="field"><input type="text" id="f-carnet" placeholder="Es. SS-10-2847" oninput="this.value=this.value.toUpperCase()"/></div>
               <button class="capply" onclick="applyCarnet()">Verifica</button>
             </div>
             <div class="cst" id="cst"></div>
           </div>
-          <div class="field">
-            <label>Note <span style="font-weight:400;text-transform:none">(opzionale)</span></label>
-            <textarea id="f-note" placeholder="Es. Ho bisogno di un monitor esterno, porto il cane..."></textarea>
-          </div>
+          <div class="field"><label>Note <span style="font-weight:400;text-transform:none">(opzionale)</span></label><textarea id="f-note" placeholder="Es. porto il portatile, ho bisogno di monitor..."></textarea></div>
         </div>
       </div>
 
@@ -229,8 +247,9 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
       <div class="panel">
         <div class="panel-label">Riepilogo</div>
         <div class="sum-row"><span>Spazio</span><span id="ss">—</span></div>
-        <div class="sum-row"><span>Piano</span><span id="sp">—</span></div>
-        <div class="sum-row"><span>Data inizio</span><span id="sd">—</span></div>
+        <div class="sum-row"><span id="plan-label-sum">Piano</span><span id="sp">—</span></div>
+        <div class="sum-row"><span>Data</span><span id="sd">—</span></div>
+        <div class="sum-row" id="orario-row" style="display:none"><span>Orario</span><span id="s-orario">—</span></div>
         <div class="sum-row"><span>IVA 22%</span><span id="si">—</span></div>
         <div class="sum-div"></div>
         <div class="sum-tot"><span>Totale</span><span id="st">—</span></div>
@@ -240,68 +259,12 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         ✅ Prenotazione inviata!<br>
         <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Ti contatteremo a breve per confermare. Controlla la tua email.</span>
       </div>
-
       <button class="cta" id="cta" disabled onclick="doBook()">Seleziona uno spazio →</button>
-      <div class="note">Confermato via email · info@sottoscalacoworking.com</div>
-
+      <div class="note">Conferma via email · info@sottoscalacoworking.com</div>
     </div>
   </div>
 </div>
 
 <script>
-// ── Configurazione ───────────────────────────────────────────
 const API_KEY = 'AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
-const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
-
-// entry ID dai campi del form (estratti dal link precompilato)
-const ENTRY = {
-  nome:     'entry.895383222',
-  email:    'entry.2051139569',
-  telefono: 'entry.1557765686',
-  spazio:   'entry.354362357',
-  piano:    'entry.1602908207',
-  data:     'entry.1684990418',
-  carnet:   'entry.201482006',
-  note:     'entry.571263674',
-};
-
-const CAL_IDS = {
-  'Postazione A1': 'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com',
-  'Postazione A2': 'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com',
-  'Postazione A3': 'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com',
-  'Postazione A4': 'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com',
-  'Postazione B1': 'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com',
-  'Postazione B2': 'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com',
-  'Postazione B3': 'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com',
-  'Postazione B4': 'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com',
-  'Sala meeting':  'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com',
-  'Bancone cucina':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com',
-  'Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com',
-};
-
-const SPACES = {
-  meeting:  {name:'Sala meeting',   calName:'Sala meeting',   price:35,  unit:'/ ora',   deskOnly:false},
-  kitchen:  {name:'Bancone cucina', calName:'Bancone cucina', price:19,  unit:'/ giorno',deskOnly:true},
-  workshop: {name:'Tavolo workshop',calName:'Tavolo workshop',price:19,  unit:'/ giorno',deskOnly:true},
-};
-
-const DEMO_C = {'SS-10-2847':{type:10,used:3},'SS-05-1234':{type:5,used:1}};
-const ALL_DESKS = ['A1','A2','A3','A4','B1','B2','B3','B4'];
-const RESERVED  = ['B1','B3']; // postazioni Lisa & Andrea
-const ZONES_LOCKABLE = ['kitchen','workshop'];
-
-let sel=null, isPost=false, planPrice=19, planLabel='Giornaliero', carnetActive=null, deskOnly=false;
-
-// ── Google Calendar check con cache e debounce ───────────────
-const availCache = {}; // cache: "resourceId_dateStr" -> bool
-let refreshTimeout = null;
-let currentRefreshDate = null;
-
-async function checkAvailability(resourceId, dateStr) {
-  const cacheKey = resourceId + '_' + dateStr;
-  if (availCache[cacheKey] !== undefined) return availCache[cacheKey];
-
-  const calId = isPost ? CAL_IDS['Postazione '+resourceId] : CAL_IDS[SPACES[resourceId] ? SPACES[resourceId].calName : resourceId];
-  if (!calId) return true;
-
-  const d = ne
+const FORM_ACT
