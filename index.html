@@ -40,25 +40,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .restrict-note.visible{display:block}
 .meeting-note{font-size:11px;font-weight:500;margin-top:5px;padding:5px 8px;border-radius:6px;border-left:3px solid var(--ss-navy);background:#EEF1FA;color:var(--ss-navy);display:none}
 .meeting-note.visible{display:block}
-/* meeting orario */
-.meeting-panel{display:none}
-.meeting-panel.visible{display:block}
-.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
-.tb{padding:6px 2px;border:1.5px solid var(--ss-border);border-radius:7px;background:var(--ss-white);cursor:pointer;font-size:11px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;font-family:'Inter',sans-serif}
-.tb:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
-.tb.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
-.tb.busy{background:#F0EEF8;color:#9E97C8;cursor:not-allowed;border-color:var(--ss-border)}
-.dur-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
-.db{padding:7px 4px;border:1.5px solid var(--ss-border);border-radius:7px;background:var(--ss-white);cursor:pointer;font-size:10px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;font-family:'Inter',sans-serif;line-height:1.4}
-.db:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
-.db.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
-.db span{display:block;font-size:11px;font-weight:600;margin-top:2px}
-.pax-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.paxb{padding:7px 4px;border:1.5px solid var(--ss-border);border-radius:7px;background:var(--ss-white);cursor:pointer;font-size:10px;font-weight:500;color:var(--ss-muted);text-align:center;transition:all 0.12s;font-family:'Inter',sans-serif;line-height:1.4}
-.paxb:hover{border-color:var(--ss-orange);color:var(--ss-orange)}
-.paxb.active{background:var(--ss-orange);color:#fff;border-color:var(--ss-orange)}
-.paxb span{display:block;font-size:11px;font-weight:600;margin-top:2px}
-/* campi form */
 .field{margin-bottom:0}
 .field label{display:block;font-size:10px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
 .field input,.field textarea{width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none;transition:border-color 0.12s}
@@ -88,11 +69,9 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .success-msg{display:none;background:#E6F4EE;border:1px solid #0F6E56;border-radius:8px;padding:1rem;text-align:center;color:#0F6E56;font-weight:600;font-size:13px}
 .success-msg.visible{display:block}
 .note{font-size:11px;color:var(--ss-muted);text-align:center}
-/* SVG */
 .desk-avail{fill:#E84A1A;cursor:pointer}
 .desk-avail:hover{opacity:0.75}
-.desk-occ{fill:#9E97C8;cursor:not-allowed}
-.desk-sel{fill:#E84A1A;stroke:#F5C400;stroke-width:3.5;cursor:pointer}
+.desk-sel{fill:#E84A1A;stroke:#F5C400;stroke-width:3.5}
 .desk-busy{fill:#9E97C8;cursor:not-allowed}
 .desk-reserved{fill:#4a4a4a;opacity:0.35;cursor:not-allowed}
 .space-avail{fill:rgba(255,255,255,0.1);stroke:rgba(255,255,255,0.3);stroke-width:1.5;cursor:pointer}
@@ -100,7 +79,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .space-sel{fill:rgba(245,196,0,0.28);stroke:#F5C400;stroke-width:2.5}
 .space-locked{fill:rgba(0,0,0,0.25);stroke:rgba(255,255,255,0.08);stroke-width:1;cursor:not-allowed}
 .space-busy{fill:rgba(158,151,200,0.35);stroke:#9E97C8;stroke-width:1.5;cursor:not-allowed}
-/* mobile */
 @media(max-width:700px){
   .app{grid-template-columns:1fr;min-height:unset}
   .left{border-right:none;border-bottom:1px solid var(--ss-border);padding:1rem}
@@ -121,7 +99,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
     </div>
     <div class="topbar-badge">Accesso 24/7</div>
   </div>
-
   <div class="app">
     <div class="left">
       <div class="legend">
@@ -150,7 +127,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <text x="297" y="23" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5">INGRESSO</text>
         <rect x="266" y="492" width="62" height="16" fill="#E84A1A" rx="3"/>
         <text x="297" y="503" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5">INGRESSO</text>
-        <!-- ISOLA A -->
         <rect id="post-A1" class="desk-avail" x="160" y="35" width="60" height="80" rx="3" onclick="selectDesk('A1')"/>
         <text x="190" y="121" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">A1</text>
         <rect id="post-A2" class="desk-avail" x="228" y="35" width="60" height="80" rx="3" onclick="selectDesk('A2')"/>
@@ -159,7 +135,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <text x="190" y="208" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">A3</text>
         <rect id="post-A4" class="desk-avail" x="228" y="122" width="60" height="80" rx="3" onclick="selectDesk('A4')"/>
         <text x="258" y="208" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">A4</text>
-        <!-- ISOLA B -->
         <rect id="post-B1" class="desk-reserved" x="160" y="222" width="60" height="80" rx="3"/>
         <text x="190" y="308" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.45)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B1</text>
         <rect id="post-B2" class="desk-avail" x="228" y="222" width="60" height="80" rx="3" onclick="selectDesk('B2')"/>
@@ -168,22 +143,16 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <text x="190" y="395" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.45)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B3</text>
         <rect id="post-B4" class="desk-avail" x="228" y="309" width="60" height="80" rx="3" onclick="selectDesk('B4')"/>
         <text x="258" y="395" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B4</text>
-        <!-- WORKSHOP -->
         <rect id="zone-workshop" class="space-avail" x="105" y="440" width="185" height="36" rx="4" onclick="handleZoneClick('workshop')"/>
         <text x="197" y="462" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Tavolo workshop</text>
       </svg>
     </div>
-
     <div class="right">
-
-      <!-- spazio selezionato -->
       <div class="panel" id="sel-card">
         <div class="panel-label">Spazio selezionato</div>
         <div class="sel-empty" id="sel-name">Clicca una postazione o uno spazio</div>
       </div>
-
-      <!-- piano (postazioni) -->
-      <div class="panel" id="plan-panel">
+      <div class="panel">
         <div class="panel-label">Piano</div>
         <div class="plan-grid" id="pgrid">
           <button class="pb active" data-plan="Giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
@@ -192,37 +161,13 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
           <button class="pb" data-plan="Annuale" data-price="199" data-desk-only="true" onclick="setPlan(this)">Annuale<span>€199/m</span><span class="badge">miglior prezzo</span></button>
         </div>
         <div class="restrict-note" id="restrict-note">Solo postazioni disponibili per questo piano</div>
-        <div class="meeting-note" id="meeting-note">La sala si prenota a ore — scegli data, orario e durata qui sotto</div>
+        <div class="meeting-note" id="meeting-note">La sala meeting si prenota a ore — scrivici per disponibilità e preventivo</div>
       </div>
-
-      <!-- MEETING: orario e durata (visibile solo per sala meeting) -->
-      <div class="panel meeting-panel" id="meeting-panel">
-        <div class="panel-label">Numero di persone</div>
-        <div class="pax-grid" style="margin-bottom:12px">
-          <button class="paxb active" data-pax="small" onclick="setPax(this)">Fino a 3 persone<span>€25/ora</span></button>
-          <button class="paxb" data-pax="large" onclick="setPax(this)">Da 4 a 6 persone<span>€35/ora</span></button>
-        </div>
-        <div class="panel-label">Orario di inizio</div>
-        <div class="time-grid" id="time-grid">
-          <!-- generato da JS -->
-        </div>
-        <div class="panel-label" style="margin-top:8px">Durata</div>
-        <div class="dur-grid">
-          <button class="db active" data-dur="1" data-label="1 ora" onclick="setDur(this)">1 ora<span id="dur-price-1"></span></button>
-          <button class="db" data-dur="2" data-label="2 ore" onclick="setDur(this)">2 ore<span id="dur-price-2"></span></button>
-          <button class="db" data-dur="4" data-label="Mezza giornata" onclick="setDur(this)">Mezza giornata<span id="dur-price-4"></span></button>
-          <button class="db" data-dur="8" data-label="Giornata intera" onclick="setDur(this)">Giornata intera<span id="dur-price-8"></span></button>
-        </div>
-      </div>
-
-      <!-- data -->
       <div class="panel">
-        <div class="panel-label" id="date-label">Data di inizio</div>
+        <div class="panel-label">Data di inizio</div>
         <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
         <div class="avail-status" id="avail-status"></div>
       </div>
-
-      <!-- dati personali -->
       <div class="panel">
         <div class="panel-label">I tuoi dati</div>
         <div style="display:flex;flex-direction:column;gap:8px">
@@ -242,19 +187,15 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
           <div class="field"><label>Note <span style="font-weight:400;text-transform:none">(opzionale)</span></label><textarea id="f-note" placeholder="Es. porto il portatile, ho bisogno di monitor..."></textarea></div>
         </div>
       </div>
-
-      <!-- riepilogo -->
       <div class="panel">
         <div class="panel-label">Riepilogo</div>
         <div class="sum-row"><span>Spazio</span><span id="ss">—</span></div>
-        <div class="sum-row"><span id="plan-label-sum">Piano</span><span id="sp">—</span></div>
+        <div class="sum-row"><span>Piano</span><span id="sp">—</span></div>
         <div class="sum-row"><span>Data</span><span id="sd">—</span></div>
-        <div class="sum-row" id="orario-row" style="display:none"><span>Orario</span><span id="s-orario">—</span></div>
         <div class="sum-row"><span>IVA 22%</span><span id="si">—</span></div>
         <div class="sum-div"></div>
         <div class="sum-tot"><span>Totale</span><span id="st">—</span></div>
       </div>
-
       <div class="success-msg" id="success-msg">
         ✅ Prenotazione inviata!<br>
         <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Ti contatteremo a breve per confermare. Controlla la tua email.</span>
@@ -264,7 +205,46 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
     </div>
   </div>
 </div>
-
 <script>
-const API_KEY = 'AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
-const FORM_ACT
+const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
+const FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
+const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',note:'entry.571263674'};
+const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Bancone cucina':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
+const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:25,unit:'/ ora',deskOnly:false},kitchen:{name:'Bancone cucina',calName:'Bancone cucina',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
+const RESERVED=['B1','B3'];
+const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
+const ZONES_LOCKABLE=['kitchen','workshop'];
+const DEMO_C={'SS-10-2847':{type:10,used:3},'SS-05-1234':{type:5,used:1}};
+
+let sel=null,isPost=false,isMeeting=false,planPrice=19,planLabel='Giornaliero',deskOnly=false,carnetActive=null;
+
+async function checkAvailability(calName,dateStr){
+  const calId=CAL_IDS[calName];
+  if(!calId)return true;
+  const d=new Date(dateStr+'T00:00:00');
+  const end=new Date(d);end.setDate(end.getDate()+1);
+  const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events?key='+API_KEY+'&timeMin='+d.toISOString()+'&timeMax='+end.toISOString()+'&singleEvents=true&fields=items(id)';
+  try{const res=await fetch(url);const data=await res.json();return!(data.items&&data.items.length>0);}catch(e){return true;}
+}
+
+async function refreshAllForDate(dateStr){
+  if(!dateStr)return;
+  const results={};
+  await Promise.all(ALL_DESKS.filter(id=>!RESERVED.includes(id)).map(async id=>{
+    results[id]=await checkAvailability('Postazione '+id,dateStr);
+  }));
+  Object.entries(results).forEach(([id,avail])=>{
+    if(sel&&isPost&&sel.id===id)return;
+    const el=document.getElementById('post-'+id);
+    if(!el)return;
+    if(avail){el.setAttribute('class','desk-avail');el.setAttribute('onclick',"selectDesk('"+id+"')");}
+    else{el.setAttribute('class','desk-busy');el.removeAttribute('onclick');}
+  });
+}
+
+function selectDesk(id){
+  if(RESERVED.includes(id))return;
+  clearAllSel();sel={id};isPost=true;isMeeting=false;
+  document.getElementById('post-'+id).setAttribute('class','desk-sel');
+  setCard('Postazione '+id,'Scegli piano e data');
+  document.g
