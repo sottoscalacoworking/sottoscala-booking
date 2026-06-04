@@ -79,6 +79,23 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .space-sel{fill:rgba(245,196,0,0.28);stroke:#F5C400;stroke-width:2.5}
 .space-locked{fill:rgba(0,0,0,0.25);stroke:rgba(255,255,255,0.08);stroke-width:1;cursor:not-allowed}
 .space-busy{fill:rgba(158,151,200,0.35);stroke:#9E97C8;stroke-width:1.5;cursor:not-allowed}
+
+/* ── Mobile responsive ─────────────────────────────── */
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; min-height:unset; }
+  .left { border-right: none; border-bottom: 1px solid var(--ss-border); padding: 1rem; }
+  .right { padding: 1rem; }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .topbar-badge { align-self: flex-start; }
+  .plan-grid { grid-template-columns: repeat(2,1fr); }
+  .field-row { flex-direction: column; gap: 8px; }
+  svg { max-height: 420px; }
+}
+@media (max-width: 400px) {
+  .plan-grid { grid-template-columns: 1fr 1fr; }
+  .legend { gap: 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -343,6 +360,11 @@ function selectDesk(id) {
   document.getElementById('post-'+id).setAttribute('class','desk-sel');
   setCard('Postazione '+id,'Scegli piano e data');
   document.getElementById('ss').textContent='Postazione '+id;
+  // riabilita piano selector
+  document.getElementById('pgrid').style.opacity = '1';
+  document.getElementById('pgrid').style.pointerEvents = 'auto';
+  const mn = document.getElementById('meeting-note');
+  if (mn) mn.classList.remove('visible');
   const d=document.getElementById('din').value;
   if(d) onDateChange(); else updateSummary();
 }
@@ -352,7 +374,37 @@ function selectSpace(id) {
   document.getElementById('zone-'+id).setAttribute('class','space-sel');
   setCard(sp.name,'Da €'+sp.price+sp.unit);
   document.getElementById('ss').textContent=sp.name;
-  if(!sp.deskOnly){ planPrice=sp.price; }
+
+  if (id === 'meeting') {
+    // sala meeting: disattiva piano, forza orario
+    planPrice = sp.price;
+    planLabel = 'Orario';
+    document.querySelectorAll('.pb').forEach(b => b.classList.remove('active'));
+    document.getElementById('sp').textContent = 'Orario (€35/ora)';
+    document.getElementById('pgrid').style.opacity = '0.35';
+    document.getElementById('pgrid').style.pointerEvents = 'none';
+    document.getElementById('restrict-note').classList.remove('visible');
+    // mostra nota orario
+    let mn = document.getElementById('meeting-note');
+    if (!mn) {
+      mn = document.createElement('div');
+      mn.id = 'meeting-note';
+      mn.className = 'restrict-note visible';
+      mn.style.borderLeftColor = 'var(--ss-navy)';
+      mn.style.background = '#EEF1FA';
+      mn.style.color = 'var(--ss-navy)';
+      mn.textContent = 'La sala meeting si prenota a ore — il team ti confermerà la disponibilità';
+      document.getElementById('pgrid').parentNode.appendChild(mn);
+    } else { mn.classList.add('visible'); }
+  } else {
+    // altri spazi: riabilita piano
+    document.getElementById('pgrid').style.opacity = deskOnly ? '0.4' : '1';
+    document.getElementById('pgrid').style.pointerEvents = deskOnly ? 'none' : 'auto';
+    planPrice = sp.price;
+    const mn = document.getElementById('meeting-note');
+    if (mn) mn.classList.remove('visible');
+  }
+
   const d=document.getElementById('din').value;
   if(d) onDateChange(); else updateSummary();
 }
