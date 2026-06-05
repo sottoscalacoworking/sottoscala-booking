@@ -155,7 +155,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
       <div class="panel">
         <div class="panel-label">Piano</div>
         <div class="plan-grid" id="pgrid">
-          <button class="pb active" data-plan="Giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
+          <button class="pb" data-plan="Giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
           <button class="pb" data-plan="Trimestrale" data-price="249" data-desk-only="true" onclick="setPlan(this)">Trimestrale<span>€249</span><span class="badge">3 mesi</span></button>
           <button class="pb" data-plan="Mensile" data-price="299" data-desk-only="true" onclick="setPlan(this)">Mensile<span>€299</span></button>
           <button class="pb" data-plan="Annuale" data-price="199" data-desk-only="true" onclick="setPlan(this)">Annuale<span>€199/m</span><span class="badge">miglior prezzo</span></button>
@@ -216,7 +216,7 @@ const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
 const DEMO_C={'SS-10-2847':{type:10,used:3},'SS-05-1234':{type:5,used:1}};
 
-let sel=null,isPost=false,isMeeting=false,planPrice=19,planLabel='Giornaliero',deskOnly=false,carnetActive=null;
+let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',deskOnly=false,carnetActive=null;
 
 async function checkAvailability(calName,dateStr){
   const calId=CAL_IDS[calName];
@@ -389,7 +389,7 @@ async function doBook(){
   cta.disabled=true;cta.className='cta loading';cta.textContent='Invio in corso...';
   const body=new URLSearchParams();
   body.append(ENTRY.nome,nome);body.append(ENTRY.email,email);body.append(ENTRY.telefono,telefono);
-  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel);body.append(ENTRY.data,data);
+  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel||'Giornaliero');body.append(ENTRY.data,data);
   if(carnet)body.append(ENTRY.carnet,carnet);if(note)body.append(ENTRY.note,note);
   try{
     await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
