@@ -121,8 +121,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <rect id="zone-meeting" class="space-avail" x="12" y="14" width="78" height="28" rx="4" onclick="selectSpace('meeting')"/>
         <text x="51" y="32" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Sala meeting</text>
         <rect id="zone-kitchen" class="space-avail" x="12" y="358" width="78" height="36" rx="4" onclick="handleZoneClick('kitchen')"/>
-        <text x="51" y="374" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Bancone</text>
-        <text x="51" y="387" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">cucina</text>
+        <text x="51" y="374" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Postazione</text>
+        <text x="51" y="387" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">alta</text>
         <rect x="266" y="12" width="62" height="16" fill="#E84A1A" rx="3"/>
         <text x="297" y="23" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5">INGRESSO</text>
         <rect x="266" y="492" width="62" height="16" fill="#E84A1A" rx="3"/>
@@ -209,8 +209,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
 const FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
 const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',note:'entry.571263674'};
-const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Bancone cucina':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
-const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:25,unit:'/ ora',deskOnly:false},kitchen:{name:'Bancone cucina',calName:'Bancone cucina',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
+const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Postazione alta':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
+const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:25,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
 const RESERVED=['B1','B3'];
 const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
@@ -325,9 +325,28 @@ function resetSelCard(){
 
 async function onDateChange(){
   const d=document.getElementById('din').value;if(!d)return;
-  document.getElementById('sd').textContent=new Date(d+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
+  const dt=new Date(d+'T00:00:00');
+  const dayOfWeek=dt.getDay(); // 0=domenica, 6=sabato
+  const isWeekend=(dayOfWeek===0||dayOfWeek===6);
+  const st=document.getElementById('avail-status');
+
+  document.getElementById('sd').textContent=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
+
+  // se piano giornaliero o postazione/workshop e weekend: blocca
+  if(isWeekend && isPost && planLabel==='Giornaliero'){
+    st.className='avail-status visible avail-busy';
+    st.textContent='✗ Le postazioni daily non sono disponibili nel weekend';
+    updateSummary(true);
+    return;
+  }
+  if(isWeekend && !isPost && (sel&&(sel.id==='kitchen'||sel.id==='workshop'))){
+    st.className='avail-status visible avail-busy';
+    st.textContent='✗ Non disponibile nel weekend';
+    updateSummary(true);
+    return;
+  }
+
   if(sel&&!isMeeting){
-    const st=document.getElementById('avail-status');
     st.className='avail-status visible avail-loading';st.textContent='Verifica disponibilità...';
     const calName=isPost?'Postazione '+sel.id:SPACES[sel.id].calName;
     const avail=await checkAvailability(calName,d);
@@ -335,11 +354,16 @@ async function onDateChange(){
     st.textContent=avail?'✓ Disponibile in questa data':'✗ Già prenotato in questa data';
   }
   await refreshAllForDate(d);
-  updateSummary();
+  updateSummary(false);
 }
 
-function updateSummary(){
+function updateSummary(blocked){
   const d=document.getElementById('din').value;const cta=document.getElementById('cta');
+  if(blocked){
+    document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
+    cta.disabled=true;cta.textContent='Data non disponibile';
+    return;
+  }
   if(sel&&d){
     const p=carnetActive?0:planPrice;const iva=Math.round(p*0.22);
     document.getElementById('si').textContent=carnetActive?'—':'€'+iva;
@@ -375,7 +399,7 @@ async function doBook(){
     alert('Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com');
   }
 }
-document.getElementById('din').min=new Date().toISOString().split('T')[0];
+document.getElementById('din').min='2026-06-15';
 </script>
 </body>
 </html>
