@@ -110,19 +110,29 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <rect width="340" height="520" fill="#2E1F8A" rx="10"/>
         <rect x="10" y="10" width="320" height="500" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" rx="3"/>
         <rect x="10" y="10" width="80" height="130" fill="#251880" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
-        <line x1="25" y1="20" x2="25" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-        <line x1="40" y1="20" x2="40" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-        <line x1="55" y1="20" x2="55" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-        <line x1="70" y1="20" x2="70" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <!-- scala: righe orizzontali = gradini, una verticale centrale = corrimano -->
+        <line x1="15" y1="30" x2="85" y2="30" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="44" x2="85" y2="44" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="58" x2="85" y2="58" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="72" x2="85" y2="72" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="86" x2="85" y2="86" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="100" x2="85" y2="100" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="114" x2="85" y2="114" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="15" y1="128" x2="85" y2="128" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+        <line x1="50" y1="15" x2="50" y2="135" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
         <rect x="10" y="145" width="80" height="175" fill="#251880" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
         <text x="20" y="163" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,Arial" font-weight="500">ANTI</text>
         <rect x="15" y="175" width="70" height="138" fill="rgba(0,0,0,0.18)" rx="3"/>
         <text x="50" y="248" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial">W.C.</text>
         <rect id="zone-meeting" class="space-avail" x="12" y="14" width="78" height="28" rx="4" onclick="selectSpace('meeting')"/>
         <text x="51" y="32" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Sala meeting</text>
-        <rect id="zone-kitchen" class="space-avail" x="12" y="358" width="78" height="36" rx="4" onclick="handleZoneClick('kitchen')"/>
-        <text x="51" y="374" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Postazione</text>
-        <text x="51" y="387" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">alta</text>
+        <!-- cucina: rettangolo fisso sotto WC -->
+        <rect x="15" y="318" width="70" height="24" fill="rgba(0,0,0,0.18)" rx="3"/>
+        <text x="50" y="334" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial">cucina</text>
+        <!-- postazione alta spostata più in basso -->
+        <rect id="zone-kitchen" class="space-avail" x="12" y="390" width="78" height="36" rx="4" onclick="handleZoneClick('kitchen')"/>
+        <text x="51" y="406" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Postazione</text>
+        <text x="51" y="419" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">alta</text>
         <rect x="266" y="12" width="62" height="16" fill="#E84A1A" rx="3"/>
         <text x="297" y="23" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5">INGRESSO</text>
         <rect x="266" y="492" width="62" height="16" fill="#E84A1A" rx="3"/>
@@ -202,6 +212,15 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
       </div>
       <button class="cta" id="cta" disabled onclick="doBook()">Seleziona uno spazio →</button>
       <div class="note">Conferma via email · info@sottoscalacoworking.com</div>
+      <div style="text-align:center;padding-top:4px;border-top:1px solid var(--ss-border);margin-top:4px">
+        <a href="https://sottoscalacoworking.com" target="_blank" style="color:var(--ss-orange);font-size:11px;font-weight:600;text-decoration:none">sottoscalacoworking.com</a>
+        <span style="color:var(--ss-border);margin:0 6px">|</span>
+        <a href="https://www.instagram.com/sottoscala.coworking/" target="_blank" style="color:var(--ss-muted);font-size:11px;text-decoration:none">Instagram</a>
+        <span style="color:var(--ss-border);margin:0 6px">|</span>
+        <a href="https://www.facebook.com/sottoscalacoworking" target="_blank" style="color:var(--ss-muted);font-size:11px;text-decoration:none">Facebook</a>
+        <span style="color:var(--ss-border);margin:0 6px">|</span>
+        <a href="https://linkedin.com/company/sottoscala-coworking-creativo/" target="_blank" style="color:var(--ss-muted);font-size:11px;text-decoration:none">LinkedIn</a>
+      </div>
     </div>
   </div>
 </div>
