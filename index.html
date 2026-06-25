@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SottoScala – Prenota</title>
+<title>SottoScala – Prenota / Book</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -17,7 +17,12 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .topbar{background:var(--ss-navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .topbar-title{font-size:15px;font-weight:700;color:#fff}
 .topbar-sub{font-size:12px;color:rgba(255,255,255,0.55);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
 .topbar-badge{background:var(--ss-orange);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.lang-toggle{display:flex;align-items:center;background:rgba(255,255,255,0.12);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.2)}
+.lang-btn{padding:4px 10px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);cursor:pointer;border:none;background:transparent;font-family:'Inter',sans-serif;transition:all 0.15s}
+.lang-btn.active{background:var(--ss-orange);color:#fff;border-radius:20px}
+.lang-btn:hover:not(.active){color:#fff}
 .app{display:grid;grid-template-columns:1fr 340px;min-height:640px}
 .left{padding:1.25rem;background:var(--ss-white);border-right:1px solid var(--ss-border)}
 .right{padding:1.25rem;background:var(--ss-bg);display:flex;flex-direction:column;gap:0.6rem;overflow-y:auto}
@@ -84,7 +89,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
   .left{border-right:none;border-bottom:1px solid var(--ss-border);padding:1rem}
   .right{padding:1rem}
   .topbar{flex-direction:column;align-items:flex-start;gap:6px}
-  .topbar-badge{align-self:flex-start}
+  .topbar-right{align-self:flex-start}
   .field-row{flex-direction:column;gap:8px}
   svg{max-height:420px}
 }
@@ -94,49 +99,45 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 <div class="wrap">
   <div class="topbar">
     <div>
-      <div class="topbar-title">SottoScala — Prenota il tuo spazio</div>
+      <div class="topbar-title" id="t-title">SottoScala — Prenota il tuo spazio</div>
       <div class="topbar-sub">Via Alessandro Manzoni 15 · Montegrotto Terme</div>
     </div>
-    <div class="topbar-badge">Accesso 24/7</div>
+    <div class="topbar-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-it" onclick="setLang('it')">IT</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="topbar-badge" id="t-badge">Accesso 24/7</div>
+    </div>
   </div>
   <div class="app">
     <div class="left">
       <div class="legend">
-        <div class="li"><div class="ld" style="background:#E84A1A"></div>Disponibile</div>
-        <div class="li"><div class="ld" style="background:#9E97C8"></div>Occupato</div>
-        <div class="li"><div class="ld" style="background:#E84A1A;outline:2.5px solid #F5C400;outline-offset:1px"></div>Selezionato</div>
+        <div class="li"><div class="ld" style="background:#E84A1A"></div><span id="t-avail">Disponibile</span></div>
+        <div class="li"><div class="ld" style="background:#9E97C8"></div><span id="t-busy">Occupato</span></div>
+        <div class="li"><div class="ld" style="background:#E84A1A;outline:2.5px solid #F5C400;outline-offset:1px"></div><span id="t-sel">Selezionato</span></div>
       </div>
       <svg viewBox="0 0 340 520" width="100%" style="border-radius:10px;display:block">
         <rect width="340" height="520" fill="#2E1F8A" rx="10"/>
         <rect x="10" y="10" width="320" height="500" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" rx="3"/>
         <rect x="10" y="10" width="80" height="130" fill="#251880" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
-        <!-- scala: righe orizzontali = gradini, una verticale centrale = corrimano -->
-        <line x1="15" y1="30" x2="85" y2="30" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="44" x2="85" y2="44" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="58" x2="85" y2="58" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="72" x2="85" y2="72" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="86" x2="85" y2="86" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="100" x2="85" y2="100" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="114" x2="85" y2="114" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="15" y1="128" x2="85" y2="128" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-        <line x1="50" y1="15" x2="50" y2="135" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+        <line x1="25" y1="20" x2="25" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <line x1="40" y1="20" x2="40" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <line x1="55" y1="20" x2="55" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <line x1="70" y1="20" x2="70" y2="135" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
         <rect x="10" y="145" width="80" height="175" fill="#251880" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
         <text x="20" y="163" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Inter,Arial" font-weight="500">ANTI</text>
         <rect x="15" y="175" width="70" height="138" fill="rgba(0,0,0,0.18)" rx="3"/>
         <text x="50" y="248" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial">W.C.</text>
         <rect id="zone-meeting" class="space-avail" x="12" y="14" width="78" height="28" rx="4" onclick="selectSpace('meeting')"/>
-        <text x="51" y="32" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Sala meeting</text>
-        <!-- cucina: rettangolo fisso sotto WC -->
-        <rect x="15" y="318" width="70" height="24" fill="rgba(0,0,0,0.18)" rx="3"/>
-        <text x="50" y="334" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="Inter,Arial">cucina</text>
-        <!-- postazione alta spostata più in basso -->
-        <rect id="zone-kitchen" class="space-avail" x="12" y="390" width="78" height="36" rx="4" onclick="handleZoneClick('kitchen')"/>
-        <text x="51" y="406" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Postazione</text>
-        <text x="51" y="419" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">alta</text>
+        <text id="svg-meeting" x="51" y="32" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Sala meeting</text>
+        <rect id="zone-kitchen" class="space-avail" x="12" y="358" width="78" height="36" rx="4" onclick="handleZoneClick('kitchen')"/>
+        <text x="51" y="374" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none" id="svg-kitchen1">Postazione</text>
+        <text x="51" y="387" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none" id="svg-kitchen2">alta</text>
         <rect x="266" y="12" width="62" height="16" fill="#E84A1A" rx="3"/>
-        <text x="297" y="23" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5">INGRESSO</text>
+        <text x="297" y="23" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5" id="svg-entrance">INGRESSO</text>
         <rect x="266" y="492" width="62" height="16" fill="#E84A1A" rx="3"/>
-        <text x="297" y="503" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5">INGRESSO</text>
+        <text x="297" y="503" text-anchor="middle" font-size="7.5" fill="white" font-family="Inter,Arial" font-weight="700" letter-spacing="0.5" id="svg-entrance2">INGRESSO</text>
         <rect id="post-A1" class="desk-avail" x="160" y="35" width="60" height="80" rx="3" onclick="selectDesk('A1')"/>
         <text x="190" y="121" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">A1</text>
         <rect id="post-A2" class="desk-avail" x="228" y="35" width="60" height="80" rx="3" onclick="selectDesk('A2')"/>
@@ -154,73 +155,64 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <rect id="post-B4" class="desk-avail" x="228" y="309" width="60" height="80" rx="3" onclick="selectDesk('B4')"/>
         <text x="258" y="395" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Inter,Arial" font-weight="600" pointer-events="none">B4</text>
         <rect id="zone-workshop" class="space-avail" x="105" y="440" width="185" height="36" rx="4" onclick="handleZoneClick('workshop')"/>
-        <text x="197" y="462" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Tavolo workshop</text>
+        <text id="svg-workshop" x="197" y="462" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.9)" font-family="Inter,Arial" font-weight="600" pointer-events="none">Tavolo workshop</text>
       </svg>
     </div>
     <div class="right">
       <div class="panel" id="sel-card">
-        <div class="panel-label">Spazio selezionato</div>
+        <div class="panel-label" id="t-selected-label">Spazio selezionato</div>
         <div class="sel-empty" id="sel-name">Clicca una postazione o uno spazio</div>
       </div>
       <div class="panel">
-        <div class="panel-label">Piano</div>
+        <div class="panel-label" id="t-plan-label">Piano</div>
         <div class="plan-grid" id="pgrid">
-          <button class="pb" data-plan="Giornaliero" data-price="19" data-desk-only="false" onclick="setPlan(this)">Giornaliero<span>€19</span></button>
-          <button class="pb" data-plan="Trimestrale" data-price="249" data-desk-only="true" onclick="setPlan(this)">Trimestrale<span>€249</span><span class="badge">3 mesi</span></button>
-          <button class="pb" data-plan="Mensile" data-price="299" data-desk-only="true" onclick="setPlan(this)">Mensile<span>€299</span></button>
-          <button class="pb" data-plan="Annuale" data-price="199" data-desk-only="true" onclick="setPlan(this)">Annuale<span>€199/m</span><span class="badge">miglior prezzo</span></button>
+          <button class="pb" data-plan-it="Giornaliero" data-plan-en="Daily" data-price="19" data-desk-only="false" onclick="setPlan(this)"><span id="pb-daily-name">Giornaliero</span><span>€19</span></button>
+          <button class="pb" data-plan-it="Trimestrale" data-plan-en="Quarterly" data-price="249" data-desk-only="true" onclick="setPlan(this)"><span id="pb-quarterly-name">Trimestrale</span><span>€249</span><span class="badge" id="pb-quarterly-badge">3 mesi</span></button>
+          <button class="pb" data-plan-it="Mensile" data-plan-en="Monthly" data-price="299" data-desk-only="true" onclick="setPlan(this)"><span id="pb-monthly-name">Mensile</span><span>€299</span></button>
+          <button class="pb" data-plan-it="Annuale" data-plan-en="Annual" data-price="199" data-desk-only="true" onclick="setPlan(this)"><span id="pb-annual-name">Annuale</span><span>€199/m</span><span class="badge" id="pb-annual-badge">miglior prezzo</span></button>
         </div>
         <div class="restrict-note" id="restrict-note">Solo postazioni disponibili per questo piano</div>
         <div class="meeting-note" id="meeting-note">La sala meeting si prenota a ore — scrivici per disponibilità e preventivo</div>
       </div>
       <div class="panel">
-        <div class="panel-label">Data di inizio</div>
+        <div class="panel-label" id="t-date-label">Data di inizio</div>
         <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
         <div class="avail-status" id="avail-status"></div>
       </div>
       <div class="panel">
-        <div class="panel-label">I tuoi dati</div>
+        <div class="panel-label" id="t-details-label">I tuoi dati</div>
         <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="field"><label>Nome e cognome *</label><input type="text" id="f-nome" placeholder="Mario Rossi"/></div>
+          <div class="field"><label id="t-name-label">Nome e cognome *</label><input type="text" id="f-nome" placeholder="Mario Rossi"/></div>
           <div class="field-row">
-            <div class="field"><label>Email *</label><input type="email" id="f-email" placeholder="mario@email.com"/></div>
-            <div class="field"><label>Telefono</label><input type="tel" id="f-telefono" placeholder="3331234567"/></div>
+            <div class="field"><label id="t-email-label">Email *</label><input type="email" id="f-email" placeholder="mario@email.com"/></div>
+            <div class="field"><label id="t-phone-label">Telefono</label><input type="tel" id="f-telefono" placeholder="3331234567"/></div>
           </div>
           <div class="field">
-            <label>Codice carnet <span style="font-weight:400;text-transform:none">(opzionale)</span></label>
+            <label id="t-carnet-label">Codice carnet <span style="font-weight:400;text-transform:none" id="t-optional">(opzionale)</span></label>
             <div class="carnet-row">
               <div class="field"><input type="text" id="f-carnet" placeholder="Es. SS-10-2847" oninput="this.value=this.value.toUpperCase()"/></div>
-              <button class="capply" onclick="applyCarnet()">Verifica</button>
+              <button class="capply" onclick="applyCarnet()" id="t-verify-btn">Verifica</button>
             </div>
             <div class="cst" id="cst"></div>
           </div>
-          <div class="field"><label>Note <span style="font-weight:400;text-transform:none">(opzionale)</span></label><textarea id="f-note" placeholder="Es. porto il portatile, ho bisogno di monitor..."></textarea></div>
+          <div class="field"><label id="t-notes-label">Note <span style="font-weight:400;text-transform:none" id="t-optional2">(opzionale)</span></label><textarea id="f-note" placeholder="Es. porto il portatile, ho bisogno di monitor..."></textarea></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-label">Riepilogo</div>
-        <div class="sum-row"><span>Spazio</span><span id="ss">—</span></div>
-        <div class="sum-row"><span>Piano</span><span id="sp">—</span></div>
-        <div class="sum-row"><span>Data</span><span id="sd">—</span></div>
+        <div class="panel-label" id="t-summary-label">Riepilogo</div>
+        <div class="sum-row"><span id="t-space-row">Spazio</span><span id="ss">—</span></div>
+        <div class="sum-row"><span id="t-plan-row">Piano</span><span id="sp">—</span></div>
+        <div class="sum-row"><span id="t-date-row">Data</span><span id="sd">—</span></div>
         <div class="sum-row"><span>IVA 22%</span><span id="si">—</span></div>
         <div class="sum-div"></div>
-        <div class="sum-tot"><span>Totale</span><span id="st">—</span></div>
+        <div class="sum-tot"><span id="t-total-row">Totale</span><span id="st">—</span></div>
       </div>
       <div class="success-msg" id="success-msg">
-        ✅ Prenotazione inviata!<br>
-        <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Ti contatteremo a breve per confermare. Controlla la tua email.</span>
+        ✅ <span id="t-success-title">Prenotazione inviata!</span><br>
+        <span id="t-success-sub" style="font-size:12px;font-weight:400;margin-top:4px;display:block">Ti contatteremo a breve per confermare. Controlla la tua email.</span>
       </div>
       <button class="cta" id="cta" disabled onclick="doBook()">Seleziona uno spazio →</button>
-      <div class="note">Conferma via email · info@sottoscalacoworking.com</div>
-      <div style="text-align:center;padding-top:4px;border-top:1px solid var(--ss-border);margin-top:4px">
-        <a href="https://sottoscalacoworking.com" target="_blank" style="color:var(--ss-orange);font-size:11px;font-weight:600;text-decoration:none">sottoscalacoworking.com</a>
-        <span style="color:var(--ss-border);margin:0 6px">|</span>
-        <a href="https://www.instagram.com/sottoscala.coworking/" target="_blank" style="color:var(--ss-muted);font-size:11px;text-decoration:none">Instagram</a>
-        <span style="color:var(--ss-border);margin:0 6px">|</span>
-        <a href="https://www.facebook.com/sottoscalacoworking" target="_blank" style="color:var(--ss-muted);font-size:11px;text-decoration:none">Facebook</a>
-        <span style="color:var(--ss-border);margin:0 6px">|</span>
-        <a href="https://linkedin.com/company/sottoscala-coworking-creativo/" target="_blank" style="color:var(--ss-muted);font-size:11px;text-decoration:none">LinkedIn</a>
-      </div>
+      <div class="note" id="t-footer-note">Conferma via email · info@sottoscalacoworking.com</div>
     </div>
   </div>
 </div>
@@ -236,7 +228,177 @@ const ZONES_LOCKABLE=['kitchen','workshop'];
 const DEMO_C={'SS-10-2847':{type:10,used:3},'SS-05-1234':{type:5,used:1}};
 
 let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',deskOnly=false,carnetActive=null;
+let currentLang='it';
 
+// ── Traduzioni ──────────────────────────────────────────────────────
+const T={
+  it:{
+    title:'SottoScala — Prenota il tuo spazio',
+    badge:'Accesso 24/7',
+    avail:'Disponibile', busy:'Occupato', sel:'Selezionato',
+    selectedLabel:'Spazio selezionato',
+    clickPrompt:'Clicca una postazione o uno spazio',
+    choosePlanDate:'Scegli piano e data',
+    planLabel:'Piano',
+    dateLabel:'Data di inizio',
+    detailsLabel:'I tuoi dati',
+    nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono',
+    carnetLbl:'Codice carnet', optional:'(opzionale)',
+    verifyBtn:'Verifica',
+    notesLbl:'Note',
+    notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
+    summaryLabel:'Riepilogo',
+    spaceRow:'Spazio', planRow:'Piano', dateRow:'Data', totalRow:'Totale',
+    successTitle:'Prenotazione inviata!',
+    successSub:'Ti contatteremo a breve per confermare. Controlla la tua email.',
+    ctaSelect:'Seleziona uno spazio →',
+    ctaDate:'Scegli una data →',
+    ctaConfirm:'Conferma prenotazione →',
+    ctaLoading:'Invio in corso...',
+    ctaUnavailable:'Data non disponibile',
+    footerNote:'Conferma via email · info@sottoscalacoworking.com',
+    restrictNote:'Solo postazioni disponibili per questo piano',
+    meetingNote:'La sala meeting si prenota a ore — scrivici per disponibilità e preventivo',
+    availOk:'✓ Disponibile in questa data',
+    availBusy:'✗ Già prenotato in questa data',
+    availChecking:'Verifica disponibilità...',
+    weekendBusy:'✗ Le postazioni daily non sono disponibili nel weekend',
+    weekendBusyZone:'✗ Non disponibile nel weekend',
+    carnetOk:'✓ Carnet valido · ',
+    carnetRemaining:' ingressi rimanenti',
+    carnetErr:'Codice non trovato.',
+    alertFields:'Inserisci nome e email per procedere.',
+    alertEmail:'Inserisci un indirizzo email valido.',
+    alertError:'Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com',
+    meetingContact:'Prenota a ore — contattaci',
+    daily:'Giornaliero', monthly:'Mensile', quarterly:'Trimestrale', annual:'Annuale',
+    bestPrice:'miglior prezzo', months3:'3 mesi',
+    svgMeeting:'Sala meeting', svgWorkshop:'Tavolo workshop',
+    svgKitchen1:'Postazione', svgKitchen2:'alta',
+    svgEntrance:'INGRESSO',
+  },
+  en:{
+    title:'SottoScala — Book your space',
+    badge:'24/7 Access',
+    avail:'Available', busy:'Occupied', sel:'Selected',
+    selectedLabel:'Selected space',
+    clickPrompt:'Click a desk or a space',
+    choosePlanDate:'Choose plan and date',
+    planLabel:'Plan',
+    dateLabel:'Start date',
+    detailsLabel:'Your details',
+    nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone',
+    carnetLbl:'Carnet code', optional:'(optional)',
+    verifyBtn:'Verify',
+    notesLbl:'Notes',
+    notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
+    summaryLabel:'Summary',
+    spaceRow:'Space', planRow:'Plan', dateRow:'Date', totalRow:'Total',
+    successTitle:'Booking request sent!',
+    successSub:'We\'ll contact you shortly to confirm. Check your email.',
+    ctaSelect:'Select a space →',
+    ctaDate:'Choose a date →',
+    ctaConfirm:'Confirm booking →',
+    ctaLoading:'Sending...',
+    ctaUnavailable:'Date not available',
+    footerNote:'Confirmation by email · info@sottoscalacoworking.com',
+    restrictNote:'Only desks available for this plan',
+    meetingNote:'Meeting room is booked by the hour — contact us for availability and a quote',
+    availOk:'✓ Available on this date',
+    availBusy:'✗ Already booked on this date',
+    availChecking:'Checking availability...',
+    weekendBusy:'✗ Daily desks are not available on weekends',
+    weekendBusyZone:'✗ Not available on weekends',
+    carnetOk:'✓ Valid carnet · ',
+    carnetRemaining:' entries remaining',
+    carnetErr:'Code not found.',
+    alertFields:'Please enter your name and email to proceed.',
+    alertEmail:'Please enter a valid email address.',
+    alertError:'Error while sending. Please try again or email info@sottoscalacoworking.com',
+    meetingContact:'Book by the hour — contact us',
+    daily:'Daily', monthly:'Monthly', quarterly:'Quarterly', annual:'Annual',
+    bestPrice:'best value', months3:'3 months',
+    svgMeeting:'Meeting room', svgWorkshop:'Workshop table',
+    svgKitchen1:'Standing', svgKitchen2:'desk',
+    svgEntrance:'ENTRANCE',
+  }
+};
+
+function setLang(lang){
+  currentLang=lang;
+  const t=T[lang];
+  document.documentElement.lang=lang;
+  document.getElementById('btn-it').classList.toggle('active',lang==='it');
+  document.getElementById('btn-en').classList.toggle('active',lang==='en');
+  // Topbar
+  document.getElementById('t-title').textContent=t.title;
+  document.getElementById('t-badge').textContent=t.badge;
+  // Legend
+  document.getElementById('t-avail').textContent=t.avail;
+  document.getElementById('t-busy').textContent=t.busy;
+  document.getElementById('t-sel').textContent=t.sel;
+  // SVG labels
+  document.getElementById('svg-meeting').textContent=t.svgMeeting;
+  document.getElementById('svg-workshop').textContent=t.svgWorkshop;
+  document.getElementById('svg-kitchen1').textContent=t.svgKitchen1;
+  document.getElementById('svg-kitchen2').textContent=t.svgKitchen2;
+  document.getElementById('svg-entrance').textContent=t.svgEntrance;
+  document.getElementById('svg-entrance2').textContent=t.svgEntrance;
+  // Panels
+  document.getElementById('t-selected-label').textContent=t.selectedLabel;
+  document.getElementById('t-plan-label').textContent=t.planLabel;
+  document.getElementById('t-date-label').textContent=t.dateLabel;
+  document.getElementById('t-details-label').textContent=t.detailsLabel;
+  document.getElementById('t-summary-label').textContent=t.summaryLabel;
+  // Plan buttons
+  document.getElementById('pb-daily-name').textContent=t.daily;
+  document.getElementById('pb-monthly-name').textContent=t.monthly;
+  document.getElementById('pb-quarterly-name').textContent=t.quarterly;
+  document.getElementById('pb-annual-name').textContent=t.annual;
+  document.getElementById('pb-annual-badge').textContent=t.bestPrice;
+  document.getElementById('pb-quarterly-badge').textContent=t.months3;
+  // Notes
+  document.getElementById('restrict-note').textContent=t.restrictNote;
+  document.getElementById('meeting-note').textContent=t.meetingNote;
+  // Form labels
+  document.getElementById('t-name-label').textContent=t.nameLbl;
+  document.getElementById('t-email-label').textContent=t.emailLbl;
+  document.getElementById('t-phone-label').textContent=t.phoneLbl;
+  document.getElementById('t-carnet-label').firstChild.textContent=t.carnetLbl+' ';
+  document.getElementById('t-optional').textContent=t.optional;
+  document.getElementById('t-optional2').textContent=t.optional;
+  document.getElementById('t-verify-btn').textContent=t.verifyBtn;
+  document.getElementById('t-notes-label').firstChild.textContent=t.notesLbl+' ';
+  document.getElementById('f-note').placeholder=t.notesPlaceholder;
+  // Summary rows
+  document.getElementById('t-space-row').textContent=t.spaceRow;
+  document.getElementById('t-plan-row').textContent=t.planRow;
+  document.getElementById('t-date-row').textContent=t.dateRow;
+  document.getElementById('t-total-row').textContent=t.totalRow;
+  // Success
+  document.getElementById('t-success-title').textContent=t.successTitle;
+  document.getElementById('t-success-sub').textContent=t.successSub;
+  // Footer
+  document.getElementById('t-footer-note').textContent=t.footerNote;
+  // sel-name if empty
+  const sn=document.getElementById('sel-name');
+  if(sn.classList.contains('sel-empty'))sn.textContent=t.clickPrompt;
+  // CTA
+  updateSummary();
+  // SPACES names in EN
+  SPACES.meeting.name=lang==='en'?'Meeting room':'Sala meeting';
+  SPACES.kitchen.name=lang==='en'?'Standing desk':'Postazione alta';
+  SPACES.workshop.name=lang==='en'?'Workshop table':'Tavolo workshop';
+}
+
+// ── Auto-detect lingua dal browser ─────────────────────────────────
+(function(){
+  const browserLang=navigator.language||navigator.userLanguage||'it';
+  const lang=browserLang.toLowerCase().startsWith('it')?'it':'en';
+  setLang(lang);
+})();
+
+// ── Logica prenotazione (invariata) ────────────────────────────────
 async function checkAvailability(calName,dateStr){
   const calId=CAL_IDS[calName];
   if(!calId)return true;
@@ -262,11 +424,12 @@ async function refreshAllForDate(dateStr){
 }
 
 function selectDesk(id){
+  const t=T[currentLang];
   if(RESERVED.includes(id))return;
   clearAllSel();sel={id};isPost=true;isMeeting=false;
   document.getElementById('post-'+id).setAttribute('class','desk-sel');
-  setCard('Postazione '+id,'Scegli piano e data');
-  document.getElementById('ss').textContent='Postazione '+id;
+  setCard((currentLang==='en'?'Desk ':'Postazione ')+id,t.choosePlanDate);
+  document.getElementById('ss').textContent=(currentLang==='en'?'Desk ':'Postazione ')+id;
   enablePlan(true);
   document.getElementById('meeting-note').classList.remove('visible');
   const d=document.getElementById('din').value;
@@ -274,15 +437,16 @@ function selectDesk(id){
 }
 
 function selectSpace(id){
+  const t=T[currentLang];
   clearAllSel();const sp=SPACES[id];sel={id,...sp};isPost=false;isMeeting=(id==='meeting');
   document.getElementById('zone-'+id).setAttribute('class','space-sel');
-  setCard(sp.name,isMeeting?'Prenota a ore — contattaci':'Da €'+sp.price+sp.unit);
+  setCard(sp.name,isMeeting?t.meetingContact:'€'+sp.price+sp.unit);
   document.getElementById('ss').textContent=sp.name;
   if(isMeeting){
     enablePlan(false);
     document.getElementById('meeting-note').classList.add('visible');
-    planPrice=sp.price;planLabel='Orario';
-    document.getElementById('sp').textContent='Orario (€25-35/ora)';
+    planPrice=sp.price;planLabel=currentLang==='en'?'Hourly':'Orario';
+    document.getElementById('sp').textContent=currentLang==='en'?'Hourly (€25-35/h)':'Orario (€25-35/ora)';
   }else{
     enablePlan(true);
     document.getElementById('meeting-note').classList.remove('visible');
@@ -308,7 +472,9 @@ function setCard(name,sub){
 
 function setPlan(btn){
   if(isMeeting)return;
-  planPrice=parseInt(btn.dataset.price);planLabel=btn.dataset.plan;deskOnly=btn.dataset.deskOnly==='true';
+  planPrice=parseInt(btn.dataset.price);
+  planLabel=btn.dataset['plan'+currentLang.charAt(0).toUpperCase()+currentLang.slice(1)]||btn.dataset.planIt;
+  deskOnly=btn.dataset.deskOnly==='true';
   document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('sp').textContent=planLabel;
   document.getElementById('restrict-note').classList.toggle('visible',deskOnly);
@@ -322,13 +488,14 @@ function updateZoneLocks(){
 }
 
 function applyCarnet(){
+  const t=T[currentLang];
   const v=document.getElementById('f-carnet').value.trim();const st=document.getElementById('cst');
   if(DEMO_C[v]){const c=DEMO_C[v];const rem=c.type-c.used;carnetActive={code:v,remaining:rem};
-    st.className='cst cok';st.textContent='✓ Carnet valido · '+rem+'/'+c.type+' ingressi rimanenti';
-    planPrice=0;planLabel='Carnet ('+rem+' rimasti)';
+    st.className='cst cok';st.textContent=t.carnetOk+rem+'/'+c.type+t.carnetRemaining;
+    planPrice=0;planLabel='Carnet ('+rem+' '+(currentLang==='en'?'left':'rimasti')+')';
     document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
     document.getElementById('sp').textContent=planLabel;updateSummary();
-  }else{carnetActive=null;st.className='cst cerr';st.textContent='Codice non trovato.';}
+  }else{carnetActive=null;st.className='cst cerr';st.textContent=t.carnetErr;}
 }
 
 function clearAllSel(){
@@ -338,84 +505,78 @@ function clearAllSel(){
 }
 
 function resetSelCard(){
-  document.getElementById('sel-name').className='sel-empty';document.getElementById('sel-name').textContent='Clicca una postazione o uno spazio';
+  const t=T[currentLang];
+  document.getElementById('sel-name').className='sel-empty';document.getElementById('sel-name').textContent=t.clickPrompt;
   const s=document.getElementById('sel-sub');if(s)s.remove();document.getElementById('ss').textContent='—';
 }
 
 async function onDateChange(){
+  const t=T[currentLang];
   const d=document.getElementById('din').value;if(!d)return;
   const dt=new Date(d+'T00:00:00');
-  const dayOfWeek=dt.getDay(); // 0=domenica, 6=sabato
+  const dayOfWeek=dt.getDay();
   const isWeekend=(dayOfWeek===0||dayOfWeek===6);
   const st=document.getElementById('avail-status');
-
-  document.getElementById('sd').textContent=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
-
-  // se piano giornaliero o postazione/workshop e weekend: blocca
-  if(isWeekend && isPost && planLabel==='Giornaliero'){
-    st.className='avail-status visible avail-busy';
-    st.textContent='✗ Le postazioni daily non sono disponibili nel weekend';
-    updateSummary(true);
-    return;
+  const locale=currentLang==='en'?'en-GB':'it-IT';
+  document.getElementById('sd').textContent=dt.toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'});
+  if(isWeekend&&isPost&&planLabel===T[currentLang].daily){
+    st.className='avail-status visible avail-busy';st.textContent=t.weekendBusy;updateSummary(true);return;
   }
-  if(isWeekend && !isPost && (sel&&(sel.id==='kitchen'||sel.id==='workshop'))){
-    st.className='avail-status visible avail-busy';
-    st.textContent='✗ Non disponibile nel weekend';
-    updateSummary(true);
-    return;
+  if(isWeekend&&!isPost&&(sel&&(sel.id==='kitchen'||sel.id==='workshop'))){
+    st.className='avail-status visible avail-busy';st.textContent=t.weekendBusyZone;updateSummary(true);return;
   }
-
   if(sel&&!isMeeting){
-    st.className='avail-status visible avail-loading';st.textContent='Verifica disponibilità...';
+    st.className='avail-status visible avail-loading';st.textContent=t.availChecking;
     const calName=isPost?'Postazione '+sel.id:SPACES[sel.id].calName;
     const avail=await checkAvailability(calName,d);
     st.className='avail-status visible '+(avail?'avail-ok':'avail-busy');
-    st.textContent=avail?'✓ Disponibile in questa data':'✗ Già prenotato in questa data';
+    st.textContent=avail?t.availOk:t.availBusy;
   }
   await refreshAllForDate(d);
   updateSummary(false);
 }
 
 function updateSummary(blocked){
+  const t=T[currentLang];
   const d=document.getElementById('din').value;const cta=document.getElementById('cta');
   if(blocked){
     document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
-    cta.disabled=true;cta.textContent='Data non disponibile';
-    return;
+    cta.disabled=true;cta.textContent=t.ctaUnavailable;return;
   }
   if(sel&&d){
     const p=carnetActive?0:planPrice;const iva=Math.round(p*0.22);
     document.getElementById('si').textContent=carnetActive?'—':'€'+iva;
     document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva);
-    cta.disabled=false;cta.textContent='Conferma prenotazione →';
+    cta.disabled=false;cta.textContent=t.ctaConfirm;
   }else{
     document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
-    cta.disabled=true;cta.textContent=sel?'Scegli una data →':'Seleziona uno spazio →';
+    cta.disabled=true;cta.textContent=sel?t.ctaDate:t.ctaSelect;
   }
 }
 
 async function doBook(){
+  const t=T[currentLang];
   const nome=document.getElementById('f-nome').value.trim();
   const email=document.getElementById('f-email').value.trim();
   const telefono=document.getElementById('f-telefono').value.trim();
   const carnet=document.getElementById('f-carnet').value.trim();
   const note=document.getElementById('f-note').value.trim();
   const data=document.getElementById('din').value;
-  if(!nome||!email){alert('Inserisci nome e email per procedere.');return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Inserisci un indirizzo email valido.');return;}
-  const spazioLabel=isPost?'Postazione '+sel.id:sel.name;
+  if(!nome||!email){alert(t.alertFields);return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(t.alertEmail);return;}
+  const spazioLabel=isPost?(currentLang==='en'?'Desk ':'Postazione ')+sel.id:sel.name;
   const cta=document.getElementById('cta');
-  cta.disabled=true;cta.className='cta loading';cta.textContent='Invio in corso...';
+  cta.disabled=true;cta.className='cta loading';cta.textContent=t.ctaLoading;
   const body=new URLSearchParams();
   body.append(ENTRY.nome,nome);body.append(ENTRY.email,email);body.append(ENTRY.telefono,telefono);
-  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel||'Giornaliero');body.append(ENTRY.data,data);
+  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel||T['it'].daily);body.append(ENTRY.data,data);
   if(carnet)body.append(ENTRY.carnet,carnet);if(note)body.append(ENTRY.note,note);
   try{
     await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
     cta.style.display='none';document.getElementById('success-msg').classList.add('visible');
   }catch(err){
-    cta.disabled=false;cta.className='cta';cta.textContent='Conferma prenotazione →';
-    alert('Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com');
+    cta.disabled=false;cta.className='cta';cta.textContent=t.ctaConfirm;
+    alert(t.alertError);
   }
 }
 document.getElementById('din').min='2026-06-15';
