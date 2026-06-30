@@ -179,6 +179,26 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
         <div class="avail-status" id="avail-status"></div>
       </div>
+      <div class="panel" id="meeting-time-panel" style="display:none">
+        <div class="panel-label" id="t-time-label">Orario</div>
+        <div class="field-row">
+          <div class="field">
+            <label id="t-start-label">Ora inizio</label>
+            <select id="f-meeting-start" onchange="onMeetingTimeChange()" style="width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none"></select>
+          </div>
+          <div class="field">
+            <label id="t-duration-label">Durata</label>
+            <select id="f-meeting-duration" onchange="onMeetingTimeChange()" style="width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none">
+              <option value="1">1 ora</option>
+              <option value="2">2 ore</option>
+              <option value="4">4 ore (mezza giornata)</option>
+              <option value="9">9 ore (giornata intera)</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ss-muted);margin-top:6px" id="t-meeting-hours-note">Orario disponibile: 9:00 – 18:00</div>
+        <div style="font-size:11px;font-weight:600;color:var(--ss-orange);margin-top:6px" id="t-meeting-out-of-hours"></div>
+      </div>
       <div class="panel">
         <div class="panel-label" id="t-details-label">I tuoi dati</div>
         <div style="display:flex;flex-direction:column;gap:8px">
@@ -221,7 +241,10 @@ const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
 const FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
 const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',note:'entry.571263674'};
 const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Postazione alta':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
-const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:25,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
+const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:20,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
+const MEETING_HOURS={start:9,end:18};
+const MEETING_PRICES={1:20,2:35,4:60,9:95};
+const MEETING_SURCHARGE=1.5;
 const RESERVED=['B1','B3'];
 const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
@@ -259,6 +282,10 @@ const T={
     footerNote:'Conferma via email · info@sottoscalacoworking.com',
     restrictNote:'Solo postazioni disponibili per questo piano',
     meetingNote:'La sala meeting si prenota a ore — scrivici per disponibilità e preventivo',
+    timeLabel:'Orario', startLabel:'Ora inizio', durationLabel:'Durata',
+    meetingHoursNote:'Orario disponibile: 9:00 – 18:00',
+    meetingOutOfHours:'⚠ Fuori orario standard (sera/weekend, +50%) — scrivici a info@sottoscalacoworking.com per disponibilità e preventivo',
+    duration1:'1 ora', duration2:'2 ore', duration4:'4 ore (mezza giornata)', duration9:'9 ore (giornata intera)',
     availOk:'✓ Disponibile in questa data',
     availBusy:'✗ Già prenotato in questa data',
     availChecking:'Verifica disponibilità...',
@@ -304,6 +331,10 @@ const T={
     footerNote:'Confirmation by email · info@sottoscalacoworking.com',
     restrictNote:'Only desks available for this plan',
     meetingNote:'Meeting room is booked by the hour — contact us for availability and a quote',
+    timeLabel:'Time', startLabel:'Start time', durationLabel:'Duration',
+    meetingHoursNote:'Available hours: 9:00 AM – 6:00 PM',
+    meetingOutOfHours:'⚠ Outside standard hours (evening/weekend, +50%) — email info@sottoscalacoworking.com for availability and a quote',
+    duration1:'1 hour', duration2:'2 hours', duration4:'4 hours (half day)', duration9:'9 hours (full day)',
     availOk:'✓ Available on this date',
     availBusy:'✗ Already booked on this date',
     availChecking:'Checking availability...',
@@ -360,6 +391,18 @@ function setLang(lang){
   // Notes
   document.getElementById('restrict-note').textContent=t.restrictNote;
   document.getElementById('meeting-note').textContent=t.meetingNote;
+  document.getElementById('t-time-label').textContent=t.timeLabel;
+  document.getElementById('t-start-label').textContent=t.startLabel;
+  document.getElementById('t-duration-label').textContent=t.durationLabel;
+  document.getElementById('t-meeting-hours-note').textContent=t.meetingHoursNote;
+  const durSel=document.getElementById('f-meeting-duration');
+  if(durSel){
+    durSel.options[0].textContent=t.duration1;
+    durSel.options[1].textContent=t.duration2;
+    durSel.options[2].textContent=t.duration4;
+    durSel.options[3].textContent=t.duration9;
+  }
+  if(isMeeting)onMeetingTimeChange();
   // Form labels
   document.getElementById('t-name-label').textContent=t.nameLbl;
   document.getElementById('t-email-label').textContent=t.emailLbl;
@@ -432,6 +475,7 @@ function selectDesk(id){
   document.getElementById('ss').textContent=(currentLang==='en'?'Desk ':'Postazione ')+id;
   enablePlan(true);
   document.getElementById('meeting-note').classList.remove('visible');
+  document.getElementById('meeting-time-panel').style.display='none';
   const d=document.getElementById('din').value;
   if(d)onDateChange();else updateSummary();
 }
@@ -442,18 +486,62 @@ function selectSpace(id){
   document.getElementById('zone-'+id).setAttribute('class','space-sel');
   setCard(sp.name,isMeeting?t.meetingContact:'€'+sp.price+sp.unit);
   document.getElementById('ss').textContent=sp.name;
+  const timePanel=document.getElementById('meeting-time-panel');
   if(isMeeting){
     enablePlan(false);
     document.getElementById('meeting-note').classList.add('visible');
-    planPrice=sp.price;planLabel=currentLang==='en'?'Hourly':'Orario';
-    document.getElementById('sp').textContent=currentLang==='en'?'Hourly (€25-35/h)':'Orario (€25-35/ora)';
+    timePanel.style.display='block';
+    populateMeetingStartTimes();
+    onMeetingTimeChange();
   }else{
     enablePlan(true);
     document.getElementById('meeting-note').classList.remove('visible');
+    timePanel.style.display='none';
     planPrice=sp.price;
   }
   const d=document.getElementById('din').value;
   if(d)onDateChange();else updateSummary();
+}
+
+function populateMeetingStartTimes(){
+  const sel=document.getElementById('f-meeting-start');
+  const prevValue=sel.value;
+  sel.innerHTML='';
+  for(let h=MEETING_HOURS.start;h<MEETING_HOURS.end;h++){
+    const opt=document.createElement('option');
+    opt.value=h;
+    opt.textContent=(h<10?'0'+h:h)+':00';
+    sel.appendChild(opt);
+  }
+  if(prevValue&&[...sel.options].some(o=>o.value===prevValue))sel.value=prevValue;
+}
+
+function isMeetingOutOfHours(){
+  const d=document.getElementById('din').value;
+  const startH=parseInt(document.getElementById('f-meeting-start').value);
+  const duration=parseInt(document.getElementById('f-meeting-duration').value);
+  let weekend=false;
+  if(d){
+    const dt=new Date(d+'T00:00:00');
+    const dow=dt.getDay();
+    weekend=(dow===0||dow===6);
+  }
+  const endH=startH+duration;
+  const outsideHours=(startH<MEETING_HOURS.start)||(endH>MEETING_HOURS.end);
+  return weekend||outsideHours;
+}
+
+function onMeetingTimeChange(){
+  const t=T[currentLang];
+  const duration=parseInt(document.getElementById('f-meeting-duration').value);
+  const basePrice=MEETING_PRICES[duration]||(duration*MEETING_PRICES[1]);
+  const outOfHours=isMeetingOutOfHours();
+  planPrice=outOfHours?Math.round(basePrice*MEETING_SURCHARGE):basePrice;
+  planLabel=(currentLang==='en'?'Meeting room – ':'Sala meeting – ')+document.getElementById('f-meeting-duration').selectedOptions[0].textContent;
+  document.getElementById('sp').textContent=planLabel;
+  const warn=document.getElementById('t-meeting-out-of-hours');
+  warn.textContent=outOfHours?t.meetingOutOfHours:'';
+  updateSummary();
 }
 
 function handleZoneClick(id){if(deskOnly)return;selectSpace(id);}
@@ -519,6 +607,11 @@ async function onDateChange(){
   const st=document.getElementById('avail-status');
   const locale=currentLang==='en'?'en-GB':'it-IT';
   document.getElementById('sd').textContent=dt.toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'});
+  if(isMeeting){
+    onMeetingTimeChange();
+    updateSummary(false);
+    return;
+  }
   if(isWeekend&&isPost&&planLabel===T[currentLang].daily){
     st.className='avail-status visible avail-busy';st.textContent=t.weekendBusy;updateSummary(true);return;
   }
@@ -560,11 +653,20 @@ async function doBook(){
   const email=document.getElementById('f-email').value.trim();
   const telefono=document.getElementById('f-telefono').value.trim();
   const carnet=document.getElementById('f-carnet').value.trim();
-  const note=document.getElementById('f-note').value.trim();
+  let note=document.getElementById('f-note').value.trim();
   const data=document.getElementById('din').value;
   if(!nome||!email){alert(t.alertFields);return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(t.alertEmail);return;}
   const spazioLabel=isPost?(currentLang==='en'?'Desk ':'Postazione ')+sel.id:sel.name;
+  if(isMeeting){
+    const startH=document.getElementById('f-meeting-start').value;
+    const duration=document.getElementById('f-meeting-duration').value;
+    const orarioNote=(currentLang==='en'
+      ?'Time: '+(startH<10?'0'+startH:startH)+':00, duration '+duration+'h'
+      :'Orario: '+(startH<10?'0'+startH:startH)+':00, durata '+duration+'h')
+      +(isMeetingOutOfHours()?(currentLang==='en'?' (out of standard hours +50%)':' (fuori orario standard +50%)'):'');
+    note=orarioNote+(note?' — '+note:'');
+  }
   const cta=document.getElementById('cta');
   cta.disabled=true;cta.className='cta loading';cta.textContent=t.ctaLoading;
   const body=new URLSearchParams();
