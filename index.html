@@ -45,6 +45,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 .restrict-note.visible{display:block}
 .meeting-note{font-size:11px;font-weight:500;margin-top:5px;padding:5px 8px;border-radius:6px;border-left:3px solid var(--ss-navy);background:#EEF1FA;color:var(--ss-navy);display:none}
 .meeting-note.visible{display:block}
+.carnet-purchase-note{font-size:11px;font-weight:500;margin-top:5px;padding:5px 8px;border-radius:6px;border-left:3px solid var(--ss-yellow);background:#FFFBEB;color:#7a5e00;display:none}
+.carnet-purchase-note.visible{display:block}
 .field{margin-bottom:0}
 .field label{display:block;font-size:10px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
 .field input,.field textarea{width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none;transition:border-color 0.12s}
@@ -175,6 +177,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         </div>
         <div class="restrict-note" id="restrict-note">Solo postazioni disponibili per questo piano</div>
         <div class="meeting-note" id="meeting-note">La sala meeting si prenota a ore — scrivici per disponibilità e preventivo</div>
+        <div class="carnet-purchase-note" id="carnet-purchase-note">Questo piano serve solo per il primo acquisto. Per gli ingressi successivi torna qui, seleziona la postazione e inserisci il tuo codice carnet qui sotto — non serve riselezionare questo piano.</div>
       </div>
       <div class="panel">
         <div class="panel-label" id="t-date-label">Data di inizio</div>
@@ -277,7 +280,7 @@ const T={
     dateLabel:'Data di inizio',
     detailsLabel:'I tuoi dati',
     nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono',
-    carnetLbl:'Codice carnet', optional:'(opzionale — lascia vuoto se acquisti un nuovo carnet)',
+    carnetLbl:'Codice carnet', optional:'(hai gi\u00e0 un carnet attivo? inserisci qui il codice e clicca Verifica — non serve riselezionare il piano Carnet)',
     verifyBtn:'Verifica',
     notesLbl:'Note',
     notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
@@ -293,6 +296,7 @@ const T={
     footerNote:'Conferma via email · info@sottoscalacoworking.com',
     restrictNote:'Solo postazioni disponibili per questo piano',
     meetingNote:'La sala meeting si prenota a ore — scrivici per disponibilità e preventivo',
+    carnetPurchaseNote:'Questo piano serve solo per il primo acquisto. Per gli ingressi successivi torna qui, seleziona la postazione e inserisci il tuo codice carnet qui sotto — non serve riselezionare questo piano.',
     timeLabel:'Orario', startLabel:'Ora inizio', durationLabel:'Durata',
     meetingHoursNote:'Orario disponibile: 9:00 – 18:00',
     meetingOutOfHours:'⚠ Fuori orario standard (sera/weekend, +50%) — scrivici a info@sottoscalacoworking.com per disponibilità e preventivo',
@@ -327,7 +331,7 @@ const T={
     dateLabel:'Start date',
     detailsLabel:'Your details',
     nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone',
-    carnetLbl:'Carnet code', optional:'(optional — leave empty if buying a new carnet)',
+    carnetLbl:'Carnet code', optional:'(already have an active carnet? enter the code and click Verify — no need to select a Carnet plan again)',
     verifyBtn:'Verify',
     notesLbl:'Notes',
     notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
@@ -343,6 +347,7 @@ const T={
     footerNote:'Confirmation by email · info@sottoscalacoworking.com',
     restrictNote:'Only desks available for this plan',
     meetingNote:'Meeting room is booked by the hour — contact us for availability and a quote',
+    carnetPurchaseNote:'This plan is only for your first purchase. For further entries, come back here, select the desk and enter your carnet code below — no need to select this plan again.',
     timeLabel:'Time', startLabel:'Start time', durationLabel:'Duration',
     meetingHoursNote:'Available hours: 9:00 AM – 6:00 PM',
     meetingOutOfHours:'⚠ Outside standard hours (evening/weekend, +50%) — email info@sottoscalacoworking.com for availability and a quote',
@@ -406,6 +411,7 @@ function setLang(lang){
   // Notes
   document.getElementById('restrict-note').textContent=t.restrictNote;
   document.getElementById('meeting-note').textContent=t.meetingNote;
+  document.getElementById('carnet-purchase-note').textContent=t.carnetPurchaseNote;
   document.getElementById('t-time-label').textContent=t.timeLabel;
   document.getElementById('t-start-label').textContent=t.startLabel;
   document.getElementById('t-duration-label').textContent=t.durationLabel;
@@ -627,6 +633,8 @@ function setPlan(btn){
   document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('sp').textContent=planLabel;
   document.getElementById('restrict-note').classList.toggle('visible',deskOnly);
+  const isCarnetPurchase=(btn.dataset.planIt==='Carnet 5'||btn.dataset.planIt==='Carnet 10');
+  document.getElementById('carnet-purchase-note').classList.toggle('visible',isCarnetPurchase);
   carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';
   if(deskOnly&&sel&&!isPost){clearAllSel();sel=null;resetSelCard();}
   updateZoneLocks();updateSummary();
