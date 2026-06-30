@@ -167,6 +167,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <div class="panel-label" id="t-plan-label">Piano</div>
         <div class="plan-grid" id="pgrid">
           <button class="pb" data-plan-it="Giornaliero" data-plan-en="Daily" data-price="19" data-desk-only="false" onclick="setPlan(this)"><span id="pb-daily-name">Giornaliero</span><span>€19</span></button>
+          <button class="pb" data-plan-it="Carnet 5" data-plan-en="Carnet 5" data-price="89" data-desk-only="false" onclick="setPlan(this)"><span id="pb-carnet5-name">Carnet 5</span><span>€89</span><span class="badge" id="pb-carnet5-badge">5 ingressi</span></button>
+          <button class="pb" data-plan-it="Carnet 10" data-plan-en="Carnet 10" data-price="169" data-desk-only="false" onclick="setPlan(this)"><span id="pb-carnet10-name">Carnet 10</span><span>€169</span><span class="badge" id="pb-carnet10-badge">10 ingressi</span></button>
           <button class="pb" data-plan-it="Trimestrale" data-plan-en="Quarterly" data-price="249" data-desk-only="true" onclick="setPlan(this)"><span id="pb-quarterly-name">Trimestrale</span><span>€249</span><span class="badge" id="pb-quarterly-badge">3 mesi</span></button>
           <button class="pb" data-plan-it="Mensile" data-plan-en="Monthly" data-price="299" data-desk-only="true" onclick="setPlan(this)"><span id="pb-monthly-name">Mensile</span><span>€299</span></button>
           <button class="pb" data-plan-it="Annuale" data-plan-en="Annual" data-price="199" data-desk-only="true" onclick="setPlan(this)"><span id="pb-annual-name">Annuale</span><span>€199/m</span><span class="badge" id="pb-annual-badge">miglior prezzo</span></button>
@@ -248,7 +250,7 @@ const MEETING_SURCHARGE=1.5;
 const RESERVED=['B1','B3'];
 const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
-const DEMO_C={'SS-10-2847':{type:10,used:3},'SS-05-1234':{type:5,used:1}};
+const CARNET_API_URL='INSERISCI_QUI_URL_WEB_APP';
 
 let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',deskOnly=false,carnetActive=null;
 let currentLang='it';
@@ -266,7 +268,7 @@ const T={
     dateLabel:'Data di inizio',
     detailsLabel:'I tuoi dati',
     nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono',
-    carnetLbl:'Codice carnet', optional:'(opzionale)',
+    carnetLbl:'Codice carnet', optional:'(opzionale — lascia vuoto se acquisti un nuovo carnet)',
     verifyBtn:'Verifica',
     notesLbl:'Note',
     notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
@@ -299,6 +301,7 @@ const T={
     alertError:'Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com',
     meetingContact:'Prenota a ore — contattaci',
     daily:'Giornaliero', monthly:'Mensile', quarterly:'Trimestrale', annual:'Annuale',
+    carnet5Badge:'5 ingressi', carnet10Badge:'10 ingressi',
     bestPrice:'miglior prezzo', months3:'3 mesi',
     svgMeeting:'Sala meeting', svgWorkshop:'Tavolo workshop',
     svgKitchen1:'Postazione', svgKitchen2:'alta',
@@ -315,7 +318,7 @@ const T={
     dateLabel:'Start date',
     detailsLabel:'Your details',
     nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone',
-    carnetLbl:'Carnet code', optional:'(optional)',
+    carnetLbl:'Carnet code', optional:'(optional — leave empty if buying a new carnet)',
     verifyBtn:'Verify',
     notesLbl:'Notes',
     notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
@@ -348,6 +351,7 @@ const T={
     alertError:'Error while sending. Please try again or email info@sottoscalacoworking.com',
     meetingContact:'Book by the hour — contact us',
     daily:'Daily', monthly:'Monthly', quarterly:'Quarterly', annual:'Annual',
+    carnet5Badge:'5 entries', carnet10Badge:'10 entries',
     bestPrice:'best value', months3:'3 months',
     svgMeeting:'Meeting room', svgWorkshop:'Workshop table',
     svgKitchen1:'Standing', svgKitchen2:'desk',
@@ -388,6 +392,8 @@ function setLang(lang){
   document.getElementById('pb-annual-name').textContent=t.annual;
   document.getElementById('pb-annual-badge').textContent=t.bestPrice;
   document.getElementById('pb-quarterly-badge').textContent=t.months3;
+  document.getElementById('pb-carnet5-badge').textContent=t.carnet5Badge;
+  document.getElementById('pb-carnet10-badge').textContent=t.carnet10Badge;
   // Notes
   document.getElementById('restrict-note').textContent=t.restrictNote;
   document.getElementById('meeting-note').textContent=t.meetingNote;
@@ -449,6 +455,37 @@ async function checkAvailability(calName,dateStr){
   const end=new Date(d);end.setDate(end.getDate()+1);
   const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events?key='+API_KEY+'&timeMin='+d.toISOString()+'&timeMax='+end.toISOString()+'&singleEvents=true&fields=items(id)';
   try{const res=await fetch(url);const data=await res.json();return!(data.items&&data.items.length>0);}catch(e){return true;}
+}
+
+async function getMeetingEventsForDate(dateStr){
+  const calId=CAL_IDS['Sala meeting'];
+  if(!calId)return[];
+  const d=new Date(dateStr+'T00:00:00');
+  const end=new Date(d);end.setDate(end.getDate()+1);
+  const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events?key='+API_KEY+'&timeMin='+d.toISOString()+'&timeMax='+end.toISOString()+'&singleEvents=true&fields=items(start,end)';
+  try{
+    const res=await fetch(url);const data=await res.json();
+    if(!data.items)return[];
+    return data.items.map(ev=>{
+      const startStr=ev.start.dateTime||ev.start.date;
+      const endStr=ev.end.dateTime||ev.end.date;
+      return{start:new Date(startStr),end:new Date(endStr)};
+    });
+  }catch(e){return[];}
+}
+
+function slotsOverlap(aStart,aEnd,bStart,bEnd){
+  return aStart<bEnd&&bStart<aEnd;
+}
+
+async function checkMeetingSlotAvailability(dateStr,startHour,durationHours){
+  const events=await getMeetingEventsForDate(dateStr);
+  const reqStart=new Date(dateStr+'T00:00:00');reqStart.setHours(startHour,0,0,0);
+  const reqEnd=new Date(reqStart);reqEnd.setHours(reqStart.getHours()+durationHours);
+  for(const ev of events){
+    if(slotsOverlap(reqStart,reqEnd,ev.start,ev.end))return false;
+  }
+  return true;
 }
 
 async function refreshAllForDate(dateStr){
@@ -531,7 +568,9 @@ function isMeetingOutOfHours(){
   return weekend||outsideHours;
 }
 
-function onMeetingTimeChange(){
+let meetingSlotAvailable=true;
+
+async function onMeetingTimeChange(){
   const t=T[currentLang];
   const duration=parseInt(document.getElementById('f-meeting-duration').value);
   const basePrice=MEETING_PRICES[duration]||(duration*MEETING_PRICES[1]);
@@ -541,7 +580,20 @@ function onMeetingTimeChange(){
   document.getElementById('sp').textContent=planLabel;
   const warn=document.getElementById('t-meeting-out-of-hours');
   warn.textContent=outOfHours?t.meetingOutOfHours:'';
-  updateSummary();
+
+  const d=document.getElementById('din').value;
+  const st=document.getElementById('avail-status');
+  meetingSlotAvailable=true;
+  if(d){
+    const startHour=parseInt(document.getElementById('f-meeting-start').value);
+    st.className='avail-status visible avail-loading';st.textContent=t.availChecking;
+    meetingSlotAvailable=await checkMeetingSlotAvailability(d,startHour,duration);
+    st.className='avail-status visible '+(meetingSlotAvailable?'avail-ok':'avail-busy');
+    st.textContent=meetingSlotAvailable?t.availOk:t.availBusy;
+  }else{
+    st.className='avail-status';
+  }
+  updateSummary(!meetingSlotAvailable&&!!d);
 }
 
 function handleZoneClick(id){if(deskOnly)return;selectSpace(id);}
@@ -575,15 +627,30 @@ function updateZoneLocks(){
   ZONES_LOCKABLE.forEach(id=>{const el=document.getElementById('zone-'+id);if(el)el.setAttribute('class',deskOnly?'space-locked':(sel&&sel.id===id?'space-sel':'space-avail'));});
 }
 
-function applyCarnet(){
+async function applyCarnet(){
   const t=T[currentLang];
   const v=document.getElementById('f-carnet').value.trim();const st=document.getElementById('cst');
-  if(DEMO_C[v]){const c=DEMO_C[v];const rem=c.type-c.used;carnetActive={code:v,remaining:rem};
-    st.className='cst cok';st.textContent=t.carnetOk+rem+'/'+c.type+t.carnetRemaining;
-    planPrice=0;planLabel='Carnet ('+rem+' '+(currentLang==='en'?'left':'rimasti')+')';
-    document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
-    document.getElementById('sp').textContent=planLabel;updateSummary();
-  }else{carnetActive=null;st.className='cst cerr';st.textContent=t.carnetErr;}
+  const btn=document.getElementById('t-verify-btn');
+  if(!v){st.className='cst';st.textContent='';return;}
+  btn.disabled=true;
+  st.className='cst';st.textContent=t.availChecking||'...';
+  try{
+    const res=await fetch(CARNET_API_URL+'?action=verificaCarnet&codice='+encodeURIComponent(v));
+    const data=await res.json();
+    if(data.valido){
+      carnetActive={code:v,remaining:data.rimanenti};
+      st.className='cst cok';
+      st.textContent=t.carnetOk+data.rimanenti+'/'+data.ingressiTotali+t.carnetRemaining+' \u00b7 '+(currentLang==='en'?'valid until ':'valido fino al ')+data.dataScadenza;
+      planPrice=0;planLabel='Carnet ('+data.rimanenti+' '+(currentLang==='en'?'left':'rimasti')+')';
+      document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
+      document.getElementById('sp').textContent=planLabel;updateSummary();
+    }else{
+      carnetActive=null;st.className='cst cerr';st.textContent=data.messaggio||t.carnetErr;
+    }
+  }catch(e){
+    carnetActive=null;st.className='cst cerr';st.textContent=t.carnetErr;
+  }
+  btn.disabled=false;
 }
 
 function clearAllSel(){
@@ -608,8 +675,7 @@ async function onDateChange(){
   const locale=currentLang==='en'?'en-GB':'it-IT';
   document.getElementById('sd').textContent=dt.toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'});
   if(isMeeting){
-    onMeetingTimeChange();
-    updateSummary(false);
+    await onMeetingTimeChange();
     return;
   }
   if(isWeekend&&isPost&&planLabel===T[currentLang].daily){
@@ -657,6 +723,7 @@ async function doBook(){
   const data=document.getElementById('din').value;
   if(!nome||!email){alert(t.alertFields);return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(t.alertEmail);return;}
+  if(isMeeting&&!meetingSlotAvailable){alert(t.availBusy);return;}
   const spazioLabel=isPost?(currentLang==='en'?'Desk ':'Postazione ')+sel.id:sel.name;
   if(isMeeting){
     const startH=document.getElementById('f-meeting-start').value;
