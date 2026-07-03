@@ -195,7 +195,6 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
             <label id="t-duration-label">Durata</label>
             <select id="f-meeting-duration" onchange="onMeetingTimeChange()" style="width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none">
               <option value="1">1 ora</option>
-              <option value="2">2 ore</option>
               <option value="4">4 ore (mezza giornata)</option>
               <option value="9">9 ore (giornata intera)</option>
             </select>
@@ -257,8 +256,9 @@ const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.155
 const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Postazione alta':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
 const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:20,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
 const MEETING_HOURS={start:9,end:18};
-const MEETING_PRICES={1:20,2:35,4:60,9:95};
-const MEETING_SURCHARGE=1.5;
+const MEETING_PRICES={1:29,4:90,9:160};
+const MEETING_PRICES_WEEKEND={1:40,4:125,9:225};
+const MEETING_SURCHARGE=1.4;
 const RESERVED=['B1','B3'];
 const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
@@ -300,7 +300,7 @@ const T={
     timeLabel:'Orario', startLabel:'Ora inizio', durationLabel:'Durata',
     meetingHoursNote:'Orario disponibile: 9:00 – 18:00',
     meetingOutOfHours:'⚠ Fuori orario standard (sera/weekend, +50%) — scrivici a info@sottoscalacoworking.com per disponibilità e preventivo',
-    duration1:'1 ora', duration2:'2 ore', duration4:'4 ore (mezza giornata)', duration9:'9 ore (giornata intera)',
+    duration1:'1 ora', duration4:'4 ore (mezza giornata)', duration9:'9 ore (giornata intera)',
     availOk:'✓ Disponibile in questa data',
     availBusy:'✗ Già prenotato in questa data',
     availChecking:'Verifica disponibilità...',
@@ -351,7 +351,7 @@ const T={
     timeLabel:'Time', startLabel:'Start time', durationLabel:'Duration',
     meetingHoursNote:'Available hours: 9:00 AM – 6:00 PM',
     meetingOutOfHours:'⚠ Outside standard hours (evening/weekend, +50%) — email info@sottoscalacoworking.com for availability and a quote',
-    duration1:'1 hour', duration2:'2 hours', duration4:'4 hours (half day)', duration9:'9 hours (full day)',
+    duration1:'1 hour', duration4:'4 hours (half day)', duration9:'9 hours (full day)',
     availOk:'✓ Available on this date',
     availBusy:'✗ Already booked on this date',
     availChecking:'Checking availability...',
@@ -419,9 +419,8 @@ function setLang(lang){
   const durSel=document.getElementById('f-meeting-duration');
   if(durSel){
     durSel.options[0].textContent=t.duration1;
-    durSel.options[1].textContent=t.duration2;
-    durSel.options[2].textContent=t.duration4;
-    durSel.options[3].textContent=t.duration9;
+    durSel.options[1].textContent=t.duration4;
+    durSel.options[2].textContent=t.duration9;
   }
   if(isMeeting)onMeetingTimeChange();
   // Form labels
@@ -588,9 +587,10 @@ let meetingSlotAvailable=true;
 async function onMeetingTimeChange(){
   const t=T[currentLang];
   const duration=parseInt(document.getElementById('f-meeting-duration').value);
-  const basePrice=MEETING_PRICES[duration]||(duration*MEETING_PRICES[1]);
   const outOfHours=isMeetingOutOfHours();
-  planPrice=outOfHours?Math.round(basePrice*MEETING_SURCHARGE):basePrice;
+  const basePrice=MEETING_PRICES[duration]||(duration*MEETING_PRICES[1]);
+  const weekendPrice=MEETING_PRICES_WEEKEND[duration]||(duration*MEETING_PRICES_WEEKEND[1]);
+  planPrice=outOfHours?weekendPrice:basePrice;
   planLabel=(currentLang==='en'?'Meeting room – ':'Sala meeting – ')+document.getElementById('f-meeting-duration').selectedOptions[0].textContent;
   document.getElementById('sp').textContent=planLabel;
   const warn=document.getElementById('t-meeting-out-of-hours');
