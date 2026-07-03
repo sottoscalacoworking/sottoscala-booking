@@ -196,7 +196,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
             <select id="f-meeting-duration" onchange="onMeetingTimeChange()" style="width:100%;font-size:12px;border:1.5px solid var(--ss-border);border-radius:7px;padding:7px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none">
               <option value="1">1 ora</option>
               <option value="4">4 ore (mezza giornata)</option>
-              <option value="9">9 ore (giornata intera)</option>
+              <option value="8">8 ore (giornata intera)</option>
             </select>
           </div>
         </div>
@@ -227,9 +227,11 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
         <div class="sum-row"><span id="t-space-row">Spazio</span><span id="ss">—</span></div>
         <div class="sum-row"><span id="t-plan-row">Piano</span><span id="sp">—</span></div>
         <div class="sum-row"><span id="t-date-row">Data</span><span id="sd">—</span></div>
-        <div class="sum-row"><span>IVA 22%</span><span id="si">—</span></div>
+        <div class="sum-row" id="annual-total-row" style="display:none;color:var(--ss-orange);font-weight:600"><span id="t-annual-total-label">Totale annuo</span><span id="s-annual-total">€2.913,36</span></div>
         <div class="sum-div"></div>
-        <div class="sum-tot"><span id="t-total-row">Totale</span><span id="st">—</span></div>
+        <div class="sum-tot" style="margin-bottom:4px"><span id="t-net-row">Imponibile</span><span id="sn">—</span></div>
+        <div class="sum-row"><span>IVA 22%</span><span id="si">—</span></div>
+        <div class="sum-row" style="font-weight:600;color:var(--ss-muted)"><span id="t-total-row">Totale IVA incl.</span><span id="st">—</span></div>
       </div>
       <div class="success-msg" id="success-msg">
         ✅ <span id="t-success-title">Prenotazione inviata!</span><br>
@@ -256,8 +258,8 @@ const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.155
 const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Postazione alta':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
 const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:20,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
 const MEETING_HOURS={start:9,end:18};
-const MEETING_PRICES={1:29,4:90,9:160};
-const MEETING_PRICES_WEEKEND={1:40,4:125,9:225};
+const MEETING_PRICES={1:29,4:99,8:180};
+const MEETING_PRICES_WEEKEND={1:40,4:125,8:225};
 const MEETING_SURCHARGE=1.4;
 const RESERVED=['B1','B3'];
 const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
@@ -285,7 +287,7 @@ const T={
     notesLbl:'Note',
     notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
     summaryLabel:'Riepilogo',
-    spaceRow:'Spazio', planRow:'Piano', dateRow:'Data', totalRow:'Totale',
+    spaceRow:'Spazio', planRow:'Piano', dateRow:'Data', netRow:'Imponibile', totalRow:'Totale IVA incl.', annualTotal:'Totale annuo IVA incl.',
     successTitle:'Prenotazione inviata!',
     successSub:'Ti contatteremo a breve per confermare. Controlla la tua email.',
     ctaSelect:'Seleziona uno spazio →',
@@ -300,7 +302,7 @@ const T={
     timeLabel:'Orario', startLabel:'Ora inizio', durationLabel:'Durata',
     meetingHoursNote:'Orario disponibile: 9:00 – 18:00',
     meetingOutOfHours:'⚠ Fuori orario standard (sera/weekend, +50%) — scrivici a info@sottoscalacoworking.com per disponibilità e preventivo',
-    duration1:'1 ora', duration4:'4 ore (mezza giornata)', duration9:'9 ore (giornata intera)',
+    duration1:'1 ora', duration4:'4 ore (mezza giornata)', duration9:'8 ore (giornata intera)',
     availOk:'✓ Disponibile in questa data',
     availBusy:'✗ Già prenotato in questa data',
     availChecking:'Verifica disponibilità...',
@@ -336,7 +338,7 @@ const T={
     notesLbl:'Notes',
     notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
     summaryLabel:'Summary',
-    spaceRow:'Space', planRow:'Plan', dateRow:'Date', totalRow:'Total',
+    spaceRow:'Space', planRow:'Plan', dateRow:'Date', netRow:'Net price', totalRow:'Total incl. VAT', annualTotal:'Annual total incl. VAT',
     successTitle:'Booking request sent!',
     successSub:'We\'ll contact you shortly to confirm. Check your email.',
     ctaSelect:'Select a space →',
@@ -351,7 +353,7 @@ const T={
     timeLabel:'Time', startLabel:'Start time', durationLabel:'Duration',
     meetingHoursNote:'Available hours: 9:00 AM – 6:00 PM',
     meetingOutOfHours:'⚠ Outside standard hours (evening/weekend, +50%) — email info@sottoscalacoworking.com for availability and a quote',
-    duration1:'1 hour', duration4:'4 hours (half day)', duration9:'9 hours (full day)',
+    duration1:'1 hour', duration4:'4 hours (half day)', duration9:'8 hours (full day)',
     availOk:'✓ Available on this date',
     availBusy:'✗ Already booked on this date',
     availChecking:'Checking availability...',
@@ -438,6 +440,8 @@ function setLang(lang){
   document.getElementById('t-plan-row').textContent=t.planRow;
   document.getElementById('t-date-row').textContent=t.dateRow;
   document.getElementById('t-total-row').textContent=t.totalRow;
+  document.getElementById('t-net-row').textContent=t.netRow;
+  document.getElementById('t-annual-total-label').textContent=t.annualTotal;
   // Success
   document.getElementById('t-success-title').textContent=t.successTitle;
   document.getElementById('t-success-sub').textContent=t.successSub;
@@ -715,16 +719,21 @@ async function onDateChange(){
 function updateSummary(blocked){
   const t=T[currentLang];
   const d=document.getElementById('din').value;const cta=document.getElementById('cta');
+  const isAnnuale=(planLabel==='Annuale'||planLabel==='Annual');
+  document.getElementById('annual-total-row').style.display=isAnnuale&&d?'flex':'none';
   if(blocked){
+    document.getElementById('sn').textContent='—';
     document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
     cta.disabled=true;cta.textContent=t.ctaUnavailable;return;
   }
   if(sel&&d){
     const p=carnetActive?0:planPrice;const iva=Math.round(p*0.22);
-    document.getElementById('si').textContent=carnetActive?'—':'€'+iva;
-    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva);
+    document.getElementById('sn').textContent=carnetActive?'—':'€'+p+(isAnnuale?' /mese':'');
+    document.getElementById('si').textContent=carnetActive?'—':'€'+iva+(isAnnuale?' /mese':'');
+    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva)+(isAnnuale?' /mese':'');
     cta.disabled=false;cta.textContent=t.ctaConfirm;
   }else{
+    document.getElementById('sn').textContent='—';
     document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
     cta.disabled=true;cta.textContent=sel?t.ctaDate:t.ctaSelect;
   }
