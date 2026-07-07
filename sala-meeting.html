@@ -601,7 +601,7 @@ async function renderCalendar(){
         inner.textContent='Libero';
         if(abbonato){
           const slotKey=d.toISOString().split('T')[0]+'-'+h;
-          inner.onclick=()=>selectSlot(d,h,inner,slotKey);
+          inner.onclick=()=>toggleSlot(d,h,inner,slotKey);
           inner.dataset.key=slotKey;
         }
       }
