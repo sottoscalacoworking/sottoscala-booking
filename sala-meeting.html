@@ -185,8 +185,271 @@ const HOURS_END=18;
 
 let currentWeekOffset=0;
 let abbonato=null;
-let selectedSlot=null;
+let selectedSlots={}; // key -> {date, hour}
 let calEvents=[];
+
+// ── Utilities ──────────────────────────────────────────────────────────
+function getMondayOfWeek(offset){
+  const now=new Date();
+  const day=now.getDay()||7;
+  const mon=new Date(now);
+  mon.setHours(0,0,0,0);
+  mon.setDate(now.getDate()-day+1+offset*7);
+  return mon;
+}
+
+function formatDate(d,opts){
+  return d.toLocaleDateString('it-IT',opts||{day:'2-digit',month:'long',year:'numeric'});
+}
+
+function formatDateShort(d){
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+}
+
+function isToday(d){
+  const now=new Date();
+  return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+}
+
+function isPast(d,hour){
+  const now=new Date();
+  const slot=new Date(d);
+  slot.setHours(hour,0,0,0);
+  return slot<=now;
+}
+
+function getSettimanaISO(d){
+  const date=new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate()+4-(date.getDay()||7));
+  const yearStart=new Date(date.getFullYear(),0,1);
+  return date.getFullYear()+'-W'+Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+
+// ── Verifica codice abbonato ───────────────────────────────────────────
+async function verificaCodice(){
+  const codice=document.getElementById('f-codice').value.trim();
+  const err=document.getElementById('err-msg');
+  const info=document.getElementById('abbonato-info');
+  err.classList.remove('visible');
+  info.classList.remove('visible');
+  if(!codice)return;
+
+  try{
+    const res=await fetch(WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(codice));
+    const data=await res.json();
+    if(data.valido){
+      abbonato=data;
+      document.getElementById('abbonato-name').textContent=data.nome;
+      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/4 ore usate';
+      const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
+      document.getElementById('ore-fill').style.width=pct+'%';
+      document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
+      info.classList.add('visible');
+      renderCalendar();
+    }else{
+      err.textContent=data.messaggio||'Codice non trovato.';
+      err.classList.add('visible');
+      abbonato=null;
+    }
+  }catch(e){
+    err.textContent='Errore di connessione. Riprova.';
+    err.classList.add('visible');
+  }
+}
+
+// ── Carica eventi Google Calendar ─────────────────────────────────────
+async function loadEvents(monday){
+  const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59);
+  const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(MEETING_CAL_ID)+
+    '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+friday.toISOString()+
+    '&singleEvents=true&fields=items(start,end,summary)';
+  try{
+    const res=await fetch(url);
+    const data=await res.json();
+    return data.items||[];
+  }catch(e){return[];}
+}
+
+function isSlotBusy(events,date,hour){
+  const slotStart=new Date(date);slotStart.setHours(hour,0,0,0);
+  const slotEnd=new Date(date);slotEnd.setHours(hour+ORE_SLOT,0,0,0);
+  return events.some(ev=>{
+    const evStart=new Date(ev.start.dateTime||ev.start.date);
+    const evEnd=new Date(ev.end.dateTime||ev.end.date);
+    return slotStart<evEnd&&evStart<slotEnd;
+  });
+}
+
+// ── Render calendario ──────────────────────────────────────────────────
+async function renderCalendar(){
+  const monday=getMondayOfWeek(currentWeekOffset);
+  const days=[];
+  for(let i=0;i<5;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d);}
+
+  const dayNames=['LUN','MAR','MER','GIO','VEN'];
+  days.forEach((d,i)=>{
+    const el=document.getElementById('hd-'+i);
+    el.innerHTML=dayNames[i]+'<br><span style="font-size:12px;font-weight:500;letter-spacing:0">'+formatDateShort(d)+'</span>';
+    el.classList.toggle('today',isToday(d));
+  });
+
+  document.getElementById('week-label').textContent=
+    formatDateShort(days[0])+' – '+formatDateShort(days[4]);
+  document.getElementById('week-sub').textContent=
+    currentWeekOffset===0?'Settimana corrente':
+    currentWeekOffset===1?'Settimana prossima':
+    currentWeekOffset===-1?'Settimana scorsa':'';
+
+  const body=document.getElementById('cal-body');
+  body.innerHTML='<div style="grid-column:1/-1;padding:16px;text-align:center;color:var(--ss-muted);font-size:13px">Caricamento disponibilità...</div>';
+  const events=await loadEvents(monday);
+  calEvents=events;
+
+  body.innerHTML='';
+  const hours=[];
+  for(let h=HOURS_START;h<HOURS_END;h++)hours.push(h);
+
+  hours.forEach((h,hi)=>{
+    const tl=document.createElement('div');
+    tl.className='time-label';
+    tl.textContent=h+':00';
+    body.appendChild(tl);
+
+    days.forEach((d,di)=>{
+      const slot=document.createElement('div');
+      slot.className='slot'+(hi===0?' first-row':'');
+      const inner=document.createElement('div');
+      inner.className='slot-inner';
+      const slotKey=d.toISOString().split('T')[0]+'-'+h;
+
+      if(isPast(d,h)){
+        inner.className+=' past';
+        inner.textContent='—';
+      }else if(isSlotBusy(events,d,h)){
+        inner.className+=' busy';
+        inner.textContent='Occupato';
+      }else{
+        inner.className+=' free';
+        inner.textContent='Libero';
+        if(abbonato){
+          inner.onclick=()=>toggleSlot(d,h,inner,slotKey);
+          inner.dataset.key=slotKey;
+        }
+      }
+      slot.appendChild(inner);
+      body.appendChild(slot);
+    });
+  });
+
+  // Reset selezione
+  selectedSlots={};
+  document.getElementById('booking-panel').classList.remove('visible');
+  document.getElementById('success-msg').classList.remove('visible');
+}
+
+// ── Toggle slot (selezione/deselezione multipla) ───────────────────────
+function toggleSlot(date,hour,el,key){
+  if(!abbonato)return;
+  if(selectedSlots[key]){
+    // Deseleziona
+    delete selectedSlots[key];
+    el.classList.remove('selected');el.classList.add('free');el.textContent='Libero';
+  }else{
+    // Seleziona
+    selectedSlots[key]={date,hour};
+    el.classList.remove('free');el.classList.add('selected');el.textContent='✓';
+  }
+  updateBookingPanel();
+}
+
+function updateBookingPanel(){
+  const slots=Object.values(selectedSlots);
+  const panel=document.getElementById('booking-panel');
+  if(slots.length===0){panel.classList.remove('visible');return;}
+
+  const totOre=slots.length*ORE_SLOT;
+  const oreRimaste=abbonato.oreDisponibili;
+  const incluse=Math.min(totOre,oreRimaste);
+  const extra=totOre-incluse;
+  const costo=extra*PREZZO_SCONTATO;
+
+  // Descrizione slot selezionati
+  const slotDesc=slots.map(s=>{
+    const giorno=formatDate(s.date,{weekday:'short',day:'2-digit',month:'short'});
+    return giorno+' '+s.hour+':00–'+(s.hour+1)+':00';
+  }).join(', ');
+
+  document.getElementById('b-giorno').textContent=totOre+' ora'+(totOre>1?'e':'')+' selezionata'+(totOre>1?'e':'');
+  document.getElementById('b-orario').textContent=slotDesc;
+  document.getElementById('b-ore-rimaste').textContent=oreRimaste+' h disponibili · '+incluse+' h incluse · '+extra+' h a pagamento';
+
+  if(extra===0){
+    document.getElementById('b-totale').textContent='€0 (incluso nel piano)';
+    document.getElementById('b-note').textContent='';
+  }else{
+    const iva=Math.round(costo*0.22);
+    document.getElementById('b-totale').textContent='€'+(costo+iva)+' IVA incl.';
+    document.getElementById('b-note').textContent=extra+' h a €'+PREZZO_SCONTATO+'/ora (sconto 20% abbonati) + IVA';
+  }
+
+  panel.classList.add('visible');
+  document.getElementById('booking-cta').disabled=false;
+  document.getElementById('success-msg').classList.remove('visible');
+}
+
+// ── Conferma prenotazione ──────────────────────────────────────────────
+async function confermaPrenotazione(){
+  const slots=Object.values(selectedSlots);
+  if(slots.length===0||!abbonato)return;
+  const cta=document.getElementById('booking-cta');
+  cta.disabled=true;cta.textContent='Invio...';
+
+  try{
+    // Invia ogni slot separatamente
+    for(const s of slots){
+      const params=new URLSearchParams({
+        action:'prenotaSalaMeeting',
+        codice:abbonato.codice,
+        data:s.date.toISOString().split('T')[0],
+        ora:s.hour,
+        ore:ORE_SLOT
+      });
+      await fetch(WEBAPP_URL+'?'+params.toString());
+    }
+
+    const totOre=slots.length*ORE_SLOT;
+
+    // Marca gli slot nel calendario
+    document.querySelectorAll('.slot-inner.selected').forEach(s=>{
+      s.classList.remove('selected');s.classList.add('myslot');s.textContent='Tu';s.onclick=null;
+    });
+
+    // Aggiorna ore
+    abbonato.oreUsate+=totOre;
+    abbonato.oreDisponibili=Math.max(0,4-abbonato.oreUsate);
+    document.getElementById('abbonato-sub').textContent=abbonato.piano+' · Questa settimana: '+abbonato.oreUsate+'/4 ore usate';
+    const pct=Math.min(100,Math.round((abbonato.oreUsate/4)*100));
+    document.getElementById('ore-fill').style.width=pct+'%';
+    document.getElementById('ore-count').textContent=abbonato.oreDisponibili+' h rimaste';
+
+    document.getElementById('booking-panel').classList.remove('visible');
+    document.getElementById('success-msg').classList.add('visible');
+    selectedSlots={};
+  }catch(e){
+    cta.disabled=false;cta.textContent='Conferma prenotazione';
+    alert('Errore durante la prenotazione. Riprova o scrivi a info@sottoscalacoworking.com');
+  }
+}
+
+function changeWeek(dir){
+  currentWeekOffset+=dir;
+  if(currentWeekOffset<0)currentWeekOffset=0;
+  renderCalendar();
+}
+
+// Init
+renderCalendar();
 
 // ── Utilities ──────────────────────────────────────────────────────────
 function getMondayOfWeek(offset){
