@@ -240,7 +240,7 @@ async function verificaCodice(){
     const data=await res.json();
     if(data.valido){
       abbonato=data;
-      document.getElementById('abbonato-name').textContent=data.nome;
+      document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
       document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/4 ore usate';
       const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
       document.getElementById('ore-fill').style.width=pct+'%';
@@ -503,7 +503,7 @@ async function verificaCodice(){
     const data=await res.json();
     if(data.valido){
       abbonato=data;
-      document.getElementById('abbonato-name').textContent=data.nome;
+      document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
       document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/4 ore usate';
       const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
       document.getElementById('ore-fill').style.width=pct+'%';
