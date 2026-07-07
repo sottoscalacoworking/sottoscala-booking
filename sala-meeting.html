@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SottoScala – Sala Meeting</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ss-orange:#E84A1A;--ss-orange-dark:#C73D10;--ss-yellow:#F5C400;
+  --ss-navy:#1B2A6B;--ss-bg:#F7F7F5;--ss-white:#FFFFFF;
+  --ss-text:#1A1A1A;--ss-muted:#6B6B6B;--ss-border:#E0E0DC;
+}
+body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
+.topbar{background:var(--ss-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:15px;font-weight:700;color:#fff}
+.topbar-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.topbar-badge{background:var(--ss-orange);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px}
+
+/* Stato abbonato */
+.codice-panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;padding:20px;margin-bottom:20px}
+.codice-row{display:flex;gap:10px;align-items:flex-end}
+.codice-input{flex:1;font-size:14px;border:1.5px solid var(--ss-border);border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;color:var(--ss-text);outline:none;transition:border-color 0.12s}
+.codice-input:focus{border-color:var(--ss-navy)}
+.codice-btn{padding:10px 20px;background:var(--ss-orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.codice-btn:hover{background:var(--ss-orange-dark)}
+.abbonato-info{margin-top:14px;padding:12px 16px;background:#EEF1FA;border-radius:8px;display:none}
+.abbonato-info.visible{display:block}
+.abbonato-name{font-size:14px;font-weight:600;color:var(--ss-navy)}
+.abbonato-sub{font-size:12px;color:var(--ss-muted);margin-top:3px}
+.ore-bar{margin-top:10px;display:flex;align-items:center;gap:10px}
+.ore-label{font-size:12px;color:var(--ss-muted);white-space:nowrap}
+.ore-track{flex:1;height:8px;background:var(--ss-border);border-radius:4px;overflow:hidden}
+.ore-fill{height:100%;background:var(--ss-orange);border-radius:4px;transition:width 0.3s}
+.ore-count{font-size:12px;font-weight:600;color:var(--ss-orange);white-space:nowrap}
+.err-msg{font-size:12px;color:#B53C1D;margin-top:8px;display:none}
+.err-msg.visible{display:block}
+
+/* Navigazione settimana */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.week-label{font-size:15px;font-weight:600;color:var(--ss-text)}
+.week-sub{font-size:12px;color:var(--ss-muted);margin-top:2px}
+.nav-btn{padding:8px 16px;background:var(--ss-white);border:1.5px solid var(--ss-border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--ss-text);transition:all 0.12s}
+.nav-btn:hover{border-color:var(--ss-navy);color:var(--ss-navy)}
+
+/* Griglia calendario */
+.cal-wrap{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;overflow:hidden}
+.cal-header{display:grid;grid-template-columns:60px repeat(5,1fr);border-bottom:1px solid var(--ss-border)}
+.cal-header-cell{padding:10px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em}
+.cal-header-cell.today{color:var(--ss-orange)}
+.cal-body{display:grid;grid-template-columns:60px repeat(5,1fr)}
+.time-label{padding:0 8px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:8px;font-size:10px;color:var(--ss-muted);font-weight:500;border-right:1px solid var(--ss-border)}
+.slot{border:1px solid var(--ss-border);border-top:none;border-left:none;min-height:48px;padding:3px;position:relative;transition:background 0.1s}
+.slot.first-row{border-top:1px solid var(--ss-border)}
+.slot-inner{width:100%;height:100%;min-height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:default;transition:all 0.12s;padding:4px}
+.slot-inner.free{background:#EEF9F0;color:#0F6E56;cursor:pointer}
+.slot-inner.free:hover{background:#D4F0DB;transform:scale(1.02)}
+.slot-inner.busy{background:#FDEEEA;color:#B53C1D;cursor:not-allowed}
+.slot-inner.past{background:#F0F0EE;color:#C0C0BE;cursor:not-allowed}
+.slot-inner.selected{background:var(--ss-orange);color:#fff;transform:scale(1.04)}
+.slot-inner.myslot{background:var(--ss-navy);color:#fff}
+.slot-inner.loading{background:#F0F0EE;color:var(--ss-muted)}
+
+/* Pannello prenotazione */
+.booking-panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;padding:20px;margin-top:16px;display:none}
+.booking-panel.visible{display:block}
+.booking-title{font-size:14px;font-weight:600;color:var(--ss-text);margin-bottom:12px}
+.booking-detail{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--ss-muted)}
+.booking-detail span:last-child{font-weight:500;color:var(--ss-text)}
+.booking-price{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:10px 0 0;border-top:1px solid var(--ss-border);margin-top:8px}
+.booking-price-note{font-size:11px;color:var(--ss-orange);font-weight:500;margin-top:2px}
+.booking-cta{width:100%;padding:12px;background:var(--ss-orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:14px;transition:background 0.12s}
+.booking-cta:hover{background:var(--ss-orange-dark)}
+.booking-cta:disabled{background:#D4D4D0;color:#999;cursor:not-allowed}
+.success-msg{display:none;background:#E6F4EE;border:1px solid #0F6E56;border-radius:8px;padding:14px;text-align:center;color:#0F6E56;font-weight:600;font-size:13px;margin-top:16px}
+.success-msg.visible{display:block}
+
+/* Note */
+.note-box{background:#FFFBEB;border:1px solid #F5C400;border-radius:10px;padding:14px 16px;margin-top:16px;font-size:12px;color:#7a5e00;line-height:1.6}
+.note-box strong{color:var(--ss-navy)}
+
+@media(max-width:600px){
+  .cal-header{grid-template-columns:44px repeat(5,1fr)}
+  .cal-body{grid-template-columns:44px repeat(5,1fr)}
+  .time-label{font-size:9px;padding:6px 4px}
+  .slot-inner{font-size:9px}
+  .codice-row{flex-direction:column}
+  .codice-btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <div class="topbar-title">SottoScala — Sala Meeting</div>
+    <div class="topbar-sub">Prenotazione riservata agli abbonati</div>
+  </div>
+  <div class="topbar-badge">Uso interno</div>
+</div>
+
+<div class="wrap">
+
+  <!-- Inserimento codice -->
+  <div class="codice-panel">
+    <div style="font-size:13px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">Il tuo codice abbonato</div>
+    <div class="codice-row">
+      <input class="codice-input" id="f-codice" type="text" placeholder="Es. M-1366" oninput="this.value=this.value.toUpperCase()"/>
+      <button class="codice-btn" onclick="verificaCodice()">Accedi</button>
+    </div>
+    <div class="err-msg" id="err-msg">Codice non trovato o abbonamento scaduto.</div>
+    <div class="abbonato-info" id="abbonato-info">
+      <div class="abbonato-name" id="abbonato-name">—</div>
+      <div class="abbonato-sub" id="abbonato-sub">—</div>
+      <div class="ore-bar">
+        <span class="ore-label">Ore questa settimana</span>
+        <div class="ore-track"><div class="ore-fill" id="ore-fill" style="width:0%"></div></div>
+        <span class="ore-count" id="ore-count">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigazione settimana -->
+  <div class="week-nav">
+    <button class="nav-btn" onclick="changeWeek(-1)">← Settimana precedente</button>
+    <div style="text-align:center">
+      <div class="week-label" id="week-label">—</div>
+      <div class="week-sub" id="week-sub">—</div>
+    </div>
+    <button class="nav-btn" onclick="changeWeek(1)">Settimana successiva →</button>
+  </div>
+
+  <!-- Calendario -->
+  <div class="cal-wrap">
+    <div class="cal-header">
+      <div class="cal-header-cell"></div>
+      <div class="cal-header-cell" id="hd-0">LUN</div>
+      <div class="cal-header-cell" id="hd-1">MAR</div>
+      <div class="cal-header-cell" id="hd-2">MER</div>
+      <div class="cal-header-cell" id="hd-3">GIO</div>
+      <div class="cal-header-cell" id="hd-4">VEN</div>
+    </div>
+    <div class="cal-body" id="cal-body">
+      <!-- generato da JS -->
+    </div>
+  </div>
+
+  <!-- Pannello prenotazione -->
+  <div class="booking-panel" id="booking-panel">
+    <div class="booking-title">Riepilogo prenotazione</div>
+    <div class="booking-detail"><span>Giorno</span><span id="b-giorno">—</span></div>
+    <div class="booking-detail"><span>Orario</span><span id="b-orario">—</span></div>
+    <div class="booking-detail"><span>Ore incluse rimanenti</span><span id="b-ore-rimaste">—</span></div>
+    <div class="booking-price">
+      <span>Totale</span><span id="b-totale">—</span>
+    </div>
+    <div class="booking-price-note" id="b-note"></div>
+    <button class="booking-cta" id="booking-cta" onclick="confermaPrenotazione()">Conferma prenotazione</button>
+  </div>
+
+  <div class="success-msg" id="success-msg">
+    ✅ Prenotazione inviata!<br>
+    <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Riceverai una conferma via email. Le ore sono state scalate dal tuo credito settimanale.</span>
+  </div>
+
+  <div class="note-box">
+    <strong>Come funziona:</strong> il tuo piano include <strong>4 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni lunedì.
+    Per prenotazioni oltre le 4 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico (€23,20/ora invece di €29).
+    Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.
+  </div>
+
+</div>
+
+<script>
+const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
+const MEETING_CAL_ID='c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com';
+const WEBAPP_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
+const PREZZO_ORE_STANDARD=29;
+const SCONTO_ABBONATO=0.20;
+const PREZZO_SCONTATO=Math.round(PREZZO_ORE_STANDARD*(1-SCONTO_ABBONATO));
+const ORE_SLOT=1; // ogni slot = 1 ora
+const HOURS_START=9;
+const HOURS_END=18;
+
+let currentWeekOffset=0;
+let abbonato=null;
+let selectedSlot=null;
+let calEvents=[];
+
+// ── Utilities ──────────────────────────────────────────────────────────
+function getMondayOfWeek(offset){
+  const now=new Date();
+  const day=now.getDay()||7;
+  const mon=new Date(now);
+  mon.setHours(0,0,0,0);
+  mon.setDate(now.getDate()-day+1+offset*7);
+  return mon;
+}
+
+function formatDate(d,opts){
+  return d.toLocaleDateString('it-IT',opts||{day:'2-digit',month:'long',year:'numeric'});
+}
+
+function formatDateShort(d){
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+}
+
+function isToday(d){
+  const now=new Date();
+  return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+}
+
+function isPast(d,hour){
+  const now=new Date();
+  const slot=new Date(d);
+  slot.setHours(hour,0,0,0);
+  return slot<=now;
+}
+
+function getSettimanaISO(d){
+  const date=new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate()+4-(date.getDay()||7));
+  const yearStart=new Date(date.getFullYear(),0,1);
+  return date.getFullYear()+'-W'+Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+
+// ── Verifica codice abbonato ───────────────────────────────────────────
+async function verificaCodice(){
+  const codice=document.getElementById('f-codice').value.trim();
+  const err=document.getElementById('err-msg');
+  const info=document.getElementById('abbonato-info');
+  err.classList.remove('visible');
+  info.classList.remove('visible');
+  if(!codice)return;
+
+  try{
+    const res=await fetch(WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(codice));
+    const data=await res.json();
+    if(data.valido){
+      abbonato=data;
+      document.getElementById('abbonato-name').textContent=data.nome;
+      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/4 ore usate';
+      const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
+      document.getElementById('ore-fill').style.width=pct+'%';
+      document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
+      info.classList.add('visible');
+      renderCalendar();
+    }else{
+      err.textContent=data.messaggio||'Codice non trovato.';
+      err.classList.add('visible');
+      abbonato=null;
+    }
+  }catch(e){
+    err.textContent='Errore di connessione. Riprova.';
+    err.classList.add('visible');
+  }
+}
+
+// ── Carica eventi Google Calendar ─────────────────────────────────────
+async function loadEvents(monday){
+  const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59);
+  const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(MEETING_CAL_ID)+
+    '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+friday.toISOString()+
+    '&singleEvents=true&fields=items(start,end,summary)';
+  try{
+    const res=await fetch(url);
+    const data=await res.json();
+    return data.items||[];
+  }catch(e){return[];}
+}
+
+function isSlotBusy(events,date,hour){
+  const slotStart=new Date(date);slotStart.setHours(hour,0,0,0);
+  const slotEnd=new Date(date);slotEnd.setHours(hour+ORE_SLOT,0,0,0);
+  return events.some(ev=>{
+    const evStart=new Date(ev.start.dateTime||ev.start.date);
+    const evEnd=new Date(ev.end.dateTime||ev.end.date);
+    return slotStart<evEnd&&evStart<slotEnd;
+  });
+}
+
+// ── Render calendario ──────────────────────────────────────────────────
+async function renderCalendar(){
+  const monday=getMondayOfWeek(currentWeekOffset);
+  const days=[];
+  for(let i=0;i<5;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d);}
+
+  // Header
+  const dayNames=['LUN','MAR','MER','GIO','VEN'];
+  days.forEach((d,i)=>{
+    const el=document.getElementById('hd-'+i);
+    el.innerHTML=dayNames[i]+'<br><span style="font-size:12px;font-weight:500;letter-spacing:0">'+formatDateShort(d)+'</span>';
+    el.classList.toggle('today',isToday(d));
+  });
+
+  // Week label
+  document.getElementById('week-label').textContent=
+    formatDateShort(days[0])+' – '+formatDateShort(days[4]);
+  document.getElementById('week-sub').textContent=
+    currentWeekOffset===0?'Settimana corrente':
+    currentWeekOffset===1?'Settimana prossima':
+    currentWeekOffset===-1?'Settimana scorsa':'';
+
+  // Carica eventi
+  const body=document.getElementById('cal-body');
+  body.innerHTML='<div style="grid-column:1/-1;padding:16px;text-align:center;color:var(--ss-muted);font-size:13px">Caricamento disponibilità...</div>';
+  const events=await loadEvents(monday);
+  calEvents=events;
+
+  // Genera griglia
+  body.innerHTML='';
+  const hours=[];
+  for(let h=HOURS_START;h<HOURS_END;h++)hours.push(h);
+
+  hours.forEach((h,hi)=>{
+    // Time label
+    const tl=document.createElement('div');
+    tl.className='time-label';
+    tl.textContent=h+':00';
+    body.appendChild(tl);
+
+    days.forEach((d,di)=>{
+      const slot=document.createElement('div');
+      slot.className='slot'+(hi===0?' first-row':'');
+      const inner=document.createElement('div');
+      inner.className='slot-inner';
+
+      if(isPast(d,h)){
+        inner.className+=' past';
+        inner.textContent='—';
+      }else if(isSlotBusy(events,d,h)){
+        inner.className+=' busy';
+        inner.textContent='Occupato';
+      }else{
+        inner.className+=' free';
+        inner.textContent='Libero';
+        if(abbonato){
+          const slotKey=d.toISOString().split('T')[0]+'-'+h;
+          inner.onclick=()=>selectSlot(d,h,inner,slotKey);
+          inner.dataset.key=slotKey;
+        }
+      }
+      slot.appendChild(inner);
+      body.appendChild(slot);
+    });
+  });
+
+  // Reset selezione
+  selectedSlot=null;
+  document.getElementById('booking-panel').classList.remove('visible');
+  document.getElementById('success-msg').classList.remove('visible');
+}
+
+// ── Selezione slot ─────────────────────────────────────────────────────
+function selectSlot(date,hour,el,key){
+  if(!abbonato){return;}
+  // Deseleziona precedente
+  document.querySelectorAll('.slot-inner.selected').forEach(s=>{
+    s.classList.remove('selected');s.classList.add('free');s.textContent='Libero';
+  });
+  el.classList.remove('free');el.classList.add('selected');el.textContent='✓';
+  selectedSlot={date,hour,key};
+
+  // Calcola prezzo
+  const oreRimaste=abbonato.oreDisponibili;
+  const incluse=Math.min(ORE_SLOT,oreRimaste);
+  const extra=ORE_SLOT-incluse;
+  const costo=extra*PREZZO_SCONTATO;
+
+  const giorno=formatDate(date,{weekday:'long',day:'2-digit',month:'long'});
+  document.getElementById('b-giorno').textContent=giorno.charAt(0).toUpperCase()+giorno.slice(1);
+  document.getElementById('b-orario').textContent=hour+':00 – '+(hour+ORE_SLOT)+':00';
+  document.getElementById('b-ore-rimaste').textContent=oreRimaste+' h';
+
+  if(incluse>0&&extra===0){
+    document.getElementById('b-totale').textContent='€0 (incluso nel piano)';
+    document.getElementById('b-note').textContent='';
+  }else{
+    const iva=Math.round(costo*0.22);
+    document.getElementById('b-totale').textContent='€'+(costo+iva)+' IVA incl.';
+    document.getElementById('b-note').textContent='Prezzo scontato 20% per abbonati (€'+PREZZO_SCONTATO+'/ora + IVA)';
+  }
+
+  document.getElementById('booking-panel').classList.add('visible');
+  document.getElementById('booking-cta').disabled=false;
+  document.getElementById('success-msg').classList.remove('visible');
+}
+
+// ── Conferma prenotazione ──────────────────────────────────────────────
+async function confermaPrenotazione(){
+  if(!selectedSlot||!abbonato)return;
+  const cta=document.getElementById('booking-cta');
+  cta.disabled=true;cta.textContent='Invio...';
+
+  try{
+    // Chiama la Web App per registrare la prenotazione
+    const params=new URLSearchParams({
+      action:'prenotaSalaMeeting',
+      codice:abbonato.codice,
+      data:selectedSlot.date.toISOString().split('T')[0],
+      ora:selectedSlot.hour,
+      ore:ORE_SLOT
+    });
+    await fetch(WEBAPP_URL+'?'+params.toString());
+
+    // Marca lo slot nel calendario
+    document.querySelectorAll('.slot-inner.selected').forEach(s=>{
+      s.classList.remove('selected');s.classList.add('myslot');s.textContent='Tu';s.onclick=null;
+    });
+
+    // Aggiorna ore
+    abbonato.oreUsate+=ORE_SLOT;
+    abbonato.oreDisponibili=Math.max(0,4-abbonato.oreUsate);
+    document.getElementById('abbonato-sub').textContent=abbonato.piano+' · Questa settimana: '+abbonato.oreUsate+'/4 ore usate';
+    const pct=Math.min(100,Math.round((abbonato.oreUsate/4)*100));
+    document.getElementById('ore-fill').style.width=pct+'%';
+    document.getElementById('ore-count').textContent=abbonato.oreDisponibili+' h rimaste';
+
+    document.getElementById('booking-panel').classList.remove('visible');
+    document.getElementById('success-msg').classList.add('visible');
+    selectedSlot=null;
+  }catch(e){
+    cta.disabled=false;cta.textContent='Conferma prenotazione';
+    alert('Errore durante la prenotazione. Riprova o scrivi a info@sottoscalacoworking.com');
+  }
+}
+
+function changeWeek(dir){
+  currentWeekOffset+=dir;
+  if(currentWeekOffset<0)currentWeekOffset=0; // non si può andare nel passato
+  renderCalendar();
+}
+
+// Init
+renderCalendar();
+</script>
+</body>
+</html>
