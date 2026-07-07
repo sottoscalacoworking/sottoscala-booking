@@ -106,7 +106,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
   <div class="codice-panel">
     <div style="font-size:13px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">Il tuo codice abbonato</div>
     <div class="codice-row">
-      <input class="codice-input" id="f-codice" type="text" placeholder="Es. M-1366" oninput="this.value=this.value.toUpperCase()"/>
+      <input class="codice-input" id="f-codice" type="text" placeholder="Es. M-0000" oninput="this.value=this.value.toUpperCase()"/>
       <button class="codice-btn" onclick="verificaCodice()">Accedi</button>
     </div>
     <div class="err-msg" id="err-msg">Codice non trovato o abbonamento scaduto.</div>
@@ -616,83 +616,9 @@ async function renderCalendar(){
   document.getElementById('success-msg').classList.remove('visible');
 }
 
-// ── Selezione slot ─────────────────────────────────────────────────────
-function selectSlot(date,hour,el,key){
-  if(!abbonato){return;}
-  // Deseleziona precedente
-  document.querySelectorAll('.slot-inner.selected').forEach(s=>{
-    s.classList.remove('selected');s.classList.add('free');s.textContent='Libero';
-  });
-  el.classList.remove('free');el.classList.add('selected');el.textContent='✓';
-  selectedSlot={date,hour,key};
-
-  // Calcola prezzo
-  const oreRimaste=abbonato.oreDisponibili;
-  const incluse=Math.min(ORE_SLOT,oreRimaste);
-  const extra=ORE_SLOT-incluse;
-  const costo=extra*PREZZO_SCONTATO;
-
-  const giorno=formatDate(date,{weekday:'long',day:'2-digit',month:'long'});
-  document.getElementById('b-giorno').textContent=giorno.charAt(0).toUpperCase()+giorno.slice(1);
-  document.getElementById('b-orario').textContent=hour+':00 – '+(hour+ORE_SLOT)+':00';
-  document.getElementById('b-ore-rimaste').textContent=oreRimaste+' h';
-
-  if(incluse>0&&extra===0){
-    document.getElementById('b-totale').textContent='€0 (incluso nel piano)';
-    document.getElementById('b-note').textContent='';
-  }else{
-    const iva=Math.round(costo*0.22);
-    document.getElementById('b-totale').textContent='€'+(costo+iva)+' IVA incl.';
-    document.getElementById('b-note').textContent='Prezzo scontato 20% per abbonati (€'+PREZZO_SCONTATO+'/ora + IVA)';
-  }
-
-  document.getElementById('booking-panel').classList.add('visible');
-  document.getElementById('booking-cta').disabled=false;
-  document.getElementById('success-msg').classList.remove('visible');
-}
-
-// ── Conferma prenotazione ──────────────────────────────────────────────
-async function confermaPrenotazione(){
-  if(!selectedSlot||!abbonato)return;
-  const cta=document.getElementById('booking-cta');
-  cta.disabled=true;cta.textContent='Invio...';
-
-  try{
-    // Chiama la Web App per registrare la prenotazione
-    const params=new URLSearchParams({
-      action:'prenotaSalaMeeting',
-      codice:abbonato.codice,
-      data:selectedSlot.date.toISOString().split('T')[0],
-      ora:selectedSlot.hour,
-      ore:ORE_SLOT
-    });
-    await fetch(WEBAPP_URL+'?'+params.toString());
-
-    // Marca lo slot nel calendario
-    document.querySelectorAll('.slot-inner.selected').forEach(s=>{
-      s.classList.remove('selected');s.classList.add('myslot');s.textContent='Tu';s.onclick=null;
-    });
-
-    // Aggiorna ore
-    abbonato.oreUsate+=ORE_SLOT;
-    abbonato.oreDisponibili=Math.max(0,4-abbonato.oreUsate);
-    document.getElementById('abbonato-sub').textContent=abbonato.piano+' · Questa settimana: '+abbonato.oreUsate+'/4 ore usate';
-    const pct=Math.min(100,Math.round((abbonato.oreUsate/4)*100));
-    document.getElementById('ore-fill').style.width=pct+'%';
-    document.getElementById('ore-count').textContent=abbonato.oreDisponibili+' h rimaste';
-
-    document.getElementById('booking-panel').classList.remove('visible');
-    document.getElementById('success-msg').classList.add('visible');
-    selectedSlot=null;
-  }catch(e){
-    cta.disabled=false;cta.textContent='Conferma prenotazione';
-    alert('Errore durante la prenotazione. Riprova o scrivi a info@sottoscalacoworking.com');
-  }
-}
-
 function changeWeek(dir){
   currentWeekOffset+=dir;
-  if(currentWeekOffset<0)currentWeekOffset=0; // non si può andare nel passato
+  if(currentWeekOffset<0)currentWeekOffset=0;
   renderCalendar();
 }
 
