@@ -405,18 +405,24 @@ async function confermaPrenotazione(){
   const cta=document.getElementById('booking-cta');
   cta.disabled=true;cta.textContent='Invio...';
 
+  // Formatta data in locale senza shift UTC
+  function localDateStr(d){
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,'0');
+    const g=String(d.getDate()).padStart(2,'0');
+    return y+'-'+m+'-'+g;
+  }
+
   try{
-    // Invia ogni slot separatamente via GET
-    for(const s of slots){
-      const params=new URLSearchParams({
-        action:'prenotaSalaMeeting',
-        codice:abbonato.codice,
-        data:s.date.toISOString().split('T')[0],
-        ora:s.hour,
-        ore:ORE_SLOT
-      });
-      await fetch(WEBAPP_URL+'?'+params.toString());
-    }
+    // Invia tutti gli slot in una sola chiamata
+    const slotsData=slots.map(s=>localDateStr(s.date)+'T'+String(s.hour).padStart(2,'0')).join(',');
+    const params=new URLSearchParams({
+      action:'prenotaSalaMeeting',
+      codice:abbonato.codice,
+      slots:slotsData,
+      ore:ORE_SLOT
+    });
+    await fetch(WEBAPP_URL+'?'+params.toString());
 
     const totOre=slots.length*ORE_SLOT;
 
