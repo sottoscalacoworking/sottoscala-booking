@@ -406,16 +406,19 @@ async function confermaPrenotazione(){
   cta.disabled=true;cta.textContent='Invio...';
 
   try{
-    // Invia ogni slot separatamente
+    // Invia ogni slot separatamente via POST
     for(const s of slots){
-      const params=new URLSearchParams({
-        action:'prenotaSalaMeeting',
-        codice:abbonato.codice,
-        data:s.date.toISOString().split('T')[0],
-        ora:s.hour,
-        ore:ORE_SLOT
+      await fetch(WEBAPP_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          action:'prenotaSalaMeeting',
+          codice:abbonato.codice,
+          data:s.date.toISOString().split('T')[0],
+          ora:s.hour,
+          ore:ORE_SLOT
+        })
       });
-      await fetch(WEBAPP_URL+'?'+params.toString());
     }
 
     const totOre=slots.length*ORE_SLOT;
