@@ -122,6 +122,13 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
   </div>
 
   <!-- Navigazione settimana -->
+  <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)"><div style="width:16px;height:16px;border-radius:3px;background:#EEF9F0;border:1px solid #0F6E56"></div>Libero</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)"><div style="width:16px;height:16px;border-radius:3px;background:var(--ss-navy)"></div>Prenotato da te</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)"><div style="width:16px;height:16px;border-radius:3px;background:#FDEEEA;border:1px solid #B53C1D"></div>Occupato</div>
+  </div>
+
+  <!-- Navigazione settimana -->
   <div class="week-nav">
     <button class="nav-btn" onclick="changeWeek(-1)">← Settimana precedente</button>
     <div style="text-align:center">
@@ -263,7 +270,7 @@ async function loadEvents(monday){
   const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59);
   const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(MEETING_CAL_ID)+
     '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+friday.toISOString()+
-    '&singleEvents=true&fields=items(start,end,summary)';
+    '&singleEvents=true&fields=items(start,end,summary,description)';
   try{
     const res=await fetch(url);
     const data=await res.json();
@@ -532,7 +539,7 @@ async function loadEvents(monday){
   const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59);
   const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(MEETING_CAL_ID)+
     '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+friday.toISOString()+
-    '&singleEvents=true&fields=items(start,end,summary)';
+    '&singleEvents=true&fields=items(start,end,summary,description)';
   try{
     const res=await fetch(url);
     const data=await res.json();
@@ -547,6 +554,18 @@ function isSlotBusy(events,date,hour){
     const evStart=new Date(ev.start.dateTime||ev.start.date);
     const evEnd=new Date(ev.end.dateTime||ev.end.date);
     return slotStart<evEnd&&evStart<slotEnd;
+  });
+}
+
+function isSlotMio(events,date,hour){
+  if(!abbonato)return false;
+  const slotStart=new Date(date);slotStart.setHours(hour,0,0,0);
+  const slotEnd=new Date(date);slotEnd.setHours(hour+ORE_SLOT,0,0,0);
+  return events.some(ev=>{
+    const evStart=new Date(ev.start.dateTime||ev.start.date);
+    const evEnd=new Date(ev.end.dateTime||ev.end.date);
+    const desc=ev.description||'';
+    return slotStart<evEnd&&evStart<slotEnd&&desc.indexOf('Codice: '+abbonato.codice)>=0;
   });
 }
 
@@ -584,7 +603,6 @@ async function renderCalendar(){
   for(let h=HOURS_START;h<HOURS_END;h++)hours.push(h);
 
   hours.forEach((h,hi)=>{
-    // Time label
     const tl=document.createElement('div');
     tl.className='time-label';
     tl.textContent=h+':00';
@@ -599,6 +617,9 @@ async function renderCalendar(){
       if(isPast(d,h)){
         inner.className+=' past';
         inner.textContent='—';
+      }else if(isSlotMio(events,d,h)){
+        inner.className+=' myslot';
+        inner.textContent='Tu';
       }else if(isSlotBusy(events,d,h)){
         inner.className+=' busy';
         inner.textContent='Occupato';
@@ -625,7 +646,28 @@ async function renderCalendar(){
 function changeWeek(dir){
   currentWeekOffset+=dir;
   if(currentWeekOffset<0)currentWeekOffset=0;
-  renderCalendar();
+  renderCalendar().then(()=>{if(abbonato)aggiornaOreSettimana();});
+}
+
+async function aggiornaOreSettimana(){
+  if(!abbonato)return;
+  const monday=getMondayOfWeek(currentWeekOffset);
+  function localDateStr(d){
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  try{
+    const res=await fetch(WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(abbonato.codice)+'&dataRif='+localDateStr(monday));
+    const data=await res.json();
+    if(data.valido){
+      abbonato.oreUsate=data.oreUsate;
+      abbonato.oreDisponibili=data.oreDisponibili;
+      const settLabel=currentWeekOffset===0?'Questa settimana':currentWeekOffset===1?'Settimana prossima':'Settimana del '+monday.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+      document.getElementById('abbonato-sub').textContent=abbonato.piano+' · '+settLabel+': '+data.oreUsate+'/4 ore usate';
+      const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
+      document.getElementById('ore-fill').style.width=pct+'%';
+      document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
+    }
+  }catch(e){}
 }
 
 // Init
