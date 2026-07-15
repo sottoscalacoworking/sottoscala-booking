@@ -171,7 +171,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
           <button class="pb" data-plan-it="Giornaliero" data-plan-en="Daily" data-price="19" data-desk-only="false" onclick="setPlan(this)"><span id="pb-daily-name">Giornaliero</span><span>€19</span></button>
           <button class="pb" data-plan-it="Carnet 5" data-plan-en="Carnet 5" data-price="89" data-desk-only="false" onclick="setPlan(this)"><span id="pb-carnet5-name">Carnet 5</span><span>€89</span><span class="badge" id="pb-carnet5-badge">5 ingressi</span></button>
           <button class="pb" data-plan-it="Carnet 10" data-plan-en="Carnet 10" data-price="169" data-desk-only="false" onclick="setPlan(this)"><span id="pb-carnet10-name">Carnet 10</span><span>€169</span><span class="badge" id="pb-carnet10-badge">10 ingressi</span></button>
-          <button class="pb" data-plan-it="Trimestrale" data-plan-en="Quarterly" data-price="249" data-desk-only="true" onclick="setPlan(this)"><span id="pb-quarterly-name">Trimestrale</span><span>€249</span><span class="badge" id="pb-quarterly-badge">3 mesi</span></button>
+          <button class="pb" data-plan-it="Trimestrale" data-plan-en="Quarterly" data-price="249" data-desk-only="true" onclick="setPlan(this)"><span id="pb-quarterly-name">Trimestrale</span><span>€249/m</span><span class="badge" id="pb-quarterly-badge">3 mesi</span></button>
           <button class="pb" data-plan-it="Mensile" data-plan-en="Monthly" data-price="299" data-desk-only="true" onclick="setPlan(this)"><span id="pb-monthly-name">Mensile</span><span>€299</span></button>
           <button class="pb" data-plan-it="Annuale" data-plan-en="Annual" data-price="199" data-desk-only="true" onclick="setPlan(this)"><span id="pb-annual-name">Annuale</span><span>€199/m</span><span class="badge" id="pb-annual-badge">miglior prezzo</span></button>
         </div>
@@ -182,6 +182,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
       <div class="panel">
         <div class="panel-label" id="t-date-label">Data di inizio</div>
         <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
+        <div class="restrict-note" id="subscription-date-note">Mensile, Trimestrale e Annuale iniziano solo il 1° o il 15 del mese</div>
         <div class="avail-status" id="avail-status"></div>
       </div>
       <div class="panel" id="meeting-time-panel" style="display:none">
@@ -219,6 +220,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
             </div>
             <div class="cst" id="cst"></div>
           </div>
+          <div class="field"><label id="t-discount-label">Codice sconto <span style="font-weight:400;text-transform:none" id="t-optional3">(opzionale)</span></label><input type="text" id="f-sconto" placeholder="Es. SUMMERCARD" oninput="this.value=this.value.toUpperCase()"/></div>
           <div class="field"><label id="t-notes-label">Note <span style="font-weight:400;text-transform:none" id="t-optional2">(opzionale)</span></label><textarea id="f-note" placeholder="Es. porto il portatile, ho bisogno di monitor..."></textarea></div>
         </div>
       </div>
@@ -254,7 +256,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 <script>
 const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
 const FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
-const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',note:'entry.571263674'};
+const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',sconto:'entry.SOSTITUISCI_CON_ID_VERO',note:'entry.571263674'};
 const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Postazione alta':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
 const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:20,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
 const MEETING_HOURS={start:9,end:18};
@@ -266,7 +268,7 @@ const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
 const CARNET_API_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
 
-let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',deskOnly=false,carnetActive=null;
+let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',planKey='',deskOnly=false,carnetActive=null;
 let currentLang='it';
 
 // ── Traduzioni ──────────────────────────────────────────────────────
@@ -283,11 +285,12 @@ const T={
     detailsLabel:'I tuoi dati',
     nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono',
     carnetLbl:'Codice carnet', optional:'(hai gi\u00e0 un carnet attivo? inserisci qui il codice e clicca Verifica — non serve riselezionare il piano Carnet)',
+    discountLbl:'Codice sconto', optionalTag:'(opzionale)',
     verifyBtn:'Verifica',
     notesLbl:'Note',
     notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
     summaryLabel:'Riepilogo',
-    spaceRow:'Spazio', planRow:'Piano', dateRow:'Data', netRow:'Imponibile', totalRow:'Totale IVA incl.', annualTotal:'Totale annuo IVA incl.',
+    spaceRow:'Spazio', planRow:'Piano', dateRow:'Data', netRow:'Imponibile', totalRow:'Totale IVA incl.', annualTotal:'Totale annuo IVA incl.', quarterlyTotal:'Totale 3 mesi (pagamento unico)',
     successTitle:'Prenotazione inviata!',
     successSub:'Ti contatteremo a breve per confermare. Controlla la tua email.',
     ctaSelect:'Seleziona uno spazio →',
@@ -297,6 +300,7 @@ const T={
     ctaUnavailable:'Data non disponibile',
     footerNote:'Conferma via email · info@sottoscalacoworking.com',
     restrictNote:'Solo postazioni disponibili per questo piano',
+    subscriptionDateNote:'Mensile, Trimestrale e Annuale iniziano solo il 1° o il 15 del mese',
     meetingNote:'La sala meeting si prenota a ore — scrivici per disponibilità e preventivo',
     carnetPurchaseNote:'Questo piano serve solo per il primo acquisto. Per gli ingressi successivi torna qui, seleziona la postazione e inserisci il tuo codice carnet qui sotto — non serve riselezionare questo piano.',
     timeLabel:'Orario', startLabel:'Ora inizio', durationLabel:'Durata',
@@ -308,6 +312,7 @@ const T={
     availChecking:'Verifica disponibilità...',
     weekendBusy:'✗ Le postazioni daily non sono disponibili nel weekend',
     weekendBusyZone:'✗ Non disponibile nel weekend',
+    subscriptionDayError:'✗ Mensile, Trimestrale e Annuale iniziano solo il 1° o il 15 del mese',
     carnetOk:'✓ Carnet valido · ',
     carnetRemaining:' ingressi rimanenti',
     carnetErr:'Codice non trovato.',
@@ -334,11 +339,12 @@ const T={
     detailsLabel:'Your details',
     nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone',
     carnetLbl:'Carnet code', optional:'(already have an active carnet? enter the code and click Verify — no need to select a Carnet plan again)',
+    discountLbl:'Discount code', optionalTag:'(optional)',
     verifyBtn:'Verify',
     notesLbl:'Notes',
     notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
     summaryLabel:'Summary',
-    spaceRow:'Space', planRow:'Plan', dateRow:'Date', netRow:'Net price', totalRow:'Total incl. VAT', annualTotal:'Annual total incl. VAT',
+    spaceRow:'Space', planRow:'Plan', dateRow:'Date', netRow:'Net price', totalRow:'Total incl. VAT', annualTotal:'Annual total incl. VAT', quarterlyTotal:'3-month total (one-off payment)',
     successTitle:'Booking request sent!',
     successSub:'We\'ll contact you shortly to confirm. Check your email.',
     ctaSelect:'Select a space →',
@@ -348,6 +354,7 @@ const T={
     ctaUnavailable:'Date not available',
     footerNote:'Confirmation by email · info@sottoscalacoworking.com',
     restrictNote:'Only desks available for this plan',
+    subscriptionDateNote:'Monthly, Quarterly and Annual plans can only start on the 1st or the 15th',
     meetingNote:'Meeting room is booked by the hour — contact us for availability and a quote',
     carnetPurchaseNote:'This plan is only for your first purchase. For further entries, come back here, select the desk and enter your carnet code below — no need to select this plan again.',
     timeLabel:'Time', startLabel:'Start time', durationLabel:'Duration',
@@ -359,6 +366,7 @@ const T={
     availChecking:'Checking availability...',
     weekendBusy:'✗ Daily desks are not available on weekends',
     weekendBusyZone:'✗ Not available on weekends',
+    subscriptionDayError:'✗ Monthly, Quarterly and Annual plans can only start on the 1st or the 15th',
     carnetOk:'✓ Valid carnet · ',
     carnetRemaining:' entries remaining',
     carnetErr:'Code not found.',
@@ -412,6 +420,7 @@ function setLang(lang){
   document.getElementById('pb-carnet10-badge').textContent=t.carnet10Badge;
   // Notes
   document.getElementById('restrict-note').textContent=t.restrictNote;
+  document.getElementById('subscription-date-note').textContent=t.subscriptionDateNote;
   document.getElementById('meeting-note').textContent=t.meetingNote;
   document.getElementById('carnet-purchase-note').textContent=t.carnetPurchaseNote;
   document.getElementById('t-time-label').textContent=t.timeLabel;
@@ -431,6 +440,8 @@ function setLang(lang){
   document.getElementById('t-phone-label').textContent=t.phoneLbl;
   document.getElementById('t-carnet-label').firstChild.textContent=t.carnetLbl+' ';
   document.getElementById('t-optional').textContent=t.optional;
+  document.getElementById('t-discount-label').firstChild.textContent=t.discountLbl+' ';
+  document.getElementById('t-optional3').textContent=t.optionalTag;
   document.getElementById('t-optional2').textContent=t.optional;
   document.getElementById('t-verify-btn').textContent=t.verifyBtn;
   document.getElementById('t-notes-label').firstChild.textContent=t.notesLbl+' ';
@@ -633,15 +644,19 @@ function setPlan(btn){
   if(isMeeting)return;
   planPrice=parseInt(btn.dataset.price);
   planLabel=btn.dataset['plan'+currentLang.charAt(0).toUpperCase()+currentLang.slice(1)]||btn.dataset.planIt;
+  planKey=btn.dataset.planIt;
   deskOnly=btn.dataset.deskOnly==='true';
   document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('sp').textContent=planLabel;
   document.getElementById('restrict-note').classList.toggle('visible',deskOnly);
+  const isSubscription=(planKey==='Mensile'||planKey==='Trimestrale'||planKey==='Annuale');
+  document.getElementById('subscription-date-note').classList.toggle('visible',isSubscription);
   const isCarnetPurchase=(btn.dataset.planIt==='Carnet 5'||btn.dataset.planIt==='Carnet 10');
   document.getElementById('carnet-purchase-note').classList.toggle('visible',isCarnetPurchase);
   carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';
   if(deskOnly&&sel&&!isPost){clearAllSel();sel=null;resetSelCard();}
   updateZoneLocks();updateSummary();
+  if(document.getElementById('din').value)onDateChange();
 }
 
 function updateZoneLocks(){
@@ -699,6 +714,10 @@ async function onDateChange(){
     await onMeetingTimeChange();
     return;
   }
+  const isSubscription=(planKey==='Mensile'||planKey==='Trimestrale'||planKey==='Annuale');
+  if(isSubscription&&dt.getDate()!==1&&dt.getDate()!==15){
+    st.className='avail-status visible avail-busy';st.textContent=t.subscriptionDayError;updateSummary(true);return;
+  }
   if(isWeekend&&isPost&&planLabel===T[currentLang].daily){
     st.className='avail-status visible avail-busy';st.textContent=t.weekendBusy;updateSummary(true);return;
   }
@@ -720,7 +739,16 @@ function updateSummary(blocked){
   const t=T[currentLang];
   const d=document.getElementById('din').value;const cta=document.getElementById('cta');
   const isAnnuale=(planLabel==='Annuale'||planLabel==='Annual');
-  document.getElementById('annual-total-row').style.display=isAnnuale&&d?'flex':'none';
+  const isTrimestrale=(planLabel==='Trimestrale'||planLabel==='Quarterly');
+  const isPerMese=isAnnuale||isTrimestrale;
+  document.getElementById('annual-total-row').style.display=isPerMese&&d?'flex':'none';
+  if(isAnnuale){
+    document.getElementById('t-annual-total-label').textContent=t.annualTotal;
+    document.getElementById('s-annual-total').textContent='\u20ac2.913,36';
+  }else if(isTrimestrale){
+    document.getElementById('t-annual-total-label').textContent=t.quarterlyTotal;
+    document.getElementById('s-annual-total').textContent='\u20ac911,34';
+  }
   if(blocked){
     document.getElementById('sn').textContent='—';
     document.getElementById('si').textContent='—';document.getElementById('st').textContent='—';
@@ -728,9 +756,9 @@ function updateSummary(blocked){
   }
   if(sel&&d){
     const p=carnetActive?0:planPrice;const iva=Math.round(p*0.22);
-    document.getElementById('sn').textContent=carnetActive?'—':'€'+p+(isAnnuale?' /mese':'');
-    document.getElementById('si').textContent=carnetActive?'—':'€'+iva+(isAnnuale?' /mese':'');
-    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva)+(isAnnuale?' /mese':'');
+    document.getElementById('sn').textContent=carnetActive?'—':'€'+p+(isPerMese?' /mese':'');
+    document.getElementById('si').textContent=carnetActive?'—':'€'+iva+(isPerMese?' /mese':'');
+    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva)+(isPerMese?' /mese':'');
     cta.disabled=false;cta.textContent=t.ctaConfirm;
   }else{
     document.getElementById('sn').textContent='—';
@@ -745,6 +773,7 @@ async function doBook(){
   const email=document.getElementById('f-email').value.trim();
   const telefono=document.getElementById('f-telefono').value.trim();
   const carnet=document.getElementById('f-carnet').value.trim();
+  const sconto=document.getElementById('f-sconto').value.trim();
   let note=document.getElementById('f-note').value.trim();
   const data=document.getElementById('din').value;
   if(!nome||!email){alert(t.alertFields);return;}
@@ -765,7 +794,7 @@ async function doBook(){
   const body=new URLSearchParams();
   body.append(ENTRY.nome,nome);body.append(ENTRY.email,email);body.append(ENTRY.telefono,telefono);
   body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel||T['it'].daily);body.append(ENTRY.data,data);
-  if(carnet)body.append(ENTRY.carnet,carnet);if(note)body.append(ENTRY.note,note);
+  if(carnet)body.append(ENTRY.carnet,carnet);if(sconto)body.append(ENTRY.sconto,sconto);if(note)body.append(ENTRY.note,note);
   try{
     await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
     cta.style.display='none';document.getElementById('success-msg').classList.add('visible');
