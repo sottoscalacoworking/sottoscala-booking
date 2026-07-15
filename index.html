@@ -220,7 +220,14 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
             </div>
             <div class="cst" id="cst"></div>
           </div>
-          <div class="field"><label id="t-discount-label">Codice sconto <span style="font-weight:400;text-transform:none" id="t-optional3">(opzionale)</span></label><input type="text" id="f-sconto" placeholder="Se ne hai uno" oninput="this.value=this.value.toUpperCase()"/></div>
+          <div class="field">
+            <label id="t-discount-label">Codice sconto <span style="font-weight:400;text-transform:none" id="t-optional3">(opzionale)</span></label>
+            <div class="carnet-row">
+              <div class="field"><input type="text" id="f-sconto" placeholder="Se ne hai uno" oninput="this.value=this.value.toUpperCase()"/></div>
+              <button class="capply" onclick="applySconto()" id="t-verify-sconto-btn">Verifica</button>
+            </div>
+            <div class="cst" id="sconto-status"></div>
+          </div>
           <div class="field"><label id="t-notes-label">Note <span style="font-weight:400;text-transform:none" id="t-optional2">(opzionale)</span></label><textarea id="f-note" placeholder="Es. porto il portatile, ho bisogno di monitor..."></textarea></div>
         </div>
       </div>
@@ -268,7 +275,7 @@ const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
 const CARNET_API_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
 
-let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',planKey='',deskOnly=false,carnetActive=null;
+let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',planKey='',deskOnly=false,carnetActive=null,scontoAttivo=false;
 let currentLang='it';
 
 // ── Traduzioni ──────────────────────────────────────────────────────
@@ -654,6 +661,7 @@ function setPlan(btn){
   const isCarnetPurchase=(btn.dataset.planIt==='Carnet 5'||btn.dataset.planIt==='Carnet 10');
   document.getElementById('carnet-purchase-note').classList.toggle('visible',isCarnetPurchase);
   carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';
+  scontoAttivo=false;document.getElementById('sconto-status').className='cst';document.getElementById('sconto-status').textContent='';
   if(deskOnly&&sel&&!isPost){clearAllSel();sel=null;resetSelCard();}
   updateZoneLocks();updateSummary();
   if(document.getElementById('din').value)onDateChange();
@@ -689,6 +697,30 @@ async function applyCarnet(){
   btn.disabled=false;
 }
 
+async function applySconto(){
+  const v=document.getElementById('f-sconto').value.trim();const st=document.getElementById('sconto-status');
+  const btn=document.getElementById('t-verify-sconto-btn');
+  if(!v){scontoAttivo=false;st.className='cst';st.textContent='';updateSummary();return;}
+  const d=document.getElementById('din').value;
+  if(!planKey||!d){st.className='cst cerr';st.textContent='Seleziona prima piano e data di inizio.';return;}
+  btn.disabled=true;
+  st.className='cst';st.textContent='...';
+  try{
+    const res=await fetch(CARNET_API_URL+'?action=verificaSconto&codice='+encodeURIComponent(v)+'&piano='+encodeURIComponent(planKey)+'&data='+encodeURIComponent(d));
+    const data=await res.json();
+    if(data.valido){
+      scontoAttivo=true;
+      st.className='cst cok';st.textContent='✓ Sconto del 20% applicato';
+    }else{
+      scontoAttivo=false;
+      st.className='cst cerr';st.textContent=data.messaggio||'Codice non valido.';
+    }
+  }catch(e){
+    scontoAttivo=false;st.className='cst cerr';st.textContent='Errore di verifica, riprova.';
+  }
+  btn.disabled=false;updateSummary();
+}
+
 function clearAllSel(){
   ALL_DESKS.forEach(id=>{if(RESERVED.includes(id))return;const el=document.getElementById('post-'+id);if(el){el.setAttribute('class','desk-avail');el.setAttribute('onclick',"selectDesk('"+id+"')");}});
   Object.keys(SPACES).forEach(id=>{const el=document.getElementById('zone-'+id);if(el)el.setAttribute('class',deskOnly&&ZONES_LOCKABLE.includes(id)?'space-locked':'space-avail');});
@@ -704,6 +736,7 @@ function resetSelCard(){
 async function onDateChange(){
   const t=T[currentLang];
   const d=document.getElementById('din').value;if(!d)return;
+  scontoAttivo=false;document.getElementById('sconto-status').className='cst';document.getElementById('sconto-status').textContent='';
   const dt=new Date(d+'T00:00:00');
   const dayOfWeek=dt.getDay();
   const isWeekend=(dayOfWeek===0||dayOfWeek===6);
@@ -755,10 +788,15 @@ function updateSummary(blocked){
     cta.disabled=true;cta.textContent=t.ctaUnavailable;return;
   }
   if(sel&&d){
-    const p=carnetActive?0:planPrice;const iva=Math.round(p*0.22);
-    document.getElementById('sn').textContent=carnetActive?'—':'€'+p+(isPerMese?' /mese':'');
-    document.getElementById('si').textContent=carnetActive?'—':'€'+iva+(isPerMese?' /mese':'');
-    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(p+iva)+(isPerMese?' /mese':'');
+    const pBase=carnetActive?0:planPrice;
+    const p=(carnetActive||!scontoAttivo)?pBase:Math.round(pBase*0.8*100)/100;
+    const iva=scontoAttivo&&!carnetActive?Math.round(p*100*0.22)/100:Math.round(p*0.22);
+    const tot=scontoAttivo&&!carnetActive?Math.round((p+iva)*100)/100:(p+iva);
+    const fmt=n=>n.toFixed(2).replace('.',',');
+    const showFmt=scontoAttivo&&!carnetActive;
+    document.getElementById('sn').textContent=carnetActive?'—':'€'+(showFmt?fmt(p):p)+(isPerMese?' /mese':'');
+    document.getElementById('si').textContent=carnetActive?'—':'€'+(showFmt?fmt(iva):iva)+(isPerMese?' /mese':'');
+    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(showFmt?fmt(tot):tot)+(isPerMese?' /mese':'');
     cta.disabled=false;cta.textContent=t.ctaConfirm;
   }else{
     document.getElementById('sn').textContent='—';
