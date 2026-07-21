@@ -172,8 +172,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
   </div>
 
   <div class="note-box">
-    <strong>Come funziona:</strong> il tuo piano include <strong>4 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni lunedì.
-    Per prenotazioni oltre le 4 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico (€23,20/ora invece di €29).
+    <strong>Come funziona:</strong> il tuo piano include <strong>3 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni lunedì.
+    Per prenotazioni oltre le 3 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico (€20,00/ora + IVA invece di €25,00/ora + IVA).
     Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.
   </div>
 
@@ -183,10 +183,11 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
 const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
 const MEETING_CAL_ID='c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com';
 const WEBAPP_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
-const PREZZO_ORE_STANDARD=29;
+const PREZZO_ORE_STANDARD=25;
 const SCONTO_ABBONATO=0.20;
 const PREZZO_SCONTATO=Math.round(PREZZO_ORE_STANDARD*(1-SCONTO_ABBONATO));
 const ORE_SLOT=1; // ogni slot = 1 ora
+const ORE_INCLUSE=3; // ore gratuite settimanali incluse per abbonato
 const HOURS_START=9;
 const HOURS_END=18;
 
@@ -248,8 +249,8 @@ async function verificaCodice(){
     if(data.valido){
       abbonato=data;
       document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
-      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/4 ore usate';
-      const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
+      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/'+ORE_INCLUSE+' ore usate';
+      const pct=Math.min(100,Math.round((data.oreUsate/ORE_INCLUSE)*100));
       document.getElementById('ore-fill').style.width=pct+'%';
       document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
       info.classList.add('visible');
@@ -440,9 +441,9 @@ async function confermaPrenotazione(){
 
     // Aggiorna ore
     abbonato.oreUsate+=totOre;
-    abbonato.oreDisponibili=Math.max(0,4-abbonato.oreUsate);
-    document.getElementById('abbonato-sub').textContent=abbonato.piano+' · Questa settimana: '+abbonato.oreUsate+'/4 ore usate';
-    const pct=Math.min(100,Math.round((abbonato.oreUsate/4)*100));
+    abbonato.oreDisponibili=Math.max(0,ORE_INCLUSE-abbonato.oreUsate);
+    document.getElementById('abbonato-sub').textContent=abbonato.piano+' · Questa settimana: '+abbonato.oreUsate+'/'+ORE_INCLUSE+' ore usate';
+    const pct=Math.min(100,Math.round((abbonato.oreUsate/ORE_INCLUSE)*100));
     document.getElementById('ore-fill').style.width=pct+'%';
     document.getElementById('ore-count').textContent=abbonato.oreDisponibili+' h rimaste';
 
@@ -517,8 +518,8 @@ async function verificaCodice(){
     if(data.valido){
       abbonato=data;
       document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
-      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/4 ore usate';
-      const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
+      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/'+ORE_INCLUSE+' ore usate';
+      const pct=Math.min(100,Math.round((data.oreUsate/ORE_INCLUSE)*100));
       document.getElementById('ore-fill').style.width=pct+'%';
       document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
       info.classList.add('visible');
@@ -662,8 +663,8 @@ async function aggiornaOreSettimana(){
       abbonato.oreUsate=data.oreUsate;
       abbonato.oreDisponibili=data.oreDisponibili;
       const settLabel=currentWeekOffset===0?'Questa settimana':currentWeekOffset===1?'Settimana prossima':'Settimana del '+monday.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
-      document.getElementById('abbonato-sub').textContent=abbonato.piano+' · '+settLabel+': '+data.oreUsate+'/4 ore usate';
-      const pct=Math.min(100,Math.round((data.oreUsate/4)*100));
+      document.getElementById('abbonato-sub').textContent=abbonato.piano+' · '+settLabel+': '+data.oreUsate+'/'+ORE_INCLUSE+' ore usate';
+      const pct=Math.min(100,Math.round((data.oreUsate/ORE_INCLUSE)*100));
       document.getElementById('ore-fill').style.width=pct+'%';
       document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
     }
