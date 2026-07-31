@@ -294,6 +294,8 @@ const T={
     carnetLbl:'Codice carnet', optional:'(hai gi\u00e0 un carnet attivo? inserisci qui il codice e clicca Verifica — non serve riselezionare il piano Carnet)',
     discountLbl:'Codice sconto', optionalTag:'(opzionale)',
     verifyBtn:'Verifica',
+    scontoPlaceholder:'Se ne hai uno', scontoSelectFirst:'Seleziona prima piano e data di inizio.',
+    scontoApplied:'✓ Sconto del 20% applicato', scontoError:'Errore di verifica, riprova.',
     notesLbl:'Note',
     notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
     summaryLabel:'Riepilogo',
@@ -348,6 +350,8 @@ const T={
     carnetLbl:'Carnet code', optional:'(already have an active carnet? enter the code and click Verify — no need to select a Carnet plan again)',
     discountLbl:'Discount code', optionalTag:'(optional)',
     verifyBtn:'Verify',
+    scontoPlaceholder:'If you have one', scontoSelectFirst:'Select a plan and start date first.',
+    scontoApplied:'✓ 20% discount applied', scontoError:'Verification error, please try again.',
     notesLbl:'Notes',
     notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
     summaryLabel:'Summary',
@@ -451,6 +455,8 @@ function setLang(lang){
   document.getElementById('t-optional3').textContent=t.optionalTag;
   document.getElementById('t-optional2').textContent=t.optionalTag;
   document.getElementById('t-verify-btn').textContent=t.verifyBtn;
+  document.getElementById('t-verify-sconto-btn').textContent=t.verifyBtn;
+  document.getElementById('f-sconto').placeholder=t.scontoPlaceholder;
   document.getElementById('t-notes-label').firstChild.textContent=t.notesLbl+' ';
   document.getElementById('f-note').placeholder=t.notesPlaceholder;
   // Summary rows
@@ -698,11 +704,12 @@ async function applyCarnet(){
 }
 
 async function applySconto(){
+  const t=T[currentLang];
   const v=document.getElementById('f-sconto').value.trim();const st=document.getElementById('sconto-status');
   const btn=document.getElementById('t-verify-sconto-btn');
   if(!v){scontoAttivo=false;st.className='cst';st.textContent='';updateSummary();return;}
   const d=document.getElementById('din').value;
-  if(!planKey||!d){st.className='cst cerr';st.textContent='Seleziona prima piano e data di inizio.';return;}
+  if(!planKey||!d){st.className='cst cerr';st.textContent=t.scontoSelectFirst;return;}
   btn.disabled=true;
   st.className='cst';st.textContent='...';
   try{
@@ -710,13 +717,13 @@ async function applySconto(){
     const data=await res.json();
     if(data.valido){
       scontoAttivo=true;
-      st.className='cst cok';st.textContent='✓ Sconto del 20% applicato';
+      st.className='cst cok';st.textContent=t.scontoApplied;
     }else{
       scontoAttivo=false;
-      st.className='cst cerr';st.textContent=data.messaggio||'Codice non valido.';
+      st.className='cst cerr';st.textContent=data.messaggio||t.scontoError;
     }
   }catch(e){
-    scontoAttivo=false;st.className='cst cerr';st.textContent='Errore di verifica, riprova.';
+    scontoAttivo=false;st.className='cst cerr';st.textContent=t.scontoError;
   }
   btn.disabled=false;updateSummary();
 }
