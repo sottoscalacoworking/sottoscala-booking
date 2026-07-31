@@ -851,7 +851,13 @@ async function doBook(){
     alert(t.alertError);
   }
 }
-document.getElementById('din').min='2026-06-15';
+(function(){
+  const oggi=new Date();
+  const yyyy=oggi.getFullYear();
+  const mm=String(oggi.getMonth()+1).padStart(2,'0');
+  const dd=String(oggi.getDate()).padStart(2,'0');
+  document.getElementById('din').min=yyyy+'-'+mm+'-'+dd;
+})();
 </script>
 </body>
 </html>
