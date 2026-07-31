@@ -562,6 +562,7 @@ function selectDesk(id){
 function selectSpace(id){
   const t=T[currentLang];
   clearAllSel();const sp=SPACES[id];sel={id,...sp};isPost=false;isMeeting=(id==='meeting');
+  if(isMeeting)planKey='Sala meeting';
   document.getElementById('zone-'+id).setAttribute('class','space-sel');
   setCard(sp.name,isMeeting?t.meetingContact:'€'+sp.price+sp.unit);
   document.getElementById('ss').textContent=sp.name;
@@ -838,7 +839,7 @@ async function doBook(){
   cta.disabled=true;cta.className='cta loading';cta.textContent=t.ctaLoading;
   const body=new URLSearchParams();
   body.append(ENTRY.nome,nome);body.append(ENTRY.email,email);body.append(ENTRY.telefono,telefono);
-  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planLabel||T['it'].daily);body.append(ENTRY.data,data);
+  body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planKey||'Giornaliero');body.append(ENTRY.data,data);
   if(carnet)body.append(ENTRY.carnet,carnet);if(sconto)body.append(ENTRY.sconto,sconto);body.append(ENTRY.lingua,currentLang);if(note)body.append(ENTRY.note,note);
   try{
     await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
