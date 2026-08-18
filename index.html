@@ -182,6 +182,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
       <div class="panel">
         <div class="panel-label" id="t-date-label">Data di inizio</div>
         <input type="date" id="din" style="width:100%;font-size:13px;border:1.5px solid var(--ss-border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;color:var(--ss-text);background:var(--ss-white);outline:none" onchange="onDateChange()"/>
+        <div class="carnet-purchase-note" id="closure-note">Prenotazioni sospese fino al 7 settembre. Per necessità prima di quella data, scrivici a info@sottoscalacoworking.com.</div>
+        <div class="carnet-purchase-note" id="advance-note">Le prenotazioni richiedono almeno 48 ore di anticipo.</div>
         <div class="restrict-note" id="subscription-date-note">Mensile, Trimestrale e Annuale iniziano solo il 1° o il 15 del mese</div>
         <div class="avail-status" id="avail-status"></div>
       </div>
@@ -293,6 +295,8 @@ const T={
     nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono',
     carnetLbl:'Codice carnet', optional:'(hai gi\u00e0 un carnet attivo? inserisci qui il codice e clicca Verifica — non serve riselezionare il piano Carnet)',
     discountLbl:'Codice sconto', optionalTag:'(opzionale)',
+    closureNote:'Prenotazioni sospese fino al 7 settembre. Per necessit\u00e0 prima di quella data, scrivici a info@sottoscalacoworking.com.',
+    advanceNote:'Le prenotazioni richiedono almeno 48 ore di anticipo.',
     verifyBtn:'Verifica',
     scontoPlaceholder:'Se ne hai uno', scontoSelectFirst:'Seleziona prima piano e data di inizio.',
     scontoApplied:'✓ Sconto del 20% applicato', scontoError:'Errore di verifica, riprova.',
@@ -349,6 +353,8 @@ const T={
     nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone',
     carnetLbl:'Carnet code', optional:'(already have an active carnet? enter the code and click Verify — no need to select a Carnet plan again)',
     discountLbl:'Discount code', optionalTag:'(optional)',
+    closureNote:'Bookings are paused until September 7. For urgent needs before then, email us at info@sottoscalacoworking.com.',
+    advanceNote:'Bookings require at least 48 hours notice.',
     verifyBtn:'Verify',
     scontoPlaceholder:'If you have one', scontoSelectFirst:'Select a plan and start date first.',
     scontoApplied:'✓ 20% discount applied', scontoError:'Verification error, please try again.',
@@ -452,6 +458,8 @@ function setLang(lang){
   document.getElementById('t-carnet-label').firstChild.textContent=t.carnetLbl+' ';
   document.getElementById('t-optional').textContent=t.optional;
   document.getElementById('t-discount-label').firstChild.textContent=t.discountLbl+' ';
+  document.getElementById('closure-note').textContent=t.closureNote;
+  document.getElementById('advance-note').textContent=t.advanceNote;
   document.getElementById('t-optional3').textContent=t.optionalTag;
   document.getElementById('t-optional2').textContent=t.optionalTag;
   document.getElementById('t-verify-btn').textContent=t.verifyBtn;
@@ -856,7 +864,21 @@ async function doBook(){
   const yyyy=oggi.getFullYear();
   const mm=String(oggi.getMonth()+1).padStart(2,'0');
   const dd=String(oggi.getDate()).padStart(2,'0');
-  document.getElementById('din').min=yyyy+'-'+mm+'-'+dd;
+  const oggiStr=yyyy+'-'+mm+'-'+dd;
+  // Anticipo minimo di prenotazione: 48 ore (oggi + 2 giorni di calendario).
+  const anticipo=new Date(oggi);
+  anticipo.setDate(anticipo.getDate()+2);
+  const anticipoStr=anticipo.getFullYear()+'-'+String(anticipo.getMonth()+1).padStart(2,'0')+'-'+String(anticipo.getDate()).padStart(2,'0');
+  // Chiusura estiva: nessuna nuova data prenotabile prima del 7 settembre 2026.
+  // Si disattiva da sola una volta superata questa data, senza bisogno di modifiche manuali.
+  const RIAPERTURA='2026-09-07';
+  const dataMinima=anticipoStr>RIAPERTURA?anticipoStr:RIAPERTURA;
+  document.getElementById('din').min=dataMinima;
+  if(dataMinima===RIAPERTURA && oggiStr<RIAPERTURA){
+    document.getElementById('closure-note').classList.add('visible');
+  }else{
+    document.getElementById('advance-note').classList.add('visible');
+  }
 })();
 </script>
 </body>
