@@ -113,7 +113,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
     <div class="abbonato-info" id="abbonato-info">
       <div class="abbonato-name" id="abbonato-name">—</div>
       <div class="abbonato-sub" id="abbonato-sub">—</div>
-      <div class="ore-bar">
+      <div class="ore-bar" id="ore-bar">
         <span class="ore-label">Ore questa settimana</span>
         <div class="ore-track"><div class="ore-fill" id="ore-fill" style="width:0%"></div></div>
         <span class="ore-count" id="ore-count">—</span>
@@ -186,8 +186,31 @@ const WEBAPP_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXx
 const PREZZO_ORE_STANDARD=25;
 const SCONTO_ABBONATO=0.20;
 const PREZZO_SCONTATO=Math.round(PREZZO_ORE_STANDARD*(1-SCONTO_ABBONATO));
+// Stessa tabella a scaglioni del widget pubblico (1h/4h/8h), con lo sconto abbonati/carnet applicato sopra.
+const MEETING_PRICES_TIER={1:25,4:85,8:150};
+function calcolaCostoExtra(ore){
+  const base=MEETING_PRICES_TIER[ore]||(ore*MEETING_PRICES_TIER[1]);
+  return Math.round(base*(1-SCONTO_ABBONATO));
+}
 const ORE_SLOT=1; // ogni slot = 1 ora
 const ORE_INCLUSE=3; // ore gratuite settimanali incluse per abbonato
+
+// Aggiorna l'intestazione (nome piano + barra ore) in base al tipo di codice:
+// un abbonato ha ore incluse settimanali con barra di avanzamento,
+// un carnet ha sconto 20% fisso su tutte le ore, senza concetto di settimana.
+function aggiornaTestataCodice(obj, oreUsateVal, settLabel){
+  const bar=document.getElementById('ore-bar');
+  if(obj.tipoCodice==='carnet'){
+    document.getElementById('abbonato-sub').textContent=obj.piano+' \u00b7 Sconto 20% su tutte le ore prenotate';
+    if(bar) bar.style.display='none';
+  }else{
+    if(bar) bar.style.display='';
+    document.getElementById('abbonato-sub').textContent=obj.piano+' \u00b7 '+(settLabel||'Questa settimana')+': '+oreUsateVal+'/'+ORE_INCLUSE+' ore usate';
+    document.getElementById('ore-count').textContent=obj.oreDisponibili+' h rimaste';
+    const pct=Math.min(100,Math.round((oreUsateVal/ORE_INCLUSE)*100));
+    document.getElementById('ore-fill').style.width=pct+'%';
+  }
+}
 const HOURS_START=9;
 const HOURS_END=18;
 
@@ -249,10 +272,7 @@ async function verificaCodice(){
     if(data.valido){
       abbonato=data;
       document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
-      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/'+ORE_INCLUSE+' ore usate';
-      const pct=Math.min(100,Math.round((data.oreUsate/ORE_INCLUSE)*100));
-      document.getElementById('ore-fill').style.width=pct+'%';
-      document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
+      aggiornaTestataCodice(data, data.oreUsate);
       info.classList.add('visible');
       renderCalendar();
     }else{
@@ -380,7 +400,7 @@ function updateBookingPanel(){
   const oreRimaste=abbonato.oreDisponibili;
   const incluse=Math.min(totOre,oreRimaste);
   const extra=totOre-incluse;
-  const costo=extra*PREZZO_SCONTATO;
+  const costo=calcolaCostoExtra(extra);
 
   // Descrizione slot selezionati
   const slotDesc=slots.map(s=>{
@@ -390,7 +410,9 @@ function updateBookingPanel(){
 
   document.getElementById('b-giorno').textContent=totOre+' ora'+(totOre>1?'e':'')+' selezionata'+(totOre>1?'e':'');
   document.getElementById('b-orario').textContent=slotDesc;
-  document.getElementById('b-ore-rimaste').textContent=oreRimaste+' h disponibili · '+incluse+' h incluse · '+extra+' h a pagamento';
+  document.getElementById('b-ore-rimaste').textContent=abbonato.tipoCodice==='carnet'
+    ? 'Sconto 20% su tutte le ore selezionate'
+    : oreRimaste+' h disponibili \u00b7 '+incluse+' h incluse \u00b7 '+extra+' h a pagamento';
 
   if(extra===0){
     document.getElementById('b-totale').textContent='€0 (incluso nel piano)';
@@ -398,7 +420,7 @@ function updateBookingPanel(){
   }else{
     const iva=Math.round(costo*0.22);
     document.getElementById('b-totale').textContent='€'+(costo+iva)+' IVA incl.';
-    document.getElementById('b-note').textContent=extra+' h a €'+PREZZO_SCONTATO+'/ora (sconto 20% abbonati) + IVA';
+    document.getElementById('b-note').textContent=extra+' h a tariffa scaglioni (sconto 20% '+(abbonato.tipoCodice==='carnet'?'carnet':'abbonati')+') + IVA';
   }
 
   panel.classList.add('visible');
@@ -442,10 +464,7 @@ async function confermaPrenotazione(){
     // Aggiorna ore
     abbonato.oreUsate+=totOre;
     abbonato.oreDisponibili=Math.max(0,ORE_INCLUSE-abbonato.oreUsate);
-    document.getElementById('abbonato-sub').textContent=abbonato.piano+' · Questa settimana: '+abbonato.oreUsate+'/'+ORE_INCLUSE+' ore usate';
-    const pct=Math.min(100,Math.round((abbonato.oreUsate/ORE_INCLUSE)*100));
-    document.getElementById('ore-fill').style.width=pct+'%';
-    document.getElementById('ore-count').textContent=abbonato.oreDisponibili+' h rimaste';
+    aggiornaTestataCodice(abbonato, abbonato.oreUsate);
 
     document.getElementById('booking-panel').classList.remove('visible');
     document.getElementById('success-msg').classList.add('visible');
@@ -518,10 +537,7 @@ async function verificaCodice(){
     if(data.valido){
       abbonato=data;
       document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
-      document.getElementById('abbonato-sub').textContent=data.piano+' · Questa settimana: '+data.oreUsate+'/'+ORE_INCLUSE+' ore usate';
-      const pct=Math.min(100,Math.round((data.oreUsate/ORE_INCLUSE)*100));
-      document.getElementById('ore-fill').style.width=pct+'%';
-      document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
+      aggiornaTestataCodice(data, data.oreUsate);
       info.classList.add('visible');
       renderCalendar();
     }else{
@@ -663,10 +679,7 @@ async function aggiornaOreSettimana(){
       abbonato.oreUsate=data.oreUsate;
       abbonato.oreDisponibili=data.oreDisponibili;
       const settLabel=currentWeekOffset===0?'Questa settimana':currentWeekOffset===1?'Settimana prossima':'Settimana del '+monday.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
-      document.getElementById('abbonato-sub').textContent=abbonato.piano+' · '+settLabel+': '+data.oreUsate+'/'+ORE_INCLUSE+' ore usate';
-      const pct=Math.min(100,Math.round((data.oreUsate/ORE_INCLUSE)*100));
-      document.getElementById('ore-fill').style.width=pct+'%';
-      document.getElementById('ore-count').textContent=data.oreDisponibili+' h rimaste';
+      aggiornaTestataCodice(abbonato, data.oreUsate, settLabel);
     }
   }catch(e){}
 }
