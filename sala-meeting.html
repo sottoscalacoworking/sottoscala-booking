@@ -171,9 +171,9 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
     <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Riceverai una conferma via email. Le ore sono state scalate dal tuo credito settimanale.</span>
   </div>
 
-  <div class="note-box">
+  <div class="note-box" id="note-box">
     <strong>Come funziona:</strong> il tuo piano include <strong>3 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni lunedì.
-    Per prenotazioni oltre le 3 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico (€20,00/ora + IVA invece di €25,00/ora + IVA).
+    Per prenotazioni oltre le 3 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico a scaglioni.
     Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.
   </div>
 
@@ -200,11 +200,14 @@ const ORE_INCLUSE=3; // ore gratuite settimanali incluse per abbonato
 // un carnet ha sconto 20% fisso su tutte le ore, senza concetto di settimana.
 function aggiornaTestataCodice(obj, oreUsateVal, settLabel){
   const bar=document.getElementById('ore-bar');
+  const note=document.getElementById('note-box');
   if(obj.tipoCodice==='carnet'){
     document.getElementById('abbonato-sub').textContent=obj.piano+' \u00b7 Sconto 20% su tutte le ore prenotate';
     if(bar) bar.style.display='none';
+    if(note) note.innerHTML='<strong>Come funziona:</strong> con il tuo carnet hai diritto a uno <strong>sconto del 20%</strong> su tutte le ore di Sala Meeting che prenoti, sul listino pubblico a scaglioni \u2014 nessuna ora gratuita inclusa. Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.';
   }else{
     if(bar) bar.style.display='';
+    if(note) note.innerHTML='<strong>Come funziona:</strong> il tuo piano include <strong>3 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni luned\u00ec. Per prenotazioni oltre le 3 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico a scaglioni. Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.';
     document.getElementById('abbonato-sub').textContent=obj.piano+' \u00b7 '+(settLabel||'Questa settimana')+': '+oreUsateVal+'/'+ORE_INCLUSE+' ore usate';
     document.getElementById('ore-count').textContent=obj.oreDisponibili+' h rimaste';
     const pct=Math.min(100,Math.round((oreUsateVal/ORE_INCLUSE)*100));
