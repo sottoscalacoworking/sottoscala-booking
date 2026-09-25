@@ -859,8 +859,8 @@ async function doBook(){
 function aggiornaDataMinima(){
   const oggi=new Date();
   // Anticipo minimo: 48 ore (oggi + 2 giorni) per prenotazioni nuove,
-  // ridotto a 24 ore (oggi + 1 giorno) per chi riutilizza un carnet gi\u00e0 verificato.
-  const giorniAnticipo=carnetActive?1:2;
+  // nessun limite per chi riutilizza un carnet gi\u00e0 verificato (anche lo stesso giorno).
+  const giorniAnticipo=carnetActive?0:2;
   const anticipo=new Date(oggi);
   anticipo.setDate(anticipo.getDate()+giorniAnticipo);
   const anticipoStr=anticipo.getFullYear()+'-'+String(anticipo.getMonth()+1).padStart(2,'0')+'-'+String(anticipo.getDate()).padStart(2,'0');
