@@ -156,18 +156,18 @@ const T={
     none:'Nessuna prenotazione in programma.',
     cancel:'Cancella',
     cancelling:'Cancellazione…',
-    cancelUntil:'Cancellabile fino alle 12:00 del {d}',
+    cancelUntil:'Cancellabile fino alle {h} del {d}',
     tooLate:'Non più cancellabile online. Per modifiche scrivi a info@sottoscalacoworking.com',
     confirmCancel:'Vuoi cancellare la prenotazione di {s} per {d}? L\'ingresso tornerà sul tuo carnet.',
     cancelledOk:'Prenotazione cancellata. Ingresso restituito: ora ne hai {r} disponibili. Ti abbiamo inviato una mail di conferma.',
     bookNew:'Prenota una nuova data',
     bookMeeting:'Sala Meeting (sconto 20%)',
-    rules:'<strong>Questa è la tua piattaforma carnet.</strong> Qui trovi tutte le informazioni sui tuoi ingressi: quanti ne hai usati, quanti te ne restano, fino a quando è valido il carnet e le tue prossime prenotazioni. Puoi anche cancellare una prenotazione in autonomia entro le <strong>12:00 del giorno prima</strong>, e l\'ingresso torna subito sul tuo carnet. Per qualsiasi altra esigenza, comprese le prenotazioni della Sala Meeting, scrivici a <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
+    rules:'<strong>Questa è la tua piattaforma carnet.</strong> Qui trovi tutte le informazioni sui tuoi ingressi: quanti ne hai usati, quanti te ne restano, fino a quando è valido il carnet e le tue prossime prenotazioni. Puoi anche cancellare una prenotazione in autonomia entro le <strong>{h} del giorno prima</strong>, e l\'ingresso torna subito sul tuo carnet. Per qualsiasi altra esigenza, comprese le prenotazioni della Sala Meeting, scrivici a <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
     enterCode:'Inserisci il tuo codice carnet.',
     errors:{
       non_trovato:'Codice non trovato.',
       non_trovata:'Prenotazione non trovata (forse è già stata cancellata).',
-      troppo_tardi:'Non è più possibile cancellare online (limite: ore 12:00 del giorno prima). Scrivici a info@sottoscalacoworking.com.',
+      troppo_tardi:'Non è più possibile cancellare online (limite: ore {h} del giorno prima). Scrivici a info@sottoscalacoworking.com.',
       occupato:'Sistema occupato, riprova tra qualche secondo.',
       server:'Errore del server, riprova tra poco.'
     },
@@ -189,18 +189,18 @@ const T={
     none:'No upcoming bookings.',
     cancel:'Cancel',
     cancelling:'Cancelling…',
-    cancelUntil:'Can be cancelled until 12:00 on {d}',
+    cancelUntil:'Can be cancelled until {h} on {d}',
     tooLate:'Can no longer be cancelled online. For changes write to info@sottoscalacoworking.com',
     confirmCancel:'Do you want to cancel your booking of {s} for {d}? The entry will be returned to your carnet.',
     cancelledOk:'Booking cancelled. Entry returned: you now have {r} available. We have sent you a confirmation email.',
     bookNew:'Book a new date',
     bookMeeting:'Meeting Room (20% off)',
-    rules:'<strong>This is your carnet platform.</strong> Here you can find all the information about your entries: how many you have used, how many are left, when your carnet expires and your upcoming bookings. You can also cancel a booking on your own up to <strong>12:00 the day before</strong>, and the entry goes straight back to your carnet. For anything else, including Meeting Room bookings, write to <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
+    rules:'<strong>This is your carnet platform.</strong> Here you can find all the information about your entries: how many you have used, how many are left, when your carnet expires and your upcoming bookings. You can also cancel a booking on your own up to <strong>{h} the day before</strong>, and the entry goes straight back to your carnet. For anything else, including Meeting Room bookings, write to <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
     enterCode:'Please enter your carnet code.',
     errors:{
       non_trovato:'Code not found.',
       non_trovata:'Booking not found (it may already have been cancelled).',
-      troppo_tardi:'It is no longer possible to cancel online (deadline: 12:00 the day before). Please write to info@sottoscalacoworking.com.',
+      troppo_tardi:'It is no longer possible to cancel online (deadline: {h} the day before). Please write to info@sottoscalacoworking.com.',
       occupato:'System busy, please try again in a few seconds.',
       server:'Server error, please try again shortly.'
     },
@@ -209,6 +209,7 @@ const T={
 };
 
 let lang='it';
+let oraLimite='9:00';   // aggiornata dallo script quando si accede
 let stato=null;          // ultimi dati ricevuti dal pannello
 let codiceCorrente='';
 let occupato=false;
@@ -216,6 +217,7 @@ let occupato=false;
 function t(k,vars){
   let s=T[lang][k];
   if(s===undefined)return k;
+  s=s.split('{h}').join(oraLimite);
   if(vars)Object.keys(vars).forEach(function(x){s=s.split('{'+x+'}').join(vars[x]);});
   return s;
 }
@@ -235,7 +237,8 @@ function nomeSpazio(s){
 }
 function errText(r){
   const e=T[lang].errors[r&&r.errore];
-  return e||(r&&r.messaggio)||t('conn');
+  if(e)return e.split('{h}').join(oraLimite);
+  return (r&&r.messaggio)||t('conn');
 }
 
 function setLang(l){
@@ -345,6 +348,7 @@ async function carica(codice,silenzioso){
     if(r.ok){
       codiceCorrente=r.codice;
       stato=r;
+      if(r.oraLimite){oraLimite=r.oraLimite;$('note-box').innerHTML=t('rules');}
       render();
     }else{
       stato=null;
