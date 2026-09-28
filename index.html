@@ -211,7 +211,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
           <div class="field"><label id="t-name-label">Nome e cognome *</label><input type="text" id="f-nome" placeholder="Mario Rossi"/></div>
           <div class="field-row">
             <div class="field"><label id="t-email-label">Email *</label><input type="email" id="f-email" placeholder="mario@email.com"/></div>
-            <div class="field"><label id="t-phone-label">Telefono</label><input type="tel" id="f-telefono" placeholder="3331234567"/></div>
+            <div class="field"><label id="t-phone-label">Telefono</label><input type="tel" id="f-telefono" placeholder="3331234567" autocomplete="tel"/></div>
           </div>
           <div class="field">
             <label id="t-carnet-label">Codice carnet <span style="font-weight:400;text-transform:none" id="t-optional">(opzionale)</span></label>
@@ -291,7 +291,7 @@ const T={
     planLabel:'Piano',
     dateLabel:'Data di inizio',
     detailsLabel:'I tuoi dati',
-    nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono',
+    nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono', phoneLblReq:'Telefono *',
     carnetLbl:'Codice carnet', optional:'(hai gi\u00e0 un carnet attivo? inserisci qui il codice e clicca Verifica — non serve riselezionare il piano Carnet)',
     discountLbl:'Codice sconto', optionalTag:'(opzionale)',
     advanceNote:'Le prenotazioni richiedono almeno 48 ore di anticipo.',
@@ -329,6 +329,7 @@ const T={
     carnetErr:'Codice non trovato.',
     alertFields:'Inserisci nome e email per procedere.',
     alertEmail:'Inserisci un indirizzo email valido.',
+    alertPhone:'Inserisci un numero di telefono valido: ci serve per avvisarti in caso di imprevisti sulla tua prenotazione.',
     alertError:'Errore durante l\'invio. Riprova o scrivici a info@sottoscalacoworking.com',
     meetingContact:'Prenota a ore — contattaci',
     daily:'Giornaliero', monthly:'Mensile', quarterly:'Trimestrale', annual:'Annuale',
@@ -348,7 +349,7 @@ const T={
     planLabel:'Plan',
     dateLabel:'Start date',
     detailsLabel:'Your details',
-    nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone',
+    nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone', phoneLblReq:'Phone *',
     carnetLbl:'Carnet code', optional:'(already have an active carnet? enter the code and click Verify — no need to select a Carnet plan again)',
     discountLbl:'Discount code', optionalTag:'(optional)',
     advanceNote:'Bookings require at least 48 hours notice.',
@@ -386,6 +387,7 @@ const T={
     carnetErr:'Code not found.',
     alertFields:'Please enter your name and email to proceed.',
     alertEmail:'Please enter a valid email address.',
+    alertPhone:'Please enter a valid phone number: we need it to reach you in case of any issue with your booking.',
     alertError:'Error while sending. Please try again or email info@sottoscalacoworking.com',
     meetingContact:'Book by the hour — contact us',
     daily:'Daily', monthly:'Monthly', quarterly:'Quarterly', annual:'Annual',
@@ -451,7 +453,7 @@ function setLang(lang){
   // Form labels
   document.getElementById('t-name-label').textContent=t.nameLbl;
   document.getElementById('t-email-label').textContent=t.emailLbl;
-  document.getElementById('t-phone-label').textContent=t.phoneLbl;
+  aggiornaCampoTelefono();
   document.getElementById('t-carnet-label').firstChild.textContent=t.carnetLbl+' ';
   document.getElementById('t-optional').textContent=t.optional;
   document.getElementById('t-discount-label').firstChild.textContent=t.discountLbl+' ';
@@ -671,7 +673,7 @@ function setPlan(btn){
   document.getElementById('subscription-date-note').classList.toggle('visible',isSubscription);
   const isCarnetPurchase=(btn.dataset.planIt==='Carnet 5'||btn.dataset.planIt==='Carnet 10');
   document.getElementById('carnet-purchase-note').classList.toggle('visible',isCarnetPurchase);
-  carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';aggiornaDataMinima();
+  carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';carnetCambiato();
   scontoAttivo=false;document.getElementById('sconto-status').className='cst';document.getElementById('sconto-status').textContent='';
   if(deskOnly&&sel&&!isPost){clearAllSel();sel=null;resetSelCard();}
   updateZoneLocks();updateSummary();
@@ -686,7 +688,7 @@ async function applyCarnet(){
   const t=T[currentLang];
   const v=document.getElementById('f-carnet').value.trim();const st=document.getElementById('cst');
   const btn=document.getElementById('t-verify-btn');
-  if(!v){st.className='cst';st.textContent='';carnetActive=null;aggiornaDataMinima();return;}
+  if(!v){st.className='cst';st.textContent='';carnetActive=null;carnetCambiato();return;}
   btn.disabled=true;
   st.className='cst';st.textContent=t.availChecking||'...';
   try{
@@ -705,7 +707,7 @@ async function applyCarnet(){
   }catch(e){
     carnetActive=null;st.className='cst cerr';st.textContent=t.carnetErr;
   }
-  aggiornaDataMinima();
+  carnetCambiato();
   btn.disabled=false;
 }
 
@@ -829,6 +831,10 @@ async function doBook(){
   const data=document.getElementById('din').value;
   if(!nome||!email){alert(t.alertFields);return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(t.alertEmail);return;}
+  if(!carnetActive){
+    const cifre=telefono.replace(/\D/g,'');
+    if(!/^[0-9+\s().\-]+$/.test(telefono)||cifre.length<8||cifre.length>15){alert(t.alertPhone);return;}
+  }
   if(isMeeting&&!meetingSlotAvailable){alert(t.availBusy);return;}
   const spazioLabel=isPost?'Postazione '+sel.id:sel.calName;
   let orarioMeetingVal='';
@@ -855,6 +861,16 @@ async function doBook(){
     cta.disabled=false;cta.className='cta';cta.textContent=t.ctaConfirm;
     alert(t.alertError);
   }
+}
+// Il telefono e' obbligatorio, tranne per chi sta usando un carnet gia' verificato.
+function aggiornaCampoTelefono(){
+  const t=T[currentLang];
+  document.getElementById('t-phone-label').textContent=carnetActive?t.phoneLbl:t.phoneLblReq;
+}
+// Da chiamare ogni volta che cambia lo stato del carnet (verificato / rimosso).
+function carnetCambiato(){
+  aggiornaDataMinima();
+  aggiornaCampoTelefono();
 }
 function aggiornaDataMinima(){
   const oggi=new Date();
