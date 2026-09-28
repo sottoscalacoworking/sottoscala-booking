@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>SottoScala – Piattaforma Carnet</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ss-orange:#E84A1A;--ss-orange-dark:#C73D10;--ss-yellow:#F5C400;
+  --ss-navy:#1B2A6B;--ss-bg:#F7F7F5;--ss-white:#FFFFFF;
+  --ss-text:#1A1A1A;--ss-muted:#6B6B6B;--ss-border:#E0E0DC;
+}
+body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh;color:var(--ss-text)}
+.topbar{background:var(--ss-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar-title{font-size:15px;font-weight:700;color:#fff}
+.topbar-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.lang-switch{display:flex;gap:6px}
+.lang-btn{background:transparent;border:1.5px solid rgba(255,255,255,0.35);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;font-family:'Inter',sans-serif}
+.lang-btn.active{background:var(--ss-orange);border-color:var(--ss-orange)}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px}
+
+/* Accesso + riepilogo carnet */
+.codice-panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;padding:20px;margin-bottom:16px}
+.panel-label{font-size:13px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+.codice-row{display:flex;gap:10px;align-items:flex-end}
+.codice-input{flex:1;font-size:14px;border:1.5px solid var(--ss-border);border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;color:var(--ss-text);outline:none;transition:border-color 0.12s}
+.codice-input:focus{border-color:var(--ss-navy)}
+.codice-btn{padding:10px 20px;background:var(--ss-orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.codice-btn:hover{background:var(--ss-orange-dark)}
+.codice-btn:disabled{background:#D4D4D0;color:#999;cursor:wait}
+.carnet-info{margin-top:14px;padding:12px 16px;background:#EEF1FA;border-radius:8px;display:none}
+.carnet-info.visible{display:block}
+.carnet-name{font-size:14px;font-weight:600;color:var(--ss-navy)}
+.carnet-sub{font-size:12px;color:var(--ss-muted);margin-top:3px}
+.carnet-sub.expired{color:#B53C1D;font-weight:600}
+.ore-bar{margin-top:10px;display:flex;align-items:center;gap:10px}
+.ore-label{font-size:12px;color:var(--ss-muted);white-space:nowrap}
+.ore-track{flex:1;height:8px;background:var(--ss-border);border-radius:4px;overflow:hidden}
+.ore-fill{height:100%;background:var(--ss-orange);border-radius:4px;transition:width 0.3s}
+.ore-count{font-size:12px;font-weight:600;color:var(--ss-orange);white-space:nowrap}
+.err-msg{font-size:12px;color:#B53C1D;margin-top:8px;display:none}
+.err-msg.visible{display:block}
+
+/* Messaggi di esito */
+.msg-ok{display:none;background:#E6F4EE;border:1px solid #0F6E56;border-radius:8px;padding:14px;color:#0F6E56;font-weight:600;font-size:13px;margin-bottom:16px}
+.msg-err{display:none;background:#FDEEEA;border:1px solid #B53C1D;border-radius:8px;padding:14px;color:#B53C1D;font-weight:600;font-size:13px;margin-bottom:16px}
+.msg-ok.visible,.msg-err.visible{display:block}
+
+/* Prenotazioni */
+.list-panel{display:none;background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;padding:20px;margin-bottom:16px}
+.list-panel.visible{display:block}
+.list-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.booking-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--ss-border)}
+.booking-row:first-of-type{border-top:none}
+.b-date{font-size:14px;font-weight:600}
+.b-space{font-size:12px;color:var(--ss-muted);margin-top:2px}
+.b-note{font-size:11px;color:var(--ss-muted);margin-top:3px}
+.btn-cancel{padding:8px 14px;background:#fff;border:1.5px solid #B53C1D;color:#B53C1D;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.btn-cancel:hover{background:#FDEEEA}
+.btn-cancel:disabled{opacity:0.5;cursor:wait}
+.locked{font-size:11px;color:var(--ss-muted);text-align:right;max-width:210px;line-height:1.4}
+.empty{font-size:13px;color:var(--ss-muted);padding:14px 0 4px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--ss-border)}
+.link-btn{padding:10px 16px;border:1.5px solid var(--ss-navy);color:var(--ss-navy);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;background:#fff}
+.link-btn:hover{background:#EEF1FA}
+.link-btn.primary{background:var(--ss-orange);border-color:var(--ss-orange);color:#fff}
+.link-btn.primary:hover{background:var(--ss-orange-dark)}
+
+/* Note */
+.note-box{background:#FFFBEB;border:1px solid #F5C400;border-radius:10px;padding:14px 16px;margin-top:16px;font-size:12px;color:#7a5e00;line-height:1.6}
+.note-box strong{color:var(--ss-navy)}
+.note-box a{color:var(--ss-orange)}
+
+@media(max-width:600px){
+  .codice-row{flex-direction:column;align-items:stretch}
+  .codice-btn{width:100%}
+  .booking-row{flex-direction:column;align-items:flex-start}
+  .locked{text-align:left;max-width:none}
+  .actions{flex-direction:column}
+  .link-btn{text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <div class="topbar-title" id="t-title">SottoScala — Piattaforma Carnet</div>
+    <div class="topbar-sub" id="t-sub">Gestisci il tuo carnet e le tue prenotazioni</div>
+  </div>
+  <div class="lang-switch">
+    <button class="lang-btn active" id="btn-it" onclick="setLang('it')">IT</button>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Accesso con codice carnet -->
+  <div class="codice-panel">
+    <div class="panel-label" id="t-code-label">Il tuo codice carnet</div>
+    <div class="codice-row">
+      <input class="codice-input" id="f-codice" type="text" placeholder="Es. SS-10-0000" autocomplete="off" oninput="this.value=this.value.toUpperCase()"/>
+      <button class="codice-btn" id="btn-accedi" onclick="accedi()">Accedi</button>
+    </div>
+    <div class="err-msg" id="err-msg"></div>
+
+    <div class="carnet-info" id="carnet-info">
+      <div class="carnet-name" id="c-name">—</div>
+      <div class="carnet-sub" id="c-sub">—</div>
+      <div class="ore-bar" id="c-bar">
+        <span class="ore-label" id="c-bar-label">Ingressi usati</span>
+        <div class="ore-track"><div class="ore-fill" id="c-fill" style="width:0%"></div></div>
+        <span class="ore-count" id="c-count">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="msg-ok" id="msg-ok"></div>
+  <div class="msg-err" id="msg-err"></div>
+
+  <!-- Prossime prenotazioni -->
+  <div class="list-panel" id="list-panel">
+    <div class="list-title" id="t-list-title">Le tue prossime prenotazioni</div>
+    <div id="list"></div>
+    <div class="actions">
+      <a class="link-btn primary" href="index.html" id="t-book-new">Prenota una nuova data</a>
+      <a class="link-btn" href="sala-meeting.html" id="t-book-meeting">Sala Meeting (sconto 20%)</a>
+    </div>
+  </div>
+
+  <div class="note-box" id="note-box"></div>
+
+</div>
+
+<script>
+const WEBAPP_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
+const LOCALE={it:'it-IT',en:'en-GB'};
+
+const T={
+  it:{
+    title:'SottoScala — Piattaforma Carnet',
+    sub:'Gestisci il tuo carnet e le tue prenotazioni',
+    codeLabel:'Il tuo codice carnet',
+    placeholder:'Es. SS-10-0000',
+    enter:'Accedi',
+    loading:'Caricamento…',
+    hello:'Ciao {n}!',
+    validUntil:'valido fino al {d}',
+    expired:'scaduto il {d}',
+    barLabel:'Ingressi usati',
+    barCount:'{r} rimasti su {t}',
+    listTitle:'Le tue prossime prenotazioni',
+    none:'Nessuna prenotazione in programma.',
+    cancel:'Cancella',
+    cancelling:'Cancellazione…',
+    cancelUntil:'Cancellabile fino alle 12:00 del {d}',
+    tooLate:'Non più cancellabile online. Per modifiche scrivi a info@sottoscalacoworking.com',
+    confirmCancel:'Vuoi cancellare la prenotazione di {s} per {d}? L\'ingresso tornerà sul tuo carnet.',
+    cancelledOk:'Prenotazione cancellata. Ingresso restituito: ora ne hai {r} disponibili. Ti abbiamo inviato una mail di conferma.',
+    bookNew:'Prenota una nuova data',
+    bookMeeting:'Sala Meeting (sconto 20%)',
+    rules:'<strong>Questa è la tua piattaforma carnet.</strong> Qui trovi tutte le informazioni sui tuoi ingressi: quanti ne hai usati, quanti te ne restano, fino a quando è valido il carnet e le tue prossime prenotazioni. Puoi anche cancellare una prenotazione in autonomia entro le <strong>12:00 del giorno prima</strong>, e l\'ingresso torna subito sul tuo carnet. Per qualsiasi altra esigenza, comprese le prenotazioni della Sala Meeting, scrivici a <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
+    enterCode:'Inserisci il tuo codice carnet.',
+    errors:{
+      non_trovato:'Codice non trovato.',
+      non_trovata:'Prenotazione non trovata (forse è già stata cancellata).',
+      troppo_tardi:'Non è più possibile cancellare online (limite: ore 12:00 del giorno prima). Scrivici a info@sottoscalacoworking.com.',
+      occupato:'Sistema occupato, riprova tra qualche secondo.',
+      server:'Errore del server, riprova tra poco.'
+    },
+    conn:'Errore di connessione, riprova.'
+  },
+  en:{
+    title:'SottoScala — Carnet Platform',
+    sub:'Manage your carnet and your bookings',
+    codeLabel:'Your carnet code',
+    placeholder:'e.g. SS-10-0000',
+    enter:'Log in',
+    loading:'Loading…',
+    hello:'Hi {n}!',
+    validUntil:'valid until {d}',
+    expired:'expired on {d}',
+    barLabel:'Entries used',
+    barCount:'{r} left of {t}',
+    listTitle:'Your upcoming bookings',
+    none:'No upcoming bookings.',
+    cancel:'Cancel',
+    cancelling:'Cancelling…',
+    cancelUntil:'Can be cancelled until 12:00 on {d}',
+    tooLate:'Can no longer be cancelled online. For changes write to info@sottoscalacoworking.com',
+    confirmCancel:'Do you want to cancel your booking of {s} for {d}? The entry will be returned to your carnet.',
+    cancelledOk:'Booking cancelled. Entry returned: you now have {r} available. We have sent you a confirmation email.',
+    bookNew:'Book a new date',
+    bookMeeting:'Meeting Room (20% off)',
+    rules:'<strong>This is your carnet platform.</strong> Here you can find all the information about your entries: how many you have used, how many are left, when your carnet expires and your upcoming bookings. You can also cancel a booking on your own up to <strong>12:00 the day before</strong>, and the entry goes straight back to your carnet. For anything else, including Meeting Room bookings, write to <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
+    enterCode:'Please enter your carnet code.',
+    errors:{
+      non_trovato:'Code not found.',
+      non_trovata:'Booking not found (it may already have been cancelled).',
+      troppo_tardi:'It is no longer possible to cancel online (deadline: 12:00 the day before). Please write to info@sottoscalacoworking.com.',
+      occupato:'System busy, please try again in a few seconds.',
+      server:'Server error, please try again shortly.'
+    },
+    conn:'Connection error, please try again.'
+  }
+};
+
+let lang='it';
+let stato=null;          // ultimi dati ricevuti dal pannello
+let codiceCorrente='';
+let occupato=false;
+
+function t(k,vars){
+  let s=T[lang][k];
+  if(s===undefined)return k;
+  if(vars)Object.keys(vars).forEach(function(x){s=s.split('{'+x+'}').join(vars[x]);});
+  return s;
+}
+function $(id){return document.getElementById(id);}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+function fmtData(iso,opts){
+  const p=iso.split('-');
+  return new Date(+p[0],+p[1]-1,+p[2],12).toLocaleDateString(LOCALE[lang],opts);
+}
+function nomeSpazio(s){
+  if(lang!=='en')return s;
+  if(/^Postazione [A-Z]\d$/.test(s))return s.replace('Postazione','Desk');
+  if(s==='Postazione alta')return 'Standing desk';
+  if(s==='Tavolo workshop')return 'Workshop table';
+  return s;
+}
+function errText(r){
+  const e=T[lang].errors[r&&r.errore];
+  return e||(r&&r.messaggio)||t('conn');
+}
+
+function setLang(l){
+  lang=(l==='en')?'en':'it';
+  document.documentElement.lang=lang;
+  $('btn-it').classList.toggle('active',lang==='it');
+  $('btn-en').classList.toggle('active',lang==='en');
+  $('t-title').textContent=t('title');
+  $('t-sub').textContent=t('sub');
+  $('t-code-label').textContent=t('codeLabel');
+  $('f-codice').placeholder=t('placeholder');
+  if(!occupato)$('btn-accedi').textContent=t('enter');
+  $('t-list-title').textContent=t('listTitle');
+  $('t-book-new').textContent=t('bookNew');
+  $('t-book-meeting').textContent=t('bookMeeting');
+  $('note-box').innerHTML=t('rules');
+  if(stato)render();
+}
+
+function nascondiMessaggi(){
+  $('msg-ok').classList.remove('visible');
+  $('msg-err').classList.remove('visible');
+}
+function mostraOk(txt){const m=$('msg-ok');m.textContent=txt;m.classList.add('visible');}
+function mostraErr(txt){const m=$('msg-err');m.textContent=txt;m.classList.add('visible');}
+function erroreAccesso(txt){const e=$('err-msg');e.textContent=txt;e.classList.add('visible');}
+function nascondiPannelli(){
+  $('carnet-info').classList.remove('visible');
+  $('list-panel').classList.remove('visible');
+}
+
+function render(){
+  const d=stato;
+  $('c-name').textContent=t('hello',{n:d.nome});
+  const scad=fmtData(d.scadenza,{day:'2-digit',month:'2-digit',year:'numeric'});
+  const sub=$('c-sub');
+  sub.textContent=d.tipo+' · '+(d.scaduto?t('expired',{d:scad}):t('validUntil',{d:scad}));
+  sub.classList.toggle('expired',!!d.scaduto);
+  $('c-bar-label').textContent=t('barLabel');
+  $('c-count').textContent=t('barCount',{r:d.rimanenti,t:d.ingressiTotali});
+  const pct=d.ingressiTotali>0?Math.min(100,Math.round((d.ingressiUsati/d.ingressiTotali)*100)):0;
+  $('c-fill').style.width=pct+'%';
+  $('carnet-info').classList.add('visible');
+
+  const list=$('list');
+  list.innerHTML='';
+  if(!d.prenotazioni.length){
+    const e=document.createElement('div');
+    e.className='empty';
+    e.textContent=t('none');
+    list.appendChild(e);
+  }else{
+    d.prenotazioni.forEach(function(p){list.appendChild(riga(p));});
+  }
+  $('list-panel').classList.add('visible');
+}
+
+function riga(p){
+  const row=document.createElement('div');
+  row.className='booking-row';
+
+  const left=document.createElement('div');
+  const dt=document.createElement('div');
+  dt.className='b-date';
+  dt.textContent=cap(fmtData(p.data,{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+  const sp=document.createElement('div');
+  sp.className='b-space';
+  sp.textContent=nomeSpazio(p.spazio);
+  left.appendChild(dt);
+  left.appendChild(sp);
+  if(p.cancellabile){
+    const n=document.createElement('div');
+    n.className='b-note';
+    n.textContent=t('cancelUntil',{d:fmtData(p.limiteData,{day:'numeric',month:'long'})});
+    left.appendChild(n);
+  }
+  row.appendChild(left);
+
+  if(p.cancellabile){
+    const b=document.createElement('button');
+    b.className='btn-cancel';
+    b.textContent=t('cancel');
+    b.addEventListener('click',function(){cancella(p,b);});
+    row.appendChild(b);
+  }else{
+    const l=document.createElement('div');
+    l.className='locked';
+    l.textContent=t('tooLate');
+    row.appendChild(l);
+  }
+  return row;
+}
+
+async function carica(codice,silenzioso){
+  const btn=$('btn-accedi');
+  $('err-msg').classList.remove('visible');
+  if(!silenzioso){
+    nascondiPannelli();
+    nascondiMessaggi();
+    stato=null;
+    btn.disabled=true;
+    btn.textContent=t('loading');
+  }
+  try{
+    const res=await fetch(WEBAPP_URL+'?action=pannelloCarnet&codice='+encodeURIComponent(codice));
+    const r=await res.json();
+    if(r.ok){
+      codiceCorrente=r.codice;
+      stato=r;
+      render();
+    }else{
+      stato=null;
+      nascondiPannelli();
+      erroreAccesso(errText(r));
+    }
+  }catch(e){
+    if(!silenzioso){erroreAccesso(t('conn'));}
+    else{mostraErr(t('conn'));}
+  }
+  btn.disabled=false;
+  btn.textContent=t('enter');
+}
+
+function accedi(){
+  if(occupato)return;
+  const codice=$('f-codice').value.trim();
+  if(!codice){
+    nascondiPannelli();
+    erroreAccesso(t('enterCode'));
+    return;
+  }
+  carica(codice,false);
+}
+
+async function cancella(p,btn){
+  if(occupato)return;
+  const dataTxt=cap(fmtData(p.data,{weekday:'long',day:'numeric',month:'long'}));
+  if(!confirm(t('confirmCancel',{s:nomeSpazio(p.spazio),d:dataTxt})))return;
+
+  occupato=true;
+  nascondiMessaggi();
+  document.querySelectorAll('.btn-cancel').forEach(function(x){x.disabled=true;});
+  btn.textContent=t('cancelling');
+  try{
+    const url=WEBAPP_URL+'?action=cancellaPrenotazioneCarnet'
+      +'&codice='+encodeURIComponent(codiceCorrente)
+      +'&spazio='+encodeURIComponent(p.spazio)
+      +'&id='+encodeURIComponent(p.id)
+      +'&lang='+lang;
+    const res=await fetch(url);
+    const r=await res.json();
+    occupato=false;
+    if(r.ok){
+      mostraOk(t('cancelledOk',{r:r.rimanenti}));
+    }else{
+      mostraErr(errText(r));
+    }
+    await carica(codiceCorrente,true);   // ricarica l'elenco aggiornato
+  }catch(e){
+    occupato=false;
+    mostraErr(t('conn'));
+    document.querySelectorAll('.btn-cancel').forEach(function(x){x.disabled=false;});
+    btn.textContent=t('cancel');
+  }
+}
+
+(function init(){
+  const p=new URLSearchParams(location.search);
+  const l=p.get('lang')||((navigator.language||'').toLowerCase().indexOf('en')===0?'en':'it');
+  setLang(l);
+  $('f-codice').addEventListener('keydown',function(ev){if(ev.key==='Enter')accedi();});
+  const c=p.get('codice');
+  if(c){
+    $('f-codice').value=c.toUpperCase();
+    accedi();
+  }
+})();
+</script>
+</body>
+</html>
