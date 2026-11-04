@@ -36,6 +36,12 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
 .ore-track{flex:1;height:8px;background:var(--ss-border);border-radius:4px;overflow:hidden}
 .ore-fill{height:100%;background:var(--ss-orange);border-radius:4px;transition:width 0.3s}
 .ore-count{font-size:12px;font-weight:600;color:var(--ss-orange);white-space:nowrap}
+.giorni{display:none;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+.giorni.visible{display:flex}
+.giorni-label{font-size:11px;color:var(--ss-muted);margin-right:2px}
+.giorno-chip{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;padding:5px 10px;border-radius:14px;border:1.5px solid #F5C400;background:#FFF3C4;color:#7a5e00;cursor:pointer}
+.giorno-chip:hover{background:#FFE78A}
+.giorno-chip.attivo{background:var(--ss-navy);border-color:var(--ss-navy);color:#fff}
 .err-msg{font-size:12px;color:#B53C1D;margin-top:8px;display:none}
 .err-msg.visible{display:block}
 
@@ -124,6 +130,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
         <div class="ore-track"><div class="ore-fill" id="ore-fill" style="width:0%"></div></div>
         <span class="ore-count" id="ore-count">—</span>
       </div>
+      <div class="giorni" id="giorni"></div>
     </div>
   </div>
 
@@ -191,6 +198,7 @@ let weekOffset=0;
 let abbonato=null;       // ultima risposta di verificaOreAbbonato per la settimana visualizzata
 let selectedSlots={};
 let renderId=0;
+let dataIniziale='';   // ?data=yyyy-mm-dd dal link della Piattaforma Carnet
 
 const $=id=>document.getElementById(id);
 
@@ -221,7 +229,13 @@ async function caricaInfo(codice,offset){
   const url=WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(codice)+
     '&dataRif='+isoLocale(getMondayOfWeek(offset));
   const res=await fetch(url);
-  return res.json();
+  const testo=await res.text();
+  try{return JSON.parse(testo);}
+  catch(e){
+    // Lo script ha risposto con una pagina di errore invece che con JSON: mostriamo il motivo.
+    const m=testo.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,200);
+    throw new Error('Risposta non valida dal server: '+m);
+  }
 }
 
 async function aggiornaInfoSettimana(){
@@ -275,9 +289,11 @@ async function verificaCodice(){
       return;
     }
     // Giornaliero/Carnet: se questa settimana non ha ore gratuite, salta alla settimana della prossima giornata.
-    if(data.modalita==='giornaliera'&&!Object.keys(data.perGiorno||{}).length){
-      const oggi=isoLocale(new Date());
-      const prossimo=(data.giorniGratuiti||[]).filter(g=>g>=oggi).sort()[0];
+    const oggiIso=isoLocale(new Date());
+    const dataLink=(dataIniziale&&dataIniziale>=oggiIso)?dataIniziale:'';
+    dataIniziale='';
+    if(dataLink||(data.modalita==='giornaliera'&&!Object.keys(data.perGiorno||{}).length)){
+      const prossimo=dataLink||(data.giorniGratuiti||[]).filter(g=>g>=oggiIso).sort()[0];
       if(prossimo){
         const off=offsetPer(prossimo);
         if(off>0){
@@ -292,7 +308,8 @@ async function verificaCodice(){
     info.classList.add('visible');
     await renderCalendar();
   }catch(e){
-    err.textContent='Errore di connessione. Riprova.';
+    console.error(e);
+    err.textContent='Errore: '+(e&&e.message?e.message:'connessione non riuscita')+'. Riprova.';
     err.classList.add('visible');
   }finally{
     btn.disabled=false;btn.textContent='Accedi';
@@ -307,6 +324,7 @@ function aggiornaTestata(){
   $('legend-incl').style.display=a.modalita==='giornaliera'?'flex':'none';
 
   if(a.modalita==='settimanale'){
+    $('giorni').classList.remove('visible');
     bar.style.display='';
     if(!a.oreMax){
       sub.textContent=a.piano+' · '+settLabel()+': nessuna ora inclusa (abbonamento valido dal '+fmtIso(a.dataInizio)+' al '+fmtIso(a.dataFine)+')';
@@ -329,8 +347,37 @@ function aggiornaTestata(){
     }else{
       sub.textContent='Ingresso giornaliero · 1 ora gratuita'+(prossimi.length?' il '+fmtLong(daIso(prossimi[0])):'');
     }
+    disegnaGiorni(prossimi);
     note.innerHTML='<strong>Come funziona:</strong> hai <strong>1 ora gratuita</strong> di Sala Meeting per ogni giornata in cui hai prenotato una postazione: la trovi in giallo nel calendario.'+extraTxt+contatti;
   }
+}
+
+// Bottoni per saltare direttamente alla settimana di ogni giornata prenotata.
+function disegnaGiorni(prossimi){
+  const box=$('giorni');
+  box.innerHTML='';
+  if(prossimi.length<1){box.classList.remove('visible');return;}
+  const lbl=document.createElement('span');
+  lbl.className='giorni-label';
+  lbl.textContent=prossimi.length>1?'Le tue giornate:':'La tua giornata:';
+  box.appendChild(lbl);
+  prossimi.forEach(g=>{
+    const b=document.createElement('button');
+    b.className='giorno-chip'+(offsetPer(g)===weekOffset?' attivo':'');
+    b.textContent=daIso(g).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'});
+    b.onclick=()=>vaiASettimana(offsetPer(g));
+    box.appendChild(b);
+  });
+  box.classList.add('visible');
+}
+
+async function vaiASettimana(off){
+  off=Math.max(0,off);
+  if(off===weekOffset)return;
+  weekOffset=off;
+  $('success-msg').classList.remove('visible');
+  await aggiornaInfoSettimana();
+  await renderCalendar();
 }
 
 // ── Calendario ────────────────────────────────────────────────────────
@@ -490,19 +537,17 @@ async function confermaPrenotazione(){
   }
 }
 
-async function changeWeek(dir){
-  const nuovo=Math.max(0,weekOffset+dir);
-  if(nuovo===weekOffset)return;
-  weekOffset=nuovo;
-  $('success-msg').classList.remove('visible');
-  await aggiornaInfoSettimana();
-  await renderCalendar();
+function changeWeek(dir){
+  return vaiASettimana(weekOffset+dir);
 }
 
 // ── Avvio ─────────────────────────────────────────────────────────────
 (function init(){
   $('f-codice').addEventListener('keydown',e=>{if(e.key==='Enter')verificaCodice();});
-  const c=new URLSearchParams(location.search).get('codice');
+  const qs=new URLSearchParams(location.search);
+  const c=qs.get('codice');
+  const d=qs.get('data')||'';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(d))dataIniziale=d;
   if(c){$('f-codice').value=c.toUpperCase();verificaCodice();}
   else renderCalendar();
 })();
