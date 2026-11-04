@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
 <title>SottoScala – Sala Meeting</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -13,23 +14,23 @@
   --ss-text:#1A1A1A;--ss-muted:#6B6B6B;--ss-border:#E0E0DC;
 }
 body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
-.topbar{background:var(--ss-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar{background:var(--ss-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .topbar-title{font-size:15px;font-weight:700;color:#fff}
 .topbar-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
-.topbar-badge{background:var(--ss-orange);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.topbar-badge{background:var(--ss-orange);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;white-space:nowrap}
 .wrap{max-width:900px;margin:0 auto;padding:24px 16px}
 
-/* Stato abbonato */
 .codice-panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;padding:20px;margin-bottom:20px}
 .codice-row{display:flex;gap:10px;align-items:flex-end}
 .codice-input{flex:1;font-size:14px;border:1.5px solid var(--ss-border);border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;color:var(--ss-text);outline:none;transition:border-color 0.12s}
 .codice-input:focus{border-color:var(--ss-navy)}
 .codice-btn{padding:10px 20px;background:var(--ss-orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
 .codice-btn:hover{background:var(--ss-orange-dark)}
+.codice-btn:disabled{background:#D4D4D0;color:#999;cursor:wait}
 .abbonato-info{margin-top:14px;padding:12px 16px;background:#EEF1FA;border-radius:8px;display:none}
 .abbonato-info.visible{display:block}
 .abbonato-name{font-size:14px;font-weight:600;color:var(--ss-navy)}
-.abbonato-sub{font-size:12px;color:var(--ss-muted);margin-top:3px}
+.abbonato-sub{font-size:12px;color:var(--ss-muted);margin-top:3px;line-height:1.5}
 .ore-bar{margin-top:10px;display:flex;align-items:center;gap:10px}
 .ore-label{font-size:12px;color:var(--ss-muted);white-space:nowrap}
 .ore-track{flex:1;height:8px;background:var(--ss-border);border-radius:4px;overflow:hidden}
@@ -38,37 +39,41 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
 .err-msg{font-size:12px;color:#B53C1D;margin-top:8px;display:none}
 .err-msg.visible{display:block}
 
-/* Navigazione settimana */
-.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)}
+.legend-dot{width:16px;height:16px;border-radius:3px}
+
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px}
 .week-label{font-size:15px;font-weight:600;color:var(--ss-text)}
 .week-sub{font-size:12px;color:var(--ss-muted);margin-top:2px}
 .nav-btn{padding:8px 16px;background:var(--ss-white);border:1.5px solid var(--ss-border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--ss-text);transition:all 0.12s}
 .nav-btn:hover{border-color:var(--ss-navy);color:var(--ss-navy)}
 
-/* Griglia calendario */
 .cal-wrap{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;overflow:hidden}
 .cal-header{display:grid;grid-template-columns:60px repeat(5,1fr);border-bottom:1px solid var(--ss-border)}
 .cal-header-cell{padding:10px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em}
 .cal-header-cell.today{color:var(--ss-orange)}
+.free-badge{display:inline-block;margin-top:4px;font-size:9px;font-weight:700;letter-spacing:0;text-transform:none;background:#FFF3C4;color:#7a5e00;border-radius:4px;padding:1px 5px}
+.free-badge.used{background:#F0F0EE;color:var(--ss-muted)}
 .cal-body{display:grid;grid-template-columns:60px repeat(5,1fr)}
-.time-label{padding:0 8px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:8px;font-size:10px;color:var(--ss-muted);font-weight:500;border-right:1px solid var(--ss-border)}
-.slot{border:1px solid var(--ss-border);border-top:none;border-left:none;min-height:48px;padding:3px;position:relative;transition:background 0.1s}
+.time-label{padding:8px 8px 0;display:flex;align-items:flex-start;justify-content:flex-end;font-size:10px;color:var(--ss-muted);font-weight:500;border-right:1px solid var(--ss-border)}
+.slot{border:1px solid var(--ss-border);border-top:none;border-left:none;min-height:48px;padding:3px}
 .slot.first-row{border-top:1px solid var(--ss-border)}
-.slot-inner{width:100%;height:100%;min-height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:default;transition:all 0.12s;padding:4px}
+.slot-inner{width:100%;height:100%;min-height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:default;transition:all 0.12s;padding:4px;text-align:center}
 .slot-inner.free{background:#EEF9F0;color:#0F6E56;cursor:pointer}
 .slot-inner.free:hover{background:#D4F0DB;transform:scale(1.02)}
+.slot-inner.free.incl{background:#FFF3C4;color:#7a5e00}
+.slot-inner.free.incl:hover{background:#FFE78A}
 .slot-inner.busy{background:#FDEEEA;color:#B53C1D;cursor:not-allowed}
 .slot-inner.past{background:#F0F0EE;color:#C0C0BE;cursor:not-allowed}
-.slot-inner.selected{background:var(--ss-orange);color:#fff;transform:scale(1.04)}
+.slot-inner.selected{background:var(--ss-orange);color:#fff;transform:scale(1.04);cursor:pointer}
 .slot-inner.myslot{background:var(--ss-navy);color:#fff}
-.slot-inner.loading{background:#F0F0EE;color:var(--ss-muted)}
 
-/* Pannello prenotazione */
 .booking-panel{background:var(--ss-white);border:1px solid var(--ss-border);border-radius:12px;padding:20px;margin-top:16px;display:none}
 .booking-panel.visible{display:block}
 .booking-title{font-size:14px;font-weight:600;color:var(--ss-text);margin-bottom:12px}
-.booking-detail{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--ss-muted)}
-.booking-detail span:last-child{font-weight:500;color:var(--ss-text)}
+.booking-detail{display:flex;justify-content:space-between;gap:16px;font-size:13px;padding:4px 0;color:var(--ss-muted)}
+.booking-detail span:last-child{font-weight:500;color:var(--ss-text);text-align:right}
 .booking-price{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:10px 0 0;border-top:1px solid var(--ss-border);margin-top:8px}
 .booking-price-note{font-size:11px;color:var(--ss-orange);font-weight:500;margin-top:2px}
 .booking-cta{width:100%;padding:12px;background:var(--ss-orange);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:14px;transition:background 0.12s}
@@ -77,17 +82,19 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
 .success-msg{display:none;background:#E6F4EE;border:1px solid #0F6E56;border-radius:8px;padding:14px;text-align:center;color:#0F6E56;font-weight:600;font-size:13px;margin-top:16px}
 .success-msg.visible{display:block}
 
-/* Note */
 .note-box{background:#FFFBEB;border:1px solid #F5C400;border-radius:10px;padding:14px 16px;margin-top:16px;font-size:12px;color:#7a5e00;line-height:1.6}
 .note-box strong{color:var(--ss-navy)}
+.note-box a{color:var(--ss-orange)}
 
 @media(max-width:600px){
+  .topbar{flex-direction:column;align-items:flex-start}
   .cal-header{grid-template-columns:44px repeat(5,1fr)}
   .cal-body{grid-template-columns:44px repeat(5,1fr)}
   .time-label{font-size:9px;padding:6px 4px}
   .slot-inner{font-size:9px}
-  .codice-row{flex-direction:column}
+  .codice-row{flex-direction:column;align-items:stretch}
   .codice-btn{width:100%}
+  .nav-btn{padding:8px 10px;font-size:12px}
 }
 </style>
 </head>
@@ -95,50 +102,47 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
 <div class="topbar">
   <div>
     <div class="topbar-title">SottoScala — Sala Meeting</div>
-    <div class="topbar-sub">Prenotazione riservata agli abbonati</div>
+    <div class="topbar-sub">Riservata ad abbonati, carnet e ingressi giornalieri</div>
   </div>
   <div class="topbar-badge">Uso interno</div>
 </div>
 
 <div class="wrap">
 
-  <!-- Inserimento codice -->
   <div class="codice-panel">
-    <div style="font-size:13px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">Il tuo codice abbonato</div>
+    <div style="font-size:13px;font-weight:600;color:var(--ss-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">Il tuo codice</div>
     <div class="codice-row">
-      <input class="codice-input" id="f-codice" type="text" placeholder="Es. M-0000" oninput="this.value=this.value.toUpperCase()"/>
-      <button class="codice-btn" onclick="verificaCodice()">Accedi</button>
+      <input class="codice-input" id="f-codice" type="text" placeholder="Es. M-0000 · G-0000 · SS-10-0000" autocomplete="off" oninput="this.value=this.value.toUpperCase()"/>
+      <button class="codice-btn" id="btn-accedi" onclick="verificaCodice()">Accedi</button>
     </div>
-    <div class="err-msg" id="err-msg">Codice non trovato o abbonamento scaduto.</div>
+    <div class="err-msg" id="err-msg"></div>
     <div class="abbonato-info" id="abbonato-info">
       <div class="abbonato-name" id="abbonato-name">—</div>
       <div class="abbonato-sub" id="abbonato-sub">—</div>
       <div class="ore-bar" id="ore-bar">
-        <span class="ore-label">Ore questa settimana</span>
+        <span class="ore-label">Ore incluse</span>
         <div class="ore-track"><div class="ore-fill" id="ore-fill" style="width:0%"></div></div>
         <span class="ore-count" id="ore-count">—</span>
       </div>
     </div>
   </div>
 
-  <!-- Navigazione settimana -->
-  <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
-    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)"><div style="width:16px;height:16px;border-radius:3px;background:#EEF9F0;border:1px solid #0F6E56"></div>Libero</div>
-    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)"><div style="width:16px;height:16px;border-radius:3px;background:var(--ss-navy)"></div>Prenotato da te</div>
-    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ss-muted)"><div style="width:16px;height:16px;border-radius:3px;background:#FDEEEA;border:1px solid #B53C1D"></div>Occupato</div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#EEF9F0;border:1px solid #0F6E56"></div>Libero</div>
+    <div class="legend-item" id="legend-incl" style="display:none"><div class="legend-dot" style="background:#FFF3C4;border:1px solid #F5C400"></div>Ora gratuita</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--ss-navy)"></div>Prenotato da te</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FDEEEA;border:1px solid #B53C1D"></div>Occupato</div>
   </div>
 
-  <!-- Navigazione settimana -->
   <div class="week-nav">
-    <button class="nav-btn" onclick="changeWeek(-1)">← Settimana precedente</button>
+    <button class="nav-btn" onclick="changeWeek(-1)">← Precedente</button>
     <div style="text-align:center">
       <div class="week-label" id="week-label">—</div>
       <div class="week-sub" id="week-sub">—</div>
     </div>
-    <button class="nav-btn" onclick="changeWeek(1)">Settimana successiva →</button>
+    <button class="nav-btn" onclick="changeWeek(1)">Successiva →</button>
   </div>
 
-  <!-- Calendario -->
   <div class="cal-wrap">
     <div class="cal-header">
       <div class="cal-header-cell"></div>
@@ -148,32 +152,27 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
       <div class="cal-header-cell" id="hd-3">GIO</div>
       <div class="cal-header-cell" id="hd-4">VEN</div>
     </div>
-    <div class="cal-body" id="cal-body">
-      <!-- generato da JS -->
-    </div>
+    <div class="cal-body" id="cal-body"></div>
   </div>
 
-  <!-- Pannello prenotazione -->
   <div class="booking-panel" id="booking-panel">
     <div class="booking-title">Riepilogo prenotazione</div>
-    <div class="booking-detail"><span>Giorno</span><span id="b-giorno">—</span></div>
-    <div class="booking-detail"><span>Orario</span><span id="b-orario">—</span></div>
-    <div class="booking-detail"><span>Ore incluse rimanenti</span><span id="b-ore-rimaste">—</span></div>
-    <div class="booking-price">
-      <span>Totale</span><span id="b-totale">—</span>
-    </div>
+    <div class="booking-detail"><span>Ore selezionate</span><span id="b-ore">—</span></div>
+    <div class="booking-detail"><span>Slot</span><span id="b-slot">—</span></div>
+    <div class="booking-detail"><span>Incluse / extra</span><span id="b-split">—</span></div>
+    <div class="booking-price"><span>Totale</span><span id="b-totale">—</span></div>
     <div class="booking-price-note" id="b-note"></div>
     <button class="booking-cta" id="booking-cta" onclick="confermaPrenotazione()">Conferma prenotazione</button>
   </div>
 
   <div class="success-msg" id="success-msg">
-    ✅ Prenotazione inviata!<br>
-    <span style="font-size:12px;font-weight:400;margin-top:4px;display:block">Riceverai una conferma via email. Le ore sono state scalate dal tuo credito settimanale.</span>
+    ✅ <span id="success-title">Prenotazione confermata!</span><br>
+    <span id="success-sub" style="font-size:12px;font-weight:400;margin-top:4px;display:block"></span>
   </div>
 
   <div class="note-box" id="note-box">
-    <strong>Come funziona:</strong> inserisci il tuo codice abbonato o carnet per vedere le condizioni riservate a te e prenotare la Sala Meeting.
-    Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.
+    <strong>Come funziona:</strong> inserisci il tuo codice abbonato, carnet o ingresso giornaliero per vedere le ore incluse e prenotare la Sala Meeting.
+    Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.
   </div>
 
 </div>
@@ -182,118 +181,62 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh}
 const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
 const MEETING_CAL_ID='c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com';
 const WEBAPP_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
-const PREZZO_ORE_STANDARD=25;
-const SCONTO_ABBONATO=0.20;
-const PREZZO_SCONTATO=Math.round(PREZZO_ORE_STANDARD*(1-SCONTO_ABBONATO));
-// Stessa tabella a scaglioni del widget pubblico (1h/4h/8h), con lo sconto abbonati/carnet applicato sopra.
-const MEETING_PRICES_TIER={1:25,4:85,8:150};
-function calcolaCostoExtra(ore){
-  const base=MEETING_PRICES_TIER[ore]||(ore*MEETING_PRICES_TIER[1]);
-  return Math.round(base*(1-SCONTO_ABBONATO));
-}
-const ORE_SLOT=1; // ogni slot = 1 ora
-const ORE_INCLUSE=3; // ore gratuite settimanali incluse per abbonato
-
-// Aggiorna l'intestazione (nome piano + barra ore) in base al tipo di codice:
-// un abbonato ha ore incluse settimanali con barra di avanzamento,
-// un carnet ha sconto 20% fisso su tutte le ore, senza concetto di settimana.
-function aggiornaTestataCodice(obj, oreUsateVal, settLabel){
-  const bar=document.getElementById('ore-bar');
-  const note=document.getElementById('note-box');
-  if(obj.tipoCodice==='carnet'){
-    document.getElementById('abbonato-sub').textContent=obj.piano+' \u00b7 Sconto 20% su tutte le ore prenotate';
-    if(bar) bar.style.display='none';
-    if(note) note.innerHTML='<strong>Come funziona:</strong> con il tuo carnet hai diritto a uno <strong>sconto del 20%</strong> su tutte le ore di Sala Meeting che prenoti, sul listino pubblico a scaglioni. Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.';
-  }else{
-    if(bar) bar.style.display='';
-    if(note) note.innerHTML='<strong>Come funziona:</strong> il tuo piano include <strong>3 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni luned\u00ec. Per prenotazioni oltre le 3 ore settimanali, hai diritto a uno <strong>sconto del 20%</strong> sul listino pubblico a scaglioni. Per orari serali o weekend, scrivici a <a href="mailto:info@sottoscalacoworking.com" style="color:var(--ss-orange)">info@sottoscalacoworking.com</a>.';
-    document.getElementById('abbonato-sub').textContent=obj.piano+' \u00b7 '+(settLabel||'Questa settimana')+': '+oreUsateVal+'/'+ORE_INCLUSE+' ore usate';
-    document.getElementById('ore-count').textContent=obj.oreDisponibili+' h rimaste';
-    const pct=Math.min(100,Math.round((oreUsateVal/ORE_INCLUSE)*100));
-    document.getElementById('ore-fill').style.width=pct+'%';
-  }
-}
+const EMAIL='info@sottoscalacoworking.com';
+const SCONTO=0.20;
+const TIER={1:25,4:85,8:150};   // listino pubblico a scaglioni, stesso del widget pubblico
 const HOURS_START=9;
 const HOURS_END=18;
 
-let currentWeekOffset=0;
-let abbonato=null;
-let selectedSlots={}; // key -> {date, hour}
-let calEvents=[];
+let weekOffset=0;
+let abbonato=null;       // ultima risposta di verificaOreAbbonato per la settimana visualizzata
+let selectedSlots={};
+let renderId=0;
 
-// ── Utilities ──────────────────────────────────────────────────────────
-function getMondayOfWeek(offset){
-  const now=new Date();
-  const day=now.getDay()||7;
-  const mon=new Date(now);
-  mon.setHours(0,0,0,0);
-  mon.setDate(now.getDate()-day+1+offset*7);
-  return mon;
+const $=id=>document.getElementById(id);
+
+// ── Utilità date (tutte in ora locale) ────────────────────────────────
+function isoLocale(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function daIso(iso){const p=iso.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function mondayOf(d){const day=d.getDay()||7;return new Date(d.getFullYear(),d.getMonth(),d.getDate()-day+1);}
+function getMondayOfWeek(offset){const m=mondayOf(new Date());m.setDate(m.getDate()+offset*7);return m;}
+function offsetPer(iso){return Math.round((mondayOf(daIso(iso))-getMondayOfWeek(0))/(7*86400000));}
+function fmtShort(d){return d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});}
+function fmtLong(d){return d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});}
+function fmtIso(iso){return daIso(iso).toLocaleDateString('it-IT');}
+function isToday(d){return isoLocale(d)===isoLocale(new Date());}
+function isPast(d,h){const s=new Date(d);s.setHours(h,0,0,0);return s<=new Date();}
+function settLabel(){
+  if(weekOffset===0)return 'Questa settimana';
+  if(weekOffset===1)return 'Settimana prossima';
+  return 'Settimana del '+fmtShort(getMondayOfWeek(weekOffset));
+}
+function costoExtra(ore){
+  if(ore<=0)return 0;
+  const base=TIER[ore]||(ore*TIER[1]);
+  return Math.round(base*(1-SCONTO));
 }
 
-function formatDate(d,opts){
-  return d.toLocaleDateString('it-IT',opts||{day:'2-digit',month:'long',year:'numeric'});
+// ── Dati dal backend ──────────────────────────────────────────────────
+async function caricaInfo(codice,offset){
+  const url=WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(codice)+
+    '&dataRif='+isoLocale(getMondayOfWeek(offset));
+  const res=await fetch(url);
+  return res.json();
 }
 
-function formatDateShort(d){
-  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
-}
-
-function isToday(d){
-  const now=new Date();
-  return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-}
-
-function isPast(d,hour){
-  const now=new Date();
-  const slot=new Date(d);
-  slot.setHours(hour,0,0,0);
-  return slot<=now;
-}
-
-function getSettimanaISO(d){
-  const date=new Date(d);
-  date.setHours(0,0,0,0);
-  date.setDate(date.getDate()+4-(date.getDay()||7));
-  const yearStart=new Date(date.getFullYear(),0,1);
-  return date.getFullYear()+'-W'+Math.ceil((((date-yearStart)/86400000)+1)/7);
-}
-
-// ── Verifica codice abbonato ───────────────────────────────────────────
-async function verificaCodice(){
-  const codice=document.getElementById('f-codice').value.trim();
-  const err=document.getElementById('err-msg');
-  const info=document.getElementById('abbonato-info');
-  err.classList.remove('visible');
-  info.classList.remove('visible');
-  if(!codice)return;
-
+async function aggiornaInfoSettimana(){
+  if(!abbonato)return;
   try{
-    const res=await fetch(WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(codice));
-    const data=await res.json();
-    if(data.valido){
-      abbonato=data;
-      document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
-      aggiornaTestataCodice(data, data.oreUsate);
-      info.classList.add('visible');
-      renderCalendar();
-    }else{
-      err.textContent=data.messaggio||'Codice non trovato.';
-      err.classList.add('visible');
-      abbonato=null;
-    }
-  }catch(e){
-    err.textContent='Errore di connessione. Riprova.';
-    err.classList.add('visible');
-  }
+    const d=await caricaInfo(abbonato.codice,weekOffset);
+    if(d.valido){abbonato=d;aggiornaTestata();}
+  }catch(e){}
 }
 
-// ── Carica eventi Google Calendar ─────────────────────────────────────
 async function loadEvents(monday){
-  const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59);
+  const end=new Date(monday);end.setDate(monday.getDate()+5);
   const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(MEETING_CAL_ID)+
-    '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+friday.toISOString()+
-    '&singleEvents=true&fields=items(start,end,summary,description)';
+    '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+end.toISOString()+
+    '&singleEvents=true&fields=items(start,end,description)';
   try{
     const res=await fetch(url);
     const data=await res.json();
@@ -301,393 +244,268 @@ async function loadEvents(monday){
   }catch(e){return[];}
 }
 
-function isSlotBusy(events,date,hour){
-  const slotStart=new Date(date);slotStart.setHours(hour,0,0,0);
-  const slotEnd=new Date(date);slotEnd.setHours(hour+ORE_SLOT,0,0,0);
-  return events.some(ev=>{
-    const evStart=new Date(ev.start.dateTime||ev.start.date);
-    const evEnd=new Date(ev.end.dateTime||ev.end.date);
-    return slotStart<evEnd&&evStart<slotEnd;
+function eventiNelloSlot(events,date,hour){
+  const s=new Date(date);s.setHours(hour,0,0,0);
+  const e=new Date(date);e.setHours(hour+1,0,0,0);
+  return events.filter(ev=>{
+    const a=new Date(ev.start.dateTime||ev.start.date);
+    const b=new Date(ev.end.dateTime||ev.end.date);
+    return s<b&&a<e;
   });
 }
 
-// ── Render calendario ──────────────────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────────────────
+async function verificaCodice(){
+  const codice=$('f-codice').value.trim().toUpperCase();
+  const err=$('err-msg'),info=$('abbonato-info'),btn=$('btn-accedi');
+  err.classList.remove('visible');
+  info.classList.remove('visible');
+  $('success-msg').classList.remove('visible');
+  abbonato=null;
+  if(!codice)return;
+
+  btn.disabled=true;btn.textContent='Verifica…';
+  try{
+    let data=await caricaInfo(codice,0);
+    weekOffset=0;
+    if(!data.valido){
+      err.textContent=data.messaggio||'Codice non trovato.';
+      err.classList.add('visible');
+      await renderCalendar();
+      return;
+    }
+    // Giornaliero/Carnet: se questa settimana non ha ore gratuite, salta alla settimana della prossima giornata.
+    if(data.modalita==='giornaliera'&&!Object.keys(data.perGiorno||{}).length){
+      const oggi=isoLocale(new Date());
+      const prossimo=(data.giorniGratuiti||[]).filter(g=>g>=oggi).sort()[0];
+      if(prossimo){
+        const off=offsetPer(prossimo);
+        if(off>0){
+          const d2=await caricaInfo(codice,off);
+          if(d2.valido){weekOffset=off;data=d2;}
+        }
+      }
+    }
+    abbonato=data;
+    $('abbonato-name').textContent='Ciao '+String(data.nome||'').split(' ')[0]+'!';
+    aggiornaTestata();
+    info.classList.add('visible');
+    await renderCalendar();
+  }catch(e){
+    err.textContent='Errore di connessione. Riprova.';
+    err.classList.add('visible');
+  }finally{
+    btn.disabled=false;btn.textContent='Accedi';
+  }
+}
+
+function aggiornaTestata(){
+  if(!abbonato)return;
+  const a=abbonato,bar=$('ore-bar'),sub=$('abbonato-sub'),note=$('note-box');
+  const extraTxt=' Per le ore oltre quelle incluse hai uno <strong>sconto del 20%</strong> sul listino pubblico a scaglioni.';
+  const contatti=' Per orari serali o weekend, scrivici a <a href="mailto:'+EMAIL+'">'+EMAIL+'</a>.';
+  $('legend-incl').style.display=a.modalita==='giornaliera'?'flex':'none';
+
+  if(a.modalita==='settimanale'){
+    bar.style.display='';
+    if(!a.oreMax){
+      sub.textContent=a.piano+' · '+settLabel()+': nessuna ora inclusa (abbonamento valido dal '+fmtIso(a.dataInizio)+' al '+fmtIso(a.dataFine)+')';
+      $('ore-count').textContent='0 h incluse';
+      $('ore-fill').style.width='0%';
+    }else{
+      sub.textContent=a.piano+' · '+settLabel()+': '+a.oreUsate+'/'+a.oreMax+' ore incluse usate';
+      $('ore-count').textContent=a.oreDisponibili+' h rimaste';
+      $('ore-fill').style.width=Math.min(100,Math.round(a.oreUsate/a.oreMax*100))+'%';
+    }
+    note.innerHTML='<strong>Come funziona:</strong> il tuo piano include <strong>3 ore settimanali</strong> di Sala Meeting, gratuite. Le ore si azzerano ogni lunedì.'+extraTxt+contatti;
+  }else{
+    bar.style.display='none';
+    const oggi=isoLocale(new Date());
+    const prossimi=(a.giorniGratuiti||[]).filter(g=>g>=oggi).sort();
+    if(a.tipoCodice==='carnet'){
+      sub.textContent=a.piano+' · '+(prossimi.length
+        ?'1 ora gratuita nelle tue giornate prenotate: '+prossimi.slice(0,4).map(g=>fmtShort(daIso(g))).join(', ')+(prossimi.length>4?'…':'')
+        :'nessuna giornata prenotata in programma: prenota una postazione per avere l\'ora gratuita');
+    }else{
+      sub.textContent='Ingresso giornaliero · 1 ora gratuita'+(prossimi.length?' il '+fmtLong(daIso(prossimi[0])):'');
+    }
+    note.innerHTML='<strong>Come funziona:</strong> hai <strong>1 ora gratuita</strong> di Sala Meeting per ogni giornata in cui hai prenotato una postazione: la trovi in giallo nel calendario.'+extraTxt+contatti;
+  }
+}
+
+// ── Calendario ────────────────────────────────────────────────────────
 async function renderCalendar(){
-  const monday=getMondayOfWeek(currentWeekOffset);
+  const myId=++renderId;
+  const monday=getMondayOfWeek(weekOffset);
   const days=[];
   for(let i=0;i<5;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d);}
+  const perGiorno=(abbonato&&abbonato.modalita==='giornaliera'&&abbonato.perGiorno)||{};
 
-  const dayNames=['LUN','MAR','MER','GIO','VEN'];
+  const nomi=['LUN','MAR','MER','GIO','VEN'];
   days.forEach((d,i)=>{
-    const el=document.getElementById('hd-'+i);
-    el.innerHTML=dayNames[i]+'<br><span style="font-size:12px;font-weight:500;letter-spacing:0">'+formatDateShort(d)+'</span>';
+    const el=$('hd-'+i);
+    const iso=isoLocale(d);
+    let badge='';
+    if(iso in perGiorno){
+      badge=perGiorno[iso]>0?'<br><span class="free-badge">1h gratuita</span>':'<br><span class="free-badge used">1h usata</span>';
+    }
+    el.innerHTML=nomi[i]+'<br><span style="font-size:12px;font-weight:500;letter-spacing:0">'+fmtShort(d)+'</span>'+badge;
     el.classList.toggle('today',isToday(d));
   });
 
-  document.getElementById('week-label').textContent=
-    formatDateShort(days[0])+' – '+formatDateShort(days[4]);
-  document.getElementById('week-sub').textContent=
-    currentWeekOffset===0?'Settimana corrente':
-    currentWeekOffset===1?'Settimana prossima':
-    currentWeekOffset===-1?'Settimana scorsa':'';
+  $('week-label').textContent=fmtShort(days[0])+' – '+fmtShort(days[4]);
+  $('week-sub').textContent=weekOffset===0?'Settimana corrente':weekOffset===1?'Settimana prossima':'';
 
-  const body=document.getElementById('cal-body');
+  const body=$('cal-body');
   body.innerHTML='<div style="grid-column:1/-1;padding:16px;text-align:center;color:var(--ss-muted);font-size:13px">Caricamento disponibilità...</div>';
   const events=await loadEvents(monday);
-  calEvents=events;
+  if(myId!==renderId)return;   // nel frattempo l'utente ha cambiato settimana
 
   body.innerHTML='';
-  const hours=[];
-  for(let h=HOURS_START;h<HOURS_END;h++)hours.push(h);
+  selectedSlots={};
+  $('booking-panel').classList.remove('visible');
 
-  hours.forEach((h,hi)=>{
+  for(let h=HOURS_START;h<HOURS_END;h++){
     const tl=document.createElement('div');
     tl.className='time-label';
     tl.textContent=h+':00';
     body.appendChild(tl);
 
-    days.forEach((d,di)=>{
+    days.forEach(d=>{
       const slot=document.createElement('div');
-      slot.className='slot'+(hi===0?' first-row':'');
+      slot.className='slot'+(h===HOURS_START?' first-row':'');
       const inner=document.createElement('div');
-      inner.className='slot-inner';
-      const slotKey=d.toISOString().split('T')[0]+'-'+h;
+      const iso=isoLocale(d);
+      const ev=eventiNelloSlot(events,d,h);
+      const mio=abbonato&&ev.some(e=>(e.description||'').toUpperCase().indexOf('CODICE: '+abbonato.codice.toUpperCase())>=0);
 
       if(isPast(d,h)){
-        inner.className+=' past';
-        inner.textContent='—';
-      }else if(isSlotBusy(events,d,h)){
-        inner.className+=' busy';
-        inner.textContent='Occupato';
+        inner.className='slot-inner past';inner.textContent='—';
+      }else if(mio){
+        inner.className='slot-inner myslot';inner.textContent='Tu';
+      }else if(ev.length){
+        inner.className='slot-inner busy';inner.textContent='Occupato';
       }else{
-        inner.className+=' free';
-        inner.textContent='Libero';
+        const incl=perGiorno[iso]>0;
+        const base='slot-inner free'+(incl?' incl':'');
+        inner.className=base;
+        inner.dataset.base=base;
+        inner.textContent=incl?'Gratis':'Libero';
         if(abbonato){
-          inner.onclick=()=>toggleSlot(d,h,inner,slotKey);
-          inner.dataset.key=slotKey;
+          const key=iso+'-'+h;
+          inner.onclick=()=>toggleSlot(d,h,inner,key);
         }
       }
       slot.appendChild(inner);
       body.appendChild(slot);
     });
-  });
-
-  // Reset selezione
-  selectedSlots={};
-  document.getElementById('booking-panel').classList.remove('visible');
-  document.getElementById('success-msg').classList.remove('visible');
+  }
 }
 
-// ── Toggle slot (selezione/deselezione multipla) ───────────────────────
 function toggleSlot(date,hour,el,key){
   if(!abbonato)return;
+  $('success-msg').classList.remove('visible');
   if(selectedSlots[key]){
-    // Deseleziona
     delete selectedSlots[key];
-    el.classList.remove('selected');el.classList.add('free');el.textContent='Libero';
+    el.className=el.dataset.base;
+    el.textContent=el.dataset.base.indexOf('incl')>=0?'Gratis':'Libero';
   }else{
-    // Seleziona
     selectedSlots[key]={date,hour};
-    el.classList.remove('free');el.classList.add('selected');el.textContent='✓';
+    el.className='slot-inner selected';
+    el.textContent='✓';
   }
   updateBookingPanel();
 }
 
+// Stessa logica del backend: abbonati per settimana, Giornaliero/Carnet per giorno prenotato.
+function calcolaSplit(slots){
+  let incluse=0;
+  if(abbonato.modalita==='settimanale'){
+    incluse=Math.min(slots.length,Math.floor(abbonato.oreDisponibili||0));
+  }else{
+    const res=Object.assign({},abbonato.perGiorno||{});
+    slots.forEach(s=>{const k=isoLocale(s.date);if(res[k]>=1){incluse++;res[k]--;}});
+  }
+  return {incluse,extra:slots.length-incluse};
+}
+
 function updateBookingPanel(){
-  const slots=Object.values(selectedSlots);
-  const panel=document.getElementById('booking-panel');
-  if(slots.length===0){panel.classList.remove('visible');return;}
+  const slots=Object.values(selectedSlots).sort((a,b)=>a.date-b.date||a.hour-b.hour);
+  const panel=$('booking-panel');
+  if(!slots.length){panel.classList.remove('visible');return;}
 
-  const totOre=slots.length*ORE_SLOT;
-  const oreRimaste=abbonato.oreDisponibili;
-  const incluse=Math.min(totOre,oreRimaste);
-  const extra=totOre-incluse;
-  const costo=calcolaCostoExtra(extra);
+  const {incluse,extra}=calcolaSplit(slots);
+  const costo=costoExtra(extra);
 
-  // Descrizione slot selezionati
-  const slotDesc=slots.map(s=>{
-    const giorno=formatDate(s.date,{weekday:'short',day:'2-digit',month:'short'});
-    return giorno+' '+s.hour+':00–'+(s.hour+1)+':00';
-  }).join(', ');
-
-  document.getElementById('b-giorno').textContent=totOre+' ora'+(totOre>1?'e':'')+' selezionata'+(totOre>1?'e':'');
-  document.getElementById('b-orario').textContent=slotDesc;
-  document.getElementById('b-ore-rimaste').textContent=abbonato.tipoCodice==='carnet'
-    ? 'Sconto 20% su tutte le ore selezionate'
-    : oreRimaste+' h disponibili \u00b7 '+incluse+' h incluse \u00b7 '+extra+' h a pagamento';
+  $('b-ore').textContent=slots.length+(slots.length>1?' ore':' ora');
+  $('b-slot').textContent=slots.map(s=>s.date.toLocaleDateString('it-IT',{weekday:'short',day:'2-digit',month:'short'})+' '+s.hour+':00–'+(s.hour+1)+':00').join(', ');
+  $('b-split').textContent=incluse+' h incluse · '+extra+' h a pagamento';
 
   if(extra===0){
-    document.getElementById('b-totale').textContent='€0 (incluso nel piano)';
-    document.getElementById('b-note').textContent='';
+    $('b-totale').textContent='€0 (incluso nel piano)';
+    $('b-note').textContent='';
   }else{
     const iva=Math.round(costo*0.22);
-    document.getElementById('b-totale').textContent='€'+(costo+iva)+' IVA incl.';
-    document.getElementById('b-note').textContent=extra+' h a tariffa scaglioni (sconto 20% '+(abbonato.tipoCodice==='carnet'?'carnet':'abbonati')+') + IVA';
+    $('b-totale').textContent='€'+(costo+iva)+' IVA incl.';
+    $('b-note').textContent=extra+' h a tariffa scaglioni con sconto 20% (€'+costo+' + IVA). La prenotazione si conferma dopo il pagamento.';
   }
 
+  const cta=$('booking-cta');
+  cta.disabled=false;cta.textContent='Conferma prenotazione';
   panel.classList.add('visible');
-  document.getElementById('booking-cta').disabled=false;
-  document.getElementById('success-msg').classList.remove('visible');
 }
 
-// ── Conferma prenotazione ──────────────────────────────────────────────
 async function confermaPrenotazione(){
   const slots=Object.values(selectedSlots);
-  if(slots.length===0||!abbonato)return;
-  const cta=document.getElementById('booking-cta');
+  if(!slots.length||!abbonato)return;
+  const cta=$('booking-cta');
   cta.disabled=true;cta.textContent='Invio...';
 
-  // Formatta data in locale senza shift UTC
-  function localDateStr(d){
-    const y=d.getFullYear();
-    const m=String(d.getMonth()+1).padStart(2,'0');
-    const g=String(d.getDate()).padStart(2,'0');
-    return y+'-'+m+'-'+g;
-  }
-
   try{
-    // Invia tutti gli slot in una sola chiamata
-    const slotsData=slots.map(s=>localDateStr(s.date)+'T'+String(s.hour).padStart(2,'0')).join(',');
-    const params=new URLSearchParams({
-      action:'prenotaSalaMeeting',
-      codice:abbonato.codice,
-      slots:slotsData,
-      ore:ORE_SLOT
-    });
-    await fetch(WEBAPP_URL+'?'+params.toString());
+    const slotsData=slots.map(s=>isoLocale(s.date)+'T'+String(s.hour).padStart(2,'0')).join(',');
+    const params=new URLSearchParams({action:'prenotaSalaMeeting',codice:abbonato.codice,slots:slotsData});
+    const res=await fetch(WEBAPP_URL+'?'+params.toString());
+    const r=await res.json();
 
-    const totOre=slots.length*ORE_SLOT;
+    if(!r.successo){
+      alert(r.messaggio||'Prenotazione non riuscita. Riprova o scrivi a '+EMAIL);
+      await aggiornaInfoSettimana();
+      await renderCalendar();
+      return;
+    }
 
-    // Marca gli slot nel calendario
-    document.querySelectorAll('.slot-inner.selected').forEach(s=>{
-      s.classList.remove('selected');s.classList.add('myslot');s.textContent='Tu';s.onclick=null;
-    });
-
-    // Aggiorna ore
-    abbonato.oreUsate+=totOre;
-    abbonato.oreDisponibili=Math.max(0,ORE_INCLUSE-abbonato.oreUsate);
-    aggiornaTestataCodice(abbonato, abbonato.oreUsate);
-
-    document.getElementById('booking-panel').classList.remove('visible');
-    document.getElementById('success-msg').classList.add('visible');
-    selectedSlots={};
+    await aggiornaInfoSettimana();
+    await renderCalendar();
+    if(r.oreExtra>0){
+      $('success-title').textContent='Richiesta inviata!';
+      $('success-sub').textContent='Ore incluse: '+r.oreIncluse+' · ore extra: '+r.oreExtra+' ('+r.importo+'). Ti scriviamo per il pagamento: la prenotazione è confermata dopo il saldo.';
+    }else{
+      $('success-title').textContent='Prenotazione confermata!';
+      $('success-sub').textContent='Riceverai una conferma via email.';
+    }
+    $('success-msg').classList.add('visible');
   }catch(e){
     cta.disabled=false;cta.textContent='Conferma prenotazione';
-    alert('Errore durante la prenotazione. Riprova o scrivi a info@sottoscalacoworking.com');
+    alert('Errore durante la prenotazione. Riprova o scrivi a '+EMAIL);
   }
 }
 
-function changeWeek(dir){
-  currentWeekOffset+=dir;
-  if(currentWeekOffset<0)currentWeekOffset=0;
-  renderCalendar();
+async function changeWeek(dir){
+  const nuovo=Math.max(0,weekOffset+dir);
+  if(nuovo===weekOffset)return;
+  weekOffset=nuovo;
+  $('success-msg').classList.remove('visible');
+  await aggiornaInfoSettimana();
+  await renderCalendar();
 }
 
-// Init
-renderCalendar();
-
-// ── Utilities ──────────────────────────────────────────────────────────
-function getMondayOfWeek(offset){
-  const now=new Date();
-  const day=now.getDay()||7;
-  const mon=new Date(now);
-  mon.setHours(0,0,0,0);
-  mon.setDate(now.getDate()-day+1+offset*7);
-  return mon;
-}
-
-function formatDate(d,opts){
-  return d.toLocaleDateString('it-IT',opts||{day:'2-digit',month:'long',year:'numeric'});
-}
-
-function formatDateShort(d){
-  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
-}
-
-function isToday(d){
-  const now=new Date();
-  return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-}
-
-function isPast(d,hour){
-  const now=new Date();
-  const slot=new Date(d);
-  slot.setHours(hour,0,0,0);
-  return slot<=now;
-}
-
-function getSettimanaISO(d){
-  const date=new Date(d);
-  date.setHours(0,0,0,0);
-  date.setDate(date.getDate()+4-(date.getDay()||7));
-  const yearStart=new Date(date.getFullYear(),0,1);
-  return date.getFullYear()+'-W'+Math.ceil((((date-yearStart)/86400000)+1)/7);
-}
-
-// ── Verifica codice abbonato ───────────────────────────────────────────
-async function verificaCodice(){
-  const codice=document.getElementById('f-codice').value.trim();
-  const err=document.getElementById('err-msg');
-  const info=document.getElementById('abbonato-info');
-  err.classList.remove('visible');
-  info.classList.remove('visible');
-  if(!codice)return;
-
-  try{
-    const res=await fetch(WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(codice));
-    const data=await res.json();
-    if(data.valido){
-      abbonato=data;
-      document.getElementById('abbonato-name').textContent='Ciao '+data.nome.split(' ')[0]+'!';
-      aggiornaTestataCodice(data, data.oreUsate);
-      info.classList.add('visible');
-      renderCalendar();
-    }else{
-      err.textContent=data.messaggio||'Codice non trovato.';
-      err.classList.add('visible');
-      abbonato=null;
-    }
-  }catch(e){
-    err.textContent='Errore di connessione. Riprova.';
-    err.classList.add('visible');
-  }
-}
-
-// ── Carica eventi Google Calendar ─────────────────────────────────────
-async function loadEvents(monday){
-  const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59);
-  const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(MEETING_CAL_ID)+
-    '/events?key='+API_KEY+'&timeMin='+monday.toISOString()+'&timeMax='+friday.toISOString()+
-    '&singleEvents=true&fields=items(start,end,summary,description)';
-  try{
-    const res=await fetch(url);
-    const data=await res.json();
-    return data.items||[];
-  }catch(e){return[];}
-}
-
-function isSlotBusy(events,date,hour){
-  const slotStart=new Date(date);slotStart.setHours(hour,0,0,0);
-  const slotEnd=new Date(date);slotEnd.setHours(hour+ORE_SLOT,0,0,0);
-  return events.some(ev=>{
-    const evStart=new Date(ev.start.dateTime||ev.start.date);
-    const evEnd=new Date(ev.end.dateTime||ev.end.date);
-    return slotStart<evEnd&&evStart<slotEnd;
-  });
-}
-
-function isSlotMio(events,date,hour){
-  if(!abbonato)return false;
-  const slotStart=new Date(date);slotStart.setHours(hour,0,0,0);
-  const slotEnd=new Date(date);slotEnd.setHours(hour+ORE_SLOT,0,0,0);
-  return events.some(ev=>{
-    const evStart=new Date(ev.start.dateTime||ev.start.date);
-    const evEnd=new Date(ev.end.dateTime||ev.end.date);
-    const desc=ev.description||'';
-    return slotStart<evEnd&&evStart<slotEnd&&desc.indexOf('Codice: '+abbonato.codice)>=0;
-  });
-}
-
-// ── Render calendario ──────────────────────────────────────────────────
-async function renderCalendar(){
-  const monday=getMondayOfWeek(currentWeekOffset);
-  const days=[];
-  for(let i=0;i<5;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d);}
-
-  // Header
-  const dayNames=['LUN','MAR','MER','GIO','VEN'];
-  days.forEach((d,i)=>{
-    const el=document.getElementById('hd-'+i);
-    el.innerHTML=dayNames[i]+'<br><span style="font-size:12px;font-weight:500;letter-spacing:0">'+formatDateShort(d)+'</span>';
-    el.classList.toggle('today',isToday(d));
-  });
-
-  // Week label
-  document.getElementById('week-label').textContent=
-    formatDateShort(days[0])+' – '+formatDateShort(days[4]);
-  document.getElementById('week-sub').textContent=
-    currentWeekOffset===0?'Settimana corrente':
-    currentWeekOffset===1?'Settimana prossima':
-    currentWeekOffset===-1?'Settimana scorsa':'';
-
-  // Carica eventi
-  const body=document.getElementById('cal-body');
-  body.innerHTML='<div style="grid-column:1/-1;padding:16px;text-align:center;color:var(--ss-muted);font-size:13px">Caricamento disponibilità...</div>';
-  const events=await loadEvents(monday);
-  calEvents=events;
-
-  // Genera griglia
-  body.innerHTML='';
-  const hours=[];
-  for(let h=HOURS_START;h<HOURS_END;h++)hours.push(h);
-
-  hours.forEach((h,hi)=>{
-    const tl=document.createElement('div');
-    tl.className='time-label';
-    tl.textContent=h+':00';
-    body.appendChild(tl);
-
-    days.forEach((d,di)=>{
-      const slot=document.createElement('div');
-      slot.className='slot'+(hi===0?' first-row':'');
-      const inner=document.createElement('div');
-      inner.className='slot-inner';
-
-      if(isPast(d,h)){
-        inner.className+=' past';
-        inner.textContent='—';
-      }else if(isSlotMio(events,d,h)){
-        inner.className+=' myslot';
-        inner.textContent='Tu';
-      }else if(isSlotBusy(events,d,h)){
-        inner.className+=' busy';
-        inner.textContent='Occupato';
-      }else{
-        inner.className+=' free';
-        inner.textContent='Libero';
-        if(abbonato){
-          const slotKey=d.toISOString().split('T')[0]+'-'+h;
-          inner.onclick=()=>toggleSlot(d,h,inner,slotKey);
-          inner.dataset.key=slotKey;
-        }
-      }
-      slot.appendChild(inner);
-      body.appendChild(slot);
-    });
-  });
-
-  // Reset selezione
-  selectedSlot=null;
-  document.getElementById('booking-panel').classList.remove('visible');
-  document.getElementById('success-msg').classList.remove('visible');
-}
-
-function changeWeek(dir){
-  currentWeekOffset+=dir;
-  if(currentWeekOffset<0)currentWeekOffset=0;
-  renderCalendar().then(()=>{if(abbonato)aggiornaOreSettimana();});
-}
-
-async function aggiornaOreSettimana(){
-  if(!abbonato)return;
-  const monday=getMondayOfWeek(currentWeekOffset);
-  function localDateStr(d){
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  }
-  try{
-    const res=await fetch(WEBAPP_URL+'?action=verificaOreAbbonato&codice='+encodeURIComponent(abbonato.codice)+'&dataRif='+localDateStr(monday));
-    const data=await res.json();
-    if(data.valido){
-      abbonato.oreUsate=data.oreUsate;
-      abbonato.oreDisponibili=data.oreDisponibili;
-      const settLabel=currentWeekOffset===0?'Questa settimana':currentWeekOffset===1?'Settimana prossima':'Settimana del '+monday.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
-      aggiornaTestataCodice(abbonato, data.oreUsate, settLabel);
-    }
-  }catch(e){}
-}
-
-// Init
-renderCalendar();
+// ── Avvio ─────────────────────────────────────────────────────────────
+(function init(){
+  $('f-codice').addEventListener('keydown',e=>{if(e.key==='Enter')verificaCodice();});
+  const c=new URLSearchParams(location.search).get('codice');
+  if(c){$('f-codice').value=c.toUpperCase();verificaCodice();}
+  else renderCalendar();
+})();
 </script>
 </body>
 </html>
