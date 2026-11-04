@@ -224,7 +224,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
           <div class="field">
             <label id="t-discount-label">Codice sconto <span style="font-weight:400;text-transform:none" id="t-optional3">(opzionale)</span></label>
             <div class="carnet-row">
-              <div class="field"><input type="text" id="f-sconto" placeholder="Se ne hai uno" oninput="this.value=this.value.toUpperCase()"/></div>
+              <div class="field"><input type="text" id="f-sconto" placeholder="Se ne hai uno" autocomplete="off" oninput="this.value=this.value.toUpperCase();scontoCambiato()"/></div>
               <button class="capply" onclick="applySconto()" id="t-verify-sconto-btn">Verifica</button>
             </div>
             <div class="cst" id="sconto-status"></div>
@@ -264,7 +264,7 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg)}
 <script>
 const API_KEY='AIzaSyCQNCK734VGihl9NlRr8_O4Ku2TyRxbRXk';
 const FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSeOlyyXFxbZEbxDV22YAVPcJ_nHh-qSMD90nRA0Gn422hm4sg/formResponse';
-const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',sconto:'entry.SOSTITUISCI_CON_ID_VERO',lingua:'entry.537193655',orarioMeeting:'entry.1983726910',note:'entry.571263674'};
+const ENTRY={nome:'entry.895383222',email:'entry.2051139569',telefono:'entry.1557765686',spazio:'entry.354362357',piano:'entry.1602908207',data:'entry.1684990418',carnet:'entry.201482006',lingua:'entry.537193655',orarioMeeting:'entry.1983726910',note:'entry.571263674'};
 const CAL_IDS={'Postazione A1':'c_5626fd65f1d3bf5e2de08ace66941c1ef5788f0e7d3d7c2ab400145598b1bad0@group.calendar.google.com','Postazione A2':'c_2b6484d8f49e69b8846ab7b50734f307ad6d004bae1914450d27ed01dd01d030@group.calendar.google.com','Postazione A3':'c_a1637c70424d7c172ad7b0cd43b270c4f83e103882b0cc564b4e207ed4ea129d@group.calendar.google.com','Postazione A4':'c_38b635eca392af24e8b41a9f16d3eeeba12cff5bb085b1bf441e7c767fdbd334@group.calendar.google.com','Postazione B1':'c_daa006a2c5d18c4035a8efb4d20d9953a35f8d76ed9853c0be7a69ab0be9201e@group.calendar.google.com','Postazione B2':'c_9b799bc12c56e875c1762a056871b6defb4792bfcbdf3ada48716c9d33e768e4@group.calendar.google.com','Postazione B3':'c_f9d63b6145e6dfafc2d26c5a90fd4c7c827613c66bd862fe929395de1a0bcf7c@group.calendar.google.com','Postazione B4':'c_2094a4eae0b4a6af0ff57871957e334bc05c3b24bdcffe663bb1b2cbece1a7da@group.calendar.google.com','Sala meeting':'c_0941a7f2564c843bd561e2c06a5107e2d9371dff0177f8d65dcb85a525cd2990@group.calendar.google.com','Postazione alta':'c_00bd8e7c21284caf138df7525533f2277d0d3b1500cadf5dbe4ebac069ecb5d2@group.calendar.google.com','Tavolo workshop':'c_246d1897fae1f13c3007f25f094093718539332c564f0293982a0a7404a2430a@group.calendar.google.com'};
 const SPACES={meeting:{name:'Sala meeting',calName:'Sala meeting',price:25,unit:'/ ora',deskOnly:false},kitchen:{name:'Postazione alta',calName:'Postazione alta',price:19,unit:'/ giorno',deskOnly:true},workshop:{name:'Tavolo workshop',calName:'Tavolo workshop',price:19,unit:'/ giorno',deskOnly:true}};
 const MEETING_HOURS={start:9,end:18};
@@ -276,7 +276,7 @@ const ALL_DESKS=['A1','A2','A3','A4','B1','B2','B3','B4'];
 const ZONES_LOCKABLE=['kitchen','workshop'];
 const CARNET_API_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
 
-let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',planKey='',deskOnly=false,carnetActive=null,scontoAttivo=false;
+let sel=null,isPost=false,isMeeting=false,planPrice=0,planLabel='',planKey='',deskOnly=false,carnetActive=null,scontoAttivo=0,codiceScontoOk='',dataSconto='';
 let currentLang='it';
 
 // ── Traduzioni ──────────────────────────────────────────────────────
@@ -294,10 +294,9 @@ const T={
     nameLbl:'Nome e cognome *', emailLbl:'Email *', phoneLbl:'Telefono', phoneLblReq:'Telefono *',
     carnetLbl:'Codice carnet', optional:'(hai gi\u00e0 un carnet attivo? inserisci qui il codice e clicca Verifica — non serve riselezionare il piano Carnet)',
     discountLbl:'Codice sconto', optionalTag:'(opzionale)',
+    scontoPlaceholder:'Se ne hai uno', scontoSelectFirst:'Seleziona prima spazio, piano e data di inizio.', scontoApplied:'✓ Sconto del {p}% applicato', scontoError:'Errore di verifica, riprova.', scontoCarnet:'Il codice sconto non si applica agli ingressi con carnet.',
     advanceNote:'Le prenotazioni richiedono almeno 48 ore di anticipo.',
     verifyBtn:'Verifica',
-    scontoPlaceholder:'Se ne hai uno', scontoSelectFirst:'Seleziona prima piano e data di inizio.',
-    scontoApplied:'✓ Sconto del 20% applicato', scontoError:'Errore di verifica, riprova.',
     notesLbl:'Note',
     notesPlaceholder:'Es. porto il portatile, ho bisogno di monitor...',
     summaryLabel:'Riepilogo',
@@ -352,10 +351,9 @@ const T={
     nameLbl:'Full name *', emailLbl:'Email *', phoneLbl:'Phone', phoneLblReq:'Phone *',
     carnetLbl:'Carnet code', optional:'(already have an active carnet? enter the code and click Verify — no need to select a Carnet plan again)',
     discountLbl:'Discount code', optionalTag:'(optional)',
+    scontoPlaceholder:'If you have one', scontoSelectFirst:'Select a space, plan and start date first.', scontoApplied:'✓ {p}% discount applied', scontoError:'Verification error, please try again.', scontoCarnet:'Discount codes do not apply to carnet entries.',
     advanceNote:'Bookings require at least 48 hours notice.',
     verifyBtn:'Verify',
-    scontoPlaceholder:'If you have one', scontoSelectFirst:'Select a plan and start date first.',
-    scontoApplied:'✓ 20% discount applied', scontoError:'Verification error, please try again.',
     notesLbl:'Notes',
     notesPlaceholder:'E.g. I\'ll bring my laptop, I need a monitor...',
     summaryLabel:'Summary',
@@ -456,13 +454,13 @@ function setLang(lang){
   aggiornaCampoTelefono();
   document.getElementById('t-carnet-label').firstChild.textContent=t.carnetLbl+' ';
   document.getElementById('t-optional').textContent=t.optional;
-  document.getElementById('t-discount-label').firstChild.textContent=t.discountLbl+' ';
   document.getElementById('advance-note').textContent=t.advanceNote;
-  document.getElementById('t-optional3').textContent=t.optionalTag;
   document.getElementById('t-optional2').textContent=t.optionalTag;
-  document.getElementById('t-verify-btn').textContent=t.verifyBtn;
+  document.getElementById('t-discount-label').firstChild.textContent=t.discountLbl+' ';
+  document.getElementById('t-optional3').textContent=t.optionalTag;
   document.getElementById('t-verify-sconto-btn').textContent=t.verifyBtn;
   document.getElementById('f-sconto').placeholder=t.scontoPlaceholder;
+  document.getElementById('t-verify-btn').textContent=t.verifyBtn;
   document.getElementById('t-notes-label').firstChild.textContent=t.notesLbl+' ';
   document.getElementById('f-note').placeholder=t.notesPlaceholder;
   // Summary rows
@@ -674,7 +672,7 @@ function setPlan(btn){
   const isCarnetPurchase=(btn.dataset.planIt==='Carnet 5'||btn.dataset.planIt==='Carnet 10');
   document.getElementById('carnet-purchase-note').classList.toggle('visible',isCarnetPurchase);
   carnetActive=null;document.getElementById('cst').textContent='';document.getElementById('f-carnet').value='';carnetCambiato();
-  scontoAttivo=false;document.getElementById('sconto-status').className='cst';document.getElementById('sconto-status').textContent='';
+  azzeraSconto();
   if(deskOnly&&sel&&!isPost){clearAllSel();sel=null;resetSelCard();}
   updateZoneLocks();updateSummary();
   if(document.getElementById('din').value)onDateChange();
@@ -700,7 +698,11 @@ async function applyCarnet(){
       st.textContent=t.carnetOk+data.rimanenti+'/'+data.ingressiTotali+t.carnetRemaining+' \u00b7 '+(currentLang==='en'?'valid until ':'valido fino al ')+data.dataScadenza;
       planPrice=0;planLabel='Carnet ('+data.rimanenti+' '+(currentLang==='en'?'left':'rimasti')+')';
       document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
+      planKey='';deskOnly=false;azzeraSconto();
+      ['restrict-note','subscription-date-note','carnet-purchase-note'].forEach(id=>document.getElementById(id).classList.remove('visible'));
+      updateZoneLocks();
       document.getElementById('sp').textContent=planLabel;updateSummary();
+      if(document.getElementById('din').value)onDateChange();
     }else{
       carnetActive=null;st.className='cst cerr';st.textContent=data.messaggio||t.carnetErr;
     }
@@ -711,27 +713,37 @@ async function applyCarnet(){
   btn.disabled=false;
 }
 
+// ── Codice sconto: verificato dal backend sul foglio "CodiciSconto" ──
+function azzeraSconto(){
+  if(!scontoAttivo&&!codiceScontoOk)return;
+  scontoAttivo=0;codiceScontoOk='';
+  const st=document.getElementById('sconto-status');st.className='cst';st.textContent='';
+}
+function scontoCambiato(){
+  if(document.getElementById('f-sconto').value.trim()!==codiceScontoOk){azzeraSconto();updateSummary();}
+}
 async function applySconto(){
   const t=T[currentLang];
-  const v=document.getElementById('f-sconto').value.trim();const st=document.getElementById('sconto-status');
+  const v=document.getElementById('f-sconto').value.trim();
+  const st=document.getElementById('sconto-status');
   const btn=document.getElementById('t-verify-sconto-btn');
-  if(!v){scontoAttivo=false;st.className='cst';st.textContent='';updateSummary();return;}
+  azzeraSconto();
+  if(!v){updateSummary();return;}
+  if(carnetActive){st.className='cst cerr';st.textContent=t.scontoCarnet;return;}
   const d=document.getElementById('din').value;
-  if(!planKey||!d){st.className='cst cerr';st.textContent=t.scontoSelectFirst;return;}
-  btn.disabled=true;
-  st.className='cst';st.textContent='...';
+  if(!sel||isMeeting||!planKey||!d){st.className='cst cerr';st.textContent=t.scontoSelectFirst;return;}
+  btn.disabled=true;st.className='cst';st.textContent='...';
   try{
     const res=await fetch(CARNET_API_URL+'?action=verificaSconto&codice='+encodeURIComponent(v)+'&piano='+encodeURIComponent(planKey)+'&data='+encodeURIComponent(d));
     const data=await res.json();
     if(data.valido){
-      scontoAttivo=true;
-      st.className='cst cok';st.textContent=t.scontoApplied;
+      scontoAttivo=data.sconto;codiceScontoOk=v;dataSconto=d;
+      st.className='cst cok';st.textContent=t.scontoApplied.replace('{p}',data.percentuale);
     }else{
-      scontoAttivo=false;
       st.className='cst cerr';st.textContent=data.messaggio||t.scontoError;
     }
   }catch(e){
-    scontoAttivo=false;st.className='cst cerr';st.textContent=t.scontoError;
+    st.className='cst cerr';st.textContent=t.scontoError;
   }
   btn.disabled=false;updateSummary();
 }
@@ -751,7 +763,7 @@ function resetSelCard(){
 async function onDateChange(){
   const t=T[currentLang];
   const d=document.getElementById('din').value;if(!d)return;
-  scontoAttivo=false;document.getElementById('sconto-status').className='cst';document.getElementById('sconto-status').textContent='';
+  if(codiceScontoOk&&d!==dataSconto)azzeraSconto();
   const dt=new Date(d+'T00:00:00');
   const dayOfWeek=dt.getDay();
   const isWeekend=(dayOfWeek===0||dayOfWeek===6);
@@ -783,6 +795,14 @@ async function onDateChange(){
   updateSummary(false);
 }
 
+// Totale annuo / trimestrale IVA inclusa, calcolato dal prezzo mensile (con eventuale sconto).
+function totalePeriodo(mesi){
+  const r2=n=>Math.round(n*100)/100;
+  const netto=r2(r2(planPrice*(1-scontoAttivo))*mesi);
+  const tot=r2(netto+r2(netto*0.22));
+  return '€'+tot.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
 function updateSummary(blocked){
   const t=T[currentLang];
   const d=document.getElementById('din').value;const cta=document.getElementById('cta');
@@ -792,10 +812,10 @@ function updateSummary(blocked){
   document.getElementById('annual-total-row').style.display=isPerMese&&d?'flex':'none';
   if(isAnnuale){
     document.getElementById('t-annual-total-label').textContent=t.annualTotal;
-    document.getElementById('s-annual-total').textContent='\u20ac2.913,36';
+    document.getElementById('s-annual-total').textContent=totalePeriodo(12);
   }else if(isTrimestrale){
     document.getElementById('t-annual-total-label').textContent=t.quarterlyTotal;
-    document.getElementById('s-annual-total').textContent='\u20ac911,34';
+    document.getElementById('s-annual-total').textContent=totalePeriodo(3);
   }
   if(blocked){
     document.getElementById('sn').textContent='—';
@@ -803,15 +823,13 @@ function updateSummary(blocked){
     cta.disabled=true;cta.textContent=t.ctaUnavailable;return;
   }
   if(sel&&d){
-    const pBase=carnetActive?0:planPrice;
-    const p=(carnetActive||!scontoAttivo)?pBase:Math.round(pBase*0.8*100)/100;
-    const iva=scontoAttivo&&!carnetActive?Math.round(p*100*0.22)/100:Math.round(p*0.22);
-    const tot=scontoAttivo&&!carnetActive?Math.round((p+iva)*100)/100:(p+iva);
+    const p=carnetActive?0:Math.round(planPrice*(1-scontoAttivo)*100)/100;
+    const iva=Math.round(p*22)/100;
+    const tot=Math.round((p+iva)*100)/100;
     const fmt=n=>n.toFixed(2).replace('.',',');
-    const showFmt=scontoAttivo&&!carnetActive;
-    document.getElementById('sn').textContent=carnetActive?'—':'€'+(showFmt?fmt(p):p)+(isPerMese?' /mese':'');
-    document.getElementById('si').textContent=carnetActive?'—':'€'+(showFmt?fmt(iva):iva)+(isPerMese?' /mese':'');
-    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+(showFmt?fmt(tot):tot)+(isPerMese?' /mese':'');
+    document.getElementById('sn').textContent=carnetActive?'—':'€'+fmt(p)+(isPerMese?' /mese':'');
+    document.getElementById('si').textContent=carnetActive?'—':'€'+fmt(iva)+(isPerMese?' /mese':'');
+    document.getElementById('st').textContent=carnetActive?'€0 (carnet)':'€'+fmt(tot)+(isPerMese?' /mese':'');
     cta.disabled=false;cta.textContent=t.ctaConfirm;
   }else{
     document.getElementById('sn').textContent='—';
@@ -826,8 +844,8 @@ async function doBook(){
   const email=document.getElementById('f-email').value.trim();
   const telefono=document.getElementById('f-telefono').value.trim();
   const carnet=document.getElementById('f-carnet').value.trim();
-  const sconto=document.getElementById('f-sconto').value.trim();
   let note=document.getElementById('f-note').value.trim();
+  if(codiceScontoOk&&!carnetActive)note=('Codice sconto: '+codiceScontoOk)+(note?' — '+note:'');
   const data=document.getElementById('din').value;
   if(!nome||!email){alert(t.alertFields);return;}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(t.alertEmail);return;}
@@ -853,7 +871,7 @@ async function doBook(){
   const body=new URLSearchParams();
   body.append(ENTRY.nome,nome);body.append(ENTRY.email,email);body.append(ENTRY.telefono,telefono);
   body.append(ENTRY.spazio,spazioLabel);body.append(ENTRY.piano,planKey||'Giornaliero');body.append(ENTRY.data,data);
-  if(carnet)body.append(ENTRY.carnet,carnet);if(sconto)body.append(ENTRY.sconto,sconto);body.append(ENTRY.lingua,currentLang);if(orarioMeetingVal)body.append(ENTRY.orarioMeeting,orarioMeetingVal);if(note)body.append(ENTRY.note,note);
+  if(carnet)body.append(ENTRY.carnet,carnet);body.append(ENTRY.lingua,currentLang);if(orarioMeetingVal)body.append(ENTRY.orarioMeeting,orarioMeetingVal);if(note)body.append(ENTRY.note,note);
   try{
     await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
     cta.style.display='none';document.getElementById('success-msg').classList.add('visible');
