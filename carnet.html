@@ -58,6 +58,9 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh;col
 .b-date{font-size:14px;font-weight:600}
 .b-space{font-size:12px;color:var(--ss-muted);margin-top:2px}
 .b-note{font-size:11px;color:var(--ss-muted);margin-top:3px}
+.b-meeting{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:#FFF3C4;color:#7a5e00;text-decoration:none}
+a.b-meeting:hover{background:#FFE78A}
+.b-meeting.used{background:#F0F0EE;color:var(--ss-muted)}
 .btn-cancel{padding:8px 14px;background:#fff;border:1.5px solid #B53C1D;color:#B53C1D;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
 .btn-cancel:hover{background:#FDEEEA}
 .btn-cancel:disabled{opacity:0.5;cursor:wait}
@@ -138,6 +141,8 @@ body{font-family:'Inter',sans-serif;background:var(--ss-bg);min-height:100vh;col
 <script>
 const WEBAPP_URL='https://script.google.com/macros/s/AKfycby4hl5vJCxN1BqG_Oq_SXxcnzzL8_jzBDaek0FWCmOQLwMsE76bUAS-246u_lGbKm2n/exec';
 const LOCALE={it:'it-IT',en:'en-GB'};
+const MEETING_URL='sala-meeting.html';
+function linkMeeting(data){return MEETING_URL+'?codice='+encodeURIComponent(codiceCorrente)+(data?'&data='+data:'');}
 
 const T={
   it:{
@@ -161,8 +166,10 @@ const T={
     confirmCancel:'Vuoi cancellare la prenotazione di {s} per {d}? L\'ingresso tornerà sul tuo carnet.',
     cancelledOk:'Prenotazione cancellata. Ingresso restituito: ora ne hai {r} disponibili. Ti abbiamo inviato una mail di conferma.',
     bookNew:'Prenota una nuova data',
-    bookMeeting:'Sala Meeting (sconto 20%)',
-    rules:'<strong>Questa è la tua piattaforma carnet.</strong> Qui trovi tutte le informazioni sui tuoi ingressi: quanti ne hai usati, quanti te ne restano, fino a quando è valido il carnet e le tue prossime prenotazioni. Puoi anche cancellare una prenotazione in autonomia entro le <strong>{h} del giorno prima</strong>, e l\'ingresso torna subito sul tuo carnet. Per qualsiasi altra esigenza, comprese le prenotazioni della Sala Meeting, scrivici a <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
+    bookMeeting:'Sala Meeting',
+    meetingFree:'Sala Meeting: 1 ora gratuita · prenota →',
+    meetingUsed:'Sala Meeting: ora gratuita già usata',
+    rules:'<strong>Questa è la tua piattaforma carnet.</strong> Qui trovi tutte le informazioni sui tuoi ingressi: quanti ne hai usati, quanti te ne restano, fino a quando è valido il carnet e le tue prossime prenotazioni. Puoi anche cancellare una prenotazione in autonomia entro le <strong>{h} del giorno prima</strong>, e l\'ingresso torna subito sul tuo carnet. Per ogni giornata prenotata hai anche <strong>1 ora gratuita di Sala Meeting</strong>: la prenoti dal link giallo sotto la data (le ore in più hanno lo sconto del 20%). Per qualsiasi altra esigenza scrivici a <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
     enterCode:'Inserisci il tuo codice carnet.',
     errors:{
       non_trovato:'Codice non trovato.',
@@ -194,8 +201,10 @@ const T={
     confirmCancel:'Do you want to cancel your booking of {s} for {d}? The entry will be returned to your carnet.',
     cancelledOk:'Booking cancelled. Entry returned: you now have {r} available. We have sent you a confirmation email.',
     bookNew:'Book a new date',
-    bookMeeting:'Meeting Room (20% off)',
-    rules:'<strong>This is your carnet platform.</strong> Here you can find all the information about your entries: how many you have used, how many are left, when your carnet expires and your upcoming bookings. You can also cancel a booking on your own up to <strong>{h} the day before</strong>, and the entry goes straight back to your carnet. For anything else, including Meeting Room bookings, write to <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
+    bookMeeting:'Meeting Room',
+    meetingFree:'Meeting Room: 1 free hour · book →',
+    meetingUsed:'Meeting Room: free hour already used',
+    rules:'<strong>This is your carnet platform.</strong> Here you can find all the information about your entries: how many you have used, how many are left, when your carnet expires and your upcoming bookings. You can also cancel a booking on your own up to <strong>{h} the day before</strong>, and the entry goes straight back to your carnet. Each booked day also includes <strong>1 free hour of Meeting Room</strong>: book it from the yellow link under the date (extra hours get 20% off). For anything else, write to <a href="mailto:info@sottoscalacoworking.com">info@sottoscalacoworking.com</a>.',
     enterCode:'Please enter your carnet code.',
     errors:{
       non_trovato:'Code not found.',
@@ -293,6 +302,7 @@ function render(){
   }else{
     d.prenotazioni.forEach(function(p){list.appendChild(riga(p));});
   }
+  $('t-book-meeting').href=linkMeeting('');
   $('list-panel').classList.add('visible');
 }
 
@@ -309,6 +319,14 @@ function riga(p){
   sp.textContent=nomeSpazio(p.spazio);
   left.appendChild(dt);
   left.appendChild(sp);
+  if(typeof p.oraMeeting==='number'){
+    const m=document.createElement(p.oraMeeting>0?'a':'div');
+    m.className='b-meeting'+(p.oraMeeting>0?'':' used');
+    m.textContent=p.oraMeeting>0?t('meetingFree'):t('meetingUsed');
+    if(p.oraMeeting>0)m.href=linkMeeting(p.data);
+    left.appendChild(m);
+    left.appendChild(document.createElement('br'));
+  }
   if(p.cancellabile){
     const n=document.createElement('div');
     n.className='b-note';
